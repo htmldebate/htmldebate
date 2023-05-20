@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" class="no-select">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTML Debate</title>
+    <link rel="icon" type="image/png" href="content/images/logos/favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="content/styles/main.css">
+</head>
+
+<body class="bg-dark text-white">
+
+    <nav class="navbar navbar-expand-xl navbar-dark py-4" aria-label="Sixth navbar example">
+        <div class="container">
+            <a class="navbar-brand" href="http://www.onixlabs.io/">
+                <img src="content/images/logos/onixlabs.svg" alt="ONIXLabs Limited company logo">
+            </a>
+            <input id="NavBarState" type="checkbox" class="d-none">
+            <label for="NavBarState" class="navbar-toggler">
+                <i class="fa-solid fa-bars"></i>
+                <i class="fa-solid fa-xmark"></i>
+            </label>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto lead">
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link active" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="research.html">Research</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="arguments.html">Arguments</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="references.html">References</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="examples.html">Examples</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container my-5">
+            <div class="row text-center text-sm-start">
+                <div class="col-12">
+                    <h1 class="display-3 fw-bolder">What's this all <span class="text-title">About</span></h1>
+                    <hr>
+                    <h2 class="mt-4">Preface</h2>
+                    <p class="lead mt-4">
+                        HTML and CSS (because we're considering that too) are <strong>undeniably languages used by
+                            programmers</strong>,
+                        although in this context, perhaps better terms would be designers, developers or engineers, but
+                        whether they
+                        constitute <strong>programming languages</strong> has divided the community into two camps, each
+                        stubbornly
+                        defending their position. Mostly I find this debate to be fuelled by trolls who seek to
+                        infuriate their peers, or
+                        gatekeepers who seek to distinguish between those who are programmers and those who are merely
+                        designers.
+                    </p>
+                    <p class="lead mt-4">
+                        Given the depth and breadth of this topic, I cannot possibly draw to conclusion whether HTML and
+                        CSS are, or are not
+                        programming languages, however I would like to draw attention to the evidence, and though
+                        comprehensive research
+                        and analysis, provide a fair and educational review.
+                    </p>
+                    <p class="lead mt-4">
+                        In order to be impartial, <strong>this website uses zero lines of JavaScript or
+                            WebAssembly!</strong> It's also
+                        responsive, which in itself demonstrates some level of conditional logic. Even the navigation
+                        menu (on mobile
+                        devices) is implemented using only HTML and CSS, which is admittedly a bit hacky, goes against
+                        web accessibility
+                        guidelines and ruins the semantics. Whilst you could argue that this behaviour is attributed to
+                        CSS more than it's
+                        attributed to HTML, it does prove that conditional and stateful behaviour can be modelled, at
+                        least in a limited
+                        sense, without resorting to JavaScript or WebAssembly.
+                    </p>
+                    <h2 class="mt-4">Opinion and Conclusion</h2>
+                    <div class="card card-glass-light d-block mt-4 p-3" role="alert">
+                        I highly recommend that you read the
+                        <strong><a href="research.html">Research</a></strong>,
+                        <strong><a href="arguments.html">Arguments</a></strong>, and
+                        <strong><a href="references.html">References</a></strong> before proceeding to read the
+                        conslusion.
+                    </div>
+                    <p class="lead mt-4">
+                        I believe that HTML sits on the cusp of the debate, where the definitions that constitute
+                        <strong>programming</strong> are so broad and varied that it's really difficult to say that it
+                        <strong>definitely
+                            is</strong>, or it <strong>definitely isn&#39;t</strong> a programming language, but if I
+                        were to give any sort
+                        of conclusion based on the evidence, I'd say that <strong>it isn&#39;t</strong>, more than it
+                        is, but I also
+                        wouldn't disqualify HTML entirely.
+                    </p>
+                    <p class="lead mt-4">
+                        HTML is not general-purpose, and it's not Turing-complete, therefore it's not capable of
+                        performing arbitrary
+                        computation. HTML has no mechanism for declaring variables (and no, the <code>&lt;var&gt;</code>
+                        element doesn't
+                        count), although arguably you can declare constants, since all HTML elements are constant
+                        without the use of DOM
+                        manipulation. HTML has limited capacity to read input using buttons, text boxes, select boxes,
+                        check boxes, radio
+                        buttons, and even files via the <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>,
+                        <code>&lt;button&gt;</code>
+                        and <code>&lt;textarea&gt;</code> elements, however these are mostly useless without JavaScript,
+                        WebAssembly, CSS,
+                        or a back-end system, and ultimately require user intervention. HTML has limited capacity to
+                        write output using a
+                        video display unit (since many elements are visual, notably the <code>&lt;svg&gt;</code>
+                        element, capable of
+                        arbitrary drawing) or audio output device (since modern HTML has <code>&lt;audio&gt;</code> and
+                        <code>&lt;video&gt;</code> elements), but no capacity to write output to storage devices (unless
+                        you consider
+                        printing your web pages and storing them on paper, and no, don't take that seriously, because it
+                        doesn't even
+                        remotely qualify). HTML has no mechanism for performing logical, arithmetic or conditional
+                        operations. HTML can
+                        define lists via the <code>&lt;ol&gt;</code> and <code>&lt;ul&gt;</code> elements, but has no
+                        capacity to iterate
+                        over them. Finally, HTML has no mechanism for defining sub-routines, modules, functions, or
+                        procedures. Whilst you
+                        could argue that the <code>&lt;template&gt;</code> element might be equivalent to creating a
+                        declarative sub-routine
+                        or module, it's useless without JavaScript or WebAssembly.
+                    </p>
+                    <p class="lead mt-4">
+                        Whilst HTML is neither general-purpose or Turing-complete, it does constitute a
+                        <strong>limited</strong>,
+                        <strong>declarative</strong> and <strong>domain-specific</strong> language (DSL) that allows you
+                        to declaratively
+                        describe the logical order and semantics of an active document. As a
+                        <strong>declarative</strong> language, as
+                        opposed to an <strong>imperative</strong> language, it allows a developer to describe
+                        <strong>what</strong> should
+                        go on a web page, rather than describing <strong>how</strong> to put it there.
+                    </p>
+                    <p class="lead mt-4">
+                        HTML is an interpreted language and does not <strong>directly</strong> execute on the underlying
+                        machine. Instead,
+                        HTML provides a mechanism to declare <strong>objects</strong> which are interpreted by a web
+                        browser, parsed into a
+                        Document Object Model (DOM) tree which are then executed by the browser, which renders those
+                        objects to a display,
+                        and optionally an audio output device where the document may contain <code>&lt;audio&gt;</code>
+                        or
+                        <code>&lt;video&gt;</code> elements.
+                    </p>
+                    <p class="lead mt-4">
+                        Therefore, HTML <strong>does</strong> affect the <strong>execution state</strong> of the
+                        underlying machine, but
+                        only in an <strong>incredibly limited</strong> sense. Whilst you cannot do much else with pure
+                        HTML, when combined
+                        with CSS (which by many is also <strong>not</strong> considered a programming language), you can
+                        begin to build some
+                        simple and even interactive programs and algorithms, for which I have provided <a
+                            href="examples.html">examples</a>.
+                    </p>
+                    <h2 class="mt-4">About The Author</h2>
+                    <p class="lead mt-4">
+                        I am the founder of ONIXLabs and a Principal Software Engineer at R3, working on Distributed
+                        Ledger Technology and
+                        building software solutions for global financial institutions and regulated markets. I began
+                        programming when I was
+                        fourteen years old using Microsoft QBasic and Visual Basic, however nowadays my favourite
+                        programming languages are
+                        C#, Kotlin and TypeScript.
+                    </p>
+                    <div>
+                        <a class="btn btn-light" href="https://www.onixlabs.io">
+                            <i class="fa-regular fa-circle-dot"></i> onixlabs.io
+                        </a>
+                        <a class="btn btn-light" href="https://twitter.com/onix_labs">
+                            <i class="fa-brands fa-twitter"></i> @onix_labs
+                        </a>
+                        <a class="btn btn-light" href="https://github.com/onix-labs">
+                            <i class="fa-brands fa-github"></i> onix-labs
+                        </a>
+                        <a class="btn btn-dark" href="https://twitter.com/MrMatthewLayton">
+                            <i class="fa-brands fa-twitter"></i> @MrMatthewLayton
+                        </a>
+                        <a class="btn btn-dark" href="https://github.com/MrMatthewLayton">
+                            <i class="fa-brands fa-github"></i> MrMatthewLayton
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

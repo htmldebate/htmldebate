@@ -1,0 +1,134 @@
+html,
+body {
+    background-color: #212529;
+    background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23495057' fill-opacity='0.71' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E"), linear-gradient(45deg, rgba(33, 37, 41, 0.25) 0%, rgba(13, 110, 253, 0.25) 100%);
+    background-attachment: fixed;
+    overscroll-behavior: none;
+}
+
+a {
+    color: #FF7700;
+}
+
+a:hover {
+    color: #BA391C;
+}
+
+code {
+    color: hotpink;
+}
+
+hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+strong {
+    font-weight: bold;
+}
+
+.vh-75 {
+    height: 75vh;
+}
+
+/* NAVBAR */
+
+.navbar-brand img {
+    max-height: 32px;
+}
+
+.navbar-toggler {
+    border: 1px solid transparent;
+    color: var(--bs-white) !important;
+    cursor: pointer;
+}
+
+#NavBarState:not(:checked)+.navbar-toggler .fa-bars {
+    display: block;
+}
+
+#NavBarState:checked+.navbar-toggler .fa-bars {
+    display: none;
+}
+
+#NavBarState:not(:checked)+.navbar-toggler .fa-xmark {
+    display: none;
+}
+
+#NavBarState:checked+.navbar-toggler .fa-xmark {
+    display: block;
+}
+
+#NavBarState:checked~.navbar-collapse {
+    display: block;
+}
+
+/* BUTTONS */
+.btn-primary {
+    background: #FF7700;
+    background: linear-gradient(to bottom left, #FF7700 0%, #C43400 100%);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    filter: brightness(125%);
+    transition-property: filter;
+    transition-duration: 250ms;
+}
+
+.btn-primary:not(:hover) {
+    filter: brightness(100%);
+    transition-property: filter;
+    transition-duration: 250ms;
+}
+
+/* TEXT */
+
+.no-select {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.text-justify {
+    text-align: justify;
+}
+
+.text-opaque {
+    opacity: 60%;
+}
+
+.text-title {
+    background: #FF7700;
+    background: linear-gradient(to bottom left, #FF8800 0%, #EE4400 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.overline {
+    text-decoration: overline;
+}
+
+/* CARDS */
+
+.card-glass-light {
+    backdrop-filter: blur(8px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-glass-dark {
+    backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.25);
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ALERTS */
+
+.alert-danger {
+    background-color: var(--bs-red);
+    border-color: var(--bs-red);
+    color: var(--bs-white);
+}

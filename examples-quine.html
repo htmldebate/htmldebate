@@ -1,0 +1,109 @@
+<html lang="en">
+
+<head>
+    <title>HTML Debate</title>
+</head>
+
+<body>
+    <h1>This page is a HTML quine (a computer program that prints its own source code).</h1>
+    <p>A quine is a computer program which takes no input and produces a copy of its own source code as its only
+        output. The standard terms for these programs in the computability theory and computer science literature are
+        "self-replicating programs", "self-reproducing programs", and "self-copying programs".</p>
+    <a href="https://en.wikipedia.org/wiki/Quine_(computing)">Wikipedia</a>
+    <style>
+        * {
+            display: block;
+            font-family: monospace;
+            font-size: 1em;
+            padding: 0;
+            text-decoration: none;
+        }
+
+        *::before,
+        *::after {
+            color: firebrick;
+            font-weight: 100;
+            font-size: 1.0em;
+        }
+
+        html {
+            max-width: 120ch;
+            margin: auto;
+        }
+
+        style {
+            color: gray;
+            white-space: pre-wrap;
+        }
+
+        html::before {
+            content: "<html>";
+        }
+
+        html::after {
+            content: "</html>";
+        }
+
+        head::before {
+            content: "<head>";
+        }
+
+        head::after {
+            content: "</head>";
+        }
+
+        title::before {
+            content: "<title>";
+        }
+
+        title::after {
+            content: "</title>";
+        }
+
+        body::before {
+            content: "<body>";
+        }
+
+        body::after {
+            content: "</body>";
+        }
+
+        h1::before {
+            content: "<h1>";
+        }
+
+        h1::after {
+            content: "</h1>";
+        }
+
+        p::before {
+            content: '<p>';
+        }
+
+        p::after {
+            content: '</p>';
+        }
+
+        a::before {
+            content: '<a>';
+        }
+
+        a::after {
+            content: '</a>';
+        }
+
+        a[href]::before {
+            content: "<a href='" attr(href) "'>";
+        }
+
+        style::before {
+            content: "<style>";
+        }
+
+        style::after {
+            content: "<\/style>";
+        }
+    </style>
+</body>
+
+</html>

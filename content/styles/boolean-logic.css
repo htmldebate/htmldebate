@@ -1,0 +1,80 @@
+/* GLOBAL */
+/* BUGFIX: The .bool class was added to prevent style conflicts with the navigation menu. */
+
+.bool input[type="checkbox"] {
+    display: none;
+}
+
+.bool input[type="checkbox"]+label:before {
+    cursor: pointer;
+}
+
+.bool input[type="checkbox"]+label:before,
+.bool .output:before {
+    background-color: var(--bs-red);
+    border-radius: var(--bs-border-radius);
+    color: var(--bs-white);
+    content: "0";
+    display: inline-block;
+    font-weight: bold;
+    margin: 2px;
+    padding: 20px 0;
+    text-align: center;
+    width: 64px;
+}
+
+.bool input[type="checkbox"]:checked+label:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+/* AND */
+.bool #AndX:checked~#AndY:checked~#AndR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+/* OR */
+.bool #OrX:checked~#OrR:before,
+.bool #OrY:checked~#OrR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+/* XOR */
+.bool #XorX:checked~#XorR:before,
+.bool #XorY:checked~#XorR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+.bool #XorX:checked~#XorY:checked~#XorR:before {
+    background-color: var(--bs-red);
+    content: "0";
+}
+
+/* NAND */
+.bool #NandX:not(:checked)~#NandR:before,
+.bool #NandY:not(:checked)~#NandR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+/* NOR */
+.bool #NorX:not(:checked)~#NorY:not(:checked)~#NorR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+/* XNOR */
+.bool #XnorX:not(:checked)~#XnorY:not(:checked)~#XnorR:before,
+.bool #XnorX:checked~#XnorY:checked~#XnorR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}
+
+/* NOT */
+.bool #NotX:not(:checked)~#NotR:before {
+    background-color: var(--bs-blue);
+    content: "1";
+}

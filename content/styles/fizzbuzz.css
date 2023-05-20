@@ -1,0 +1,26 @@
+ol#fizzbuzz {
+    list-style: none;
+    counter-reset: item;
+    padding: 0;
+    color: white;
+}
+
+ol#fizzbuzz li {
+    counter-increment: item;
+}
+
+ol#fizzbuzz li:not(:nth-child(3n)):after {
+    content: counter(item);
+}
+
+ol#fizzbuzz li:nth-child(3n):before {
+    color: var(--bs-red);
+    content: "fizz";
+    font-weight: bold;
+}
+
+ol#fizzbuzz li:nth-child(5n):after {
+    color: var(--bs-red);
+    content: "buzz";
+    font-weight: bold;
+}

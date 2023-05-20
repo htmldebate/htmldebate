@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" class="no-select">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTML Debate</title>
+    <link rel="icon" type="image/png" href="content/images/logos/favicon.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="content/styles/main.css">
+</head>
+
+<body class="bg-dark text-white">
+
+    <nav class="navbar navbar-expand-xl navbar-dark py-4" aria-label="Sixth navbar example">
+        <div class="container">
+            <a class="navbar-brand" href="http://www.onixlabs.io/">
+                <img src="content/images/logos/onixlabs.svg" alt="ONIXLabs Limited company logo">
+            </a>
+            <input id="NavBarState" type="checkbox" class="d-none">
+            <label for="NavBarState" class="navbar-toggler">
+                <i class="fa-solid fa-bars"></i>
+                <i class="fa-solid fa-xmark"></i>
+            </label>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto lead">
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="research.html">Research</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="arguments.html">Arguments</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="references.html">References</a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link active" href="examples.html">Examples</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container my-5">
+            <div class="row d-flex align-items-center">
+                <div class="col-6 col-lg-4 col-xl-4 offset-3 offset-lg-4 offset-xl-0 mb-4 order-xl-last">
+                    <img src="content/images/htmlbot.png" alt="HTML 5 Logo" class="img-fluid">
+                </div>
+                <div class="col-12 col-xl-8 text-center text-xl-start order-xl-first">
+                    <h1 class="display-3 fw-bolder">Programming <span class="text-title">Examples</span></h1>
+                    <h2 class="display-5 fw-lighter text-opaque mt-3">How far can we push HTML and CSS</h2>
+                    <p class="lead mt-4">
+                        It turns out that HTML and CSS <strong>can</strong> be used as programming languages, but only
+                        in a
+                        <strong class=fw-bold>very limited</strong> capacity. They're certainly not as powerful or
+                        robust as general-purpose programming languages, and they definitely shouldn't be used that way
+                        either. The following examples serve to prove just how far we can push HTML and CSS.
+                        <strong>No JavaScript or WebAssembly was used!</strong>
+                    </p>
+                </div>
+            </div>
+            <div class="row d-md-block d-lg-none text-center">
+                <div class="col-12">
+                    <div class="alert alert-danger mt-4" role="alert">
+                        These demos are not mobile optimised and are better viewed on a desktop computer.
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-xl-6 h-100 flex-fill mt-4 text-center text-xl-start">
+                    <div class="card card-glass-dark p-3 h-100 shadow">
+                        <h1 class="h2">Fizz <span class="text-title">Buzz</span></h1>
+                        <p class="lead mt-2 flex-fill">
+                            Fizz buzz is a group word game for children to teach them about division. Players take turns
+                            to count incrementally, replacing any number divisible by three with the word "fizz", and
+                            any number divisible by five with the word "buzz".
+                        </p>
+                        <div class="text-center text-xl-end">
+                            <a class="btn btn-primary" href="examples-fizzbuzz.html">
+                                View the Example <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6 flex-fill mt-4 text-center text-xl-start">
+                    <div class="card card-glass-dark p-3 h-100 shadow">
+                        <h1 class="h2">Sieve of <span class="text-title">Eratosthenes</span></h1>
+                        <p class="lead mt-2 flex-fill">
+                            In mathematics, the <strong>sieve of Eratosthenes</strong> is an ancient
+                            <strong>algorithm</strong> for finding all prime numbers up to any given limit.
+                        </p>
+                        <div class="text-center text-xl-end">
+                            <a class="btn btn-primary" href="examples-sieve-of-eratosthenes.html">
+                                View the Example <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6 flex-fill mt-4 text-center text-xl-start">
+                    <div class="card card-glass-dark p-3 h-100 shadow">
+                        <h1 class="h2">Boolean <span class="text-title">Algebra</span></h1>
+                        <p class="lead mt-2 flex-fill">
+                            In mathematics and mathematical logic, <strong>Boolean algebra</strong> is the branch of
+                            algebra in which the values of the variables are the truth values <strong>true</strong>
+                            &amp; <strong class="fw-bold">false</strong>, usually denoted <strong>1</strong> &amp;
+                            <strong class="fw-bold">0</strong>, respectively.
+                        </p>
+                        <div class="text-center text-xl-end">
+                            <a class="btn btn-primary" href="examples-boolean-algebra.html">
+                                View the Example <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6 flex-fill mt-4 text-center text-xl-start">
+                    <div class="card card-glass-dark p-3 h-100 shadow">
+                        <h1 class="h2">HTML <span class="text-title">Quine</span></h1>
+                        <p class="lead mt-2 flex-fill">
+                            A quine is a <strong>computer program</strong> which takes no input and produces a copy of
+                            its own source code as its only output. The standard terms for these programs in the
+                            computability theory and computer science literature are "self-replicating programs",
+                            "self-reproducing programs", and "self-copying programs".
+                        </p>
+                        <div class="text-center text-xl-end">
+                            <a class="btn btn-primary" href="examples-quine.html">
+                                View the Example <i class="fa-solid fa-arrow-right-long ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

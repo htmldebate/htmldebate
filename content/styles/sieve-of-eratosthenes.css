@@ -1,0 +1,65 @@
+.fixed-size-container {
+    display: block;
+    width: 495px;
+}
+
+ol#sieve {
+    list-style: none;
+    counter-reset: item;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+ol#sieve li {
+    counter-increment: item;
+    float: left;
+}
+
+ol#sieve li:before {
+    border-radius: var(--bs-border-radius);
+    color: var(--bs-white);
+    content: counter(item);
+    display: inline-block;
+    font-weight: bold;
+    margin: 2px;
+    padding: 10px 0;
+    text-align: center;
+    width: 45px;
+}
+
+ol#sieve li:first-child::before {
+    background-color: transparent;
+    color: transparent;
+}
+
+ol#sieve li:nth-child(2n):not(:nth-child(2))::before {
+    background-color: var(--bs-red);
+    color: var(--bs-white);
+    font-weight: normal;
+}
+
+ol#sieve li:nth-child(3n):not(:nth-child(3))::before {
+    background-color: var(--bs-green);
+    color: var(--bs-white);
+    font-weight: normal;
+}
+
+ol#sieve li:nth-child(5n):not(:nth-child(5))::before {
+    background-color: var(--bs-blue);
+    color: var(--bs-white);
+    font-weight: normal;
+}
+
+ol#sieve li:nth-child(7n):not(:nth-child(7))::before {
+    background-color: var(--bs-yellow);
+    color: var(--bs-white);
+    font-weight: normal;
+}
+
+#cbShowPrimes:checked~ol>li:nth-child(2n):not(:nth-child(2))::before,
+#cbShowPrimes:checked~ol>li:nth-child(3n):not(:nth-child(3))::before,
+#cbShowPrimes:checked~ol>li:nth-child(5n):not(:nth-child(5))::before,
+#cbShowPrimes:checked~ol>li:nth-child(7n):not(:nth-child(7))::before {
+    display: none !important;
+}
