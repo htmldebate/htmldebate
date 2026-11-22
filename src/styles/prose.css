@@ -1,0 +1,189 @@
+/* Long-form text: articles and biographies rendered from Markdown. */
+
+.prose {
+    color: var(--text);
+    font-size: var(--text-base);
+    line-height: 1.7;
+}
+
+.prose > * + * {
+    margin-top: 1.25em;
+}
+
+.prose h2 {
+    margin-top: 2.2em;
+    font-size: var(--text-3xl);
+    letter-spacing: -0.025em;
+}
+
+.prose h3 {
+    margin-top: 2em;
+    font-size: var(--text-xl);
+}
+
+.prose h4 {
+    margin-top: 1.75em;
+}
+
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + * {
+    margin-top: 0.75em;
+}
+
+.prose a {
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--link) 45%, transparent);
+    text-underline-offset: 0.18em;
+    transition: text-decoration-color var(--duration);
+}
+
+.prose a:hover {
+    text-decoration-color: currentColor;
+}
+
+.prose ul,
+.prose ol {
+    padding-left: 1.4em;
+}
+
+.prose li + li {
+    margin-top: 0.45em;
+}
+
+.prose li::marker {
+    color: var(--text-muted);
+}
+
+.prose blockquote {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-style: normal;
+}
+
+.prose :not(pre) > code {
+    padding: 0.15em 0.4em;
+    border-radius: 0.35rem;
+    background: var(--surface);
+    color: var(--heading);
+    font-size: 0.85em;
+}
+
+.prose pre {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius);
+    background: var(--code-bg);
+    font-size: 0.82em;
+    line-height: 1.7;
+    overflow-x: auto;
+}
+
+.prose pre code {
+    color: var(--text);
+}
+
+/* Syntax highlighting: Prism's token classes, in the --code-* colours. */
+.prose .token.comment,
+.prose .token.prolog,
+.prose .token.doctype,
+.prose .token.cdata {
+    color: var(--code-comment);
+    font-style: italic;
+}
+
+.prose .token.keyword,
+.prose .token.boolean,
+.prose .token.null,
+.prose .token.important,
+.prose .token.atrule {
+    color: var(--code-keyword);
+}
+
+.prose .token.string,
+.prose .token.char,
+.prose .token.template-string,
+.prose .token.regex,
+.prose .token.interpolation-punctuation {
+    color: var(--code-string);
+}
+
+.prose .token.number,
+.prose .token.constant,
+.prose .token.symbol {
+    color: var(--code-number);
+}
+
+.prose .token.class-name,
+.prose .token.builtin,
+.prose .token.type-expression,
+.prose .token.namespace {
+    color: var(--code-type);
+}
+
+.prose .token.function,
+.prose .token.method {
+    color: var(--code-function);
+}
+
+.prose .token.operator,
+.prose .token.entity {
+    color: var(--code-operator);
+}
+
+.prose .token.attribute,
+.prose .token.attr-name,
+.prose .token.annotation,
+.prose .token.property,
+.prose .token.tag {
+    color: var(--code-attribute);
+}
+
+.prose .token.punctuation {
+    color: var(--text-muted);
+}
+
+/* The namespace in a using directive reads as plain text. */
+.prose .token.namespace .token.punctuation {
+    color: inherit;
+}
+
+.prose .table-responsive {
+    border: 1px solid var(--table-border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+}
+
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.prose th,
+.prose td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--table-border);
+    text-align: left;
+    vertical-align: top;
+}
+
+.prose th {
+    background: var(--surface);
+    color: var(--heading);
+    font-weight: 600;
+}
+
+.prose tr:last-child td {
+    border-bottom: 0;
+}
+
+.prose img {
+    border-radius: var(--radius);
+}
+
+.prose hr {
+    margin-block: 2.5em;
+}

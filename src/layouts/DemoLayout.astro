@@ -1,0 +1,78 @@
+---
+import Button from '../components/Button.astro';
+import PageHero from '../components/PageHero.astro';
+import type { Demo } from '../config/demo';
+import { DemoStatus } from '../config/demo-status';
+import { demos } from '../config/demos';
+import BaseLayout from './BaseLayout.astro';
+
+// A demo: its hero, the demo itself on a wide panel, how it works, and the way on to the demos either side.
+interface Props {
+    readonly path: string;
+}
+
+const { path }: Props = Astro.props;
+const ready: ReadonlyArray<Demo> = demos.filter((demo: Demo): boolean => demo.status === DemoStatus.Ready);
+const index: number = ready.findIndex((demo: Demo): boolean => demo.path === path);
+const demo: Demo | undefined = ready[index];
+
+if (demo === undefined) {
+    throw new Error(`src/config/demos.ts has no ready demo at ${path}.`);
+}
+
+const previous: Demo | undefined = ready[index - 1];
+const next: Demo | undefined = ready[index + 1];
+---
+<BaseLayout title={demo.title} description={demo.summary} path={demo.path}>
+    <PageHero label="Demo" title={demo.title} highlight="in HTML and CSS" lead={demo.summary} />
+
+    <div class="container-wide demo-page">
+        <section class="surface demo-stage" aria-label={`The ${demo.title} demo`}>
+            <slot name="demo" />
+        </section>
+
+        <article class="prose demo-notes">
+            <slot />
+        </article>
+
+        <nav class="demo-nav" aria-label="Demos">
+            {previous === undefined
+                ? <Button href="/Demos" variant="ghost">All demos</Button>
+                : <Button href={previous.path} variant="ghost">{previous.title}</Button>}
+            {next === undefined
+                ? <Button href="/Demos" variant="primary">All demos</Button>
+                : <Button href={next.path} variant="primary">Next: {next.title}</Button>}
+        </nav>
+    </div>
+</BaseLayout>
+
+<style>
+    .demo-page {
+        display: grid;
+        gap: clamp(2.5rem, 2rem + 2vw, 4rem);
+        padding-block: var(--space-section);
+    }
+
+    .demo-stage {
+        padding: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+    }
+
+    .demo-notes {
+        max-width: 46rem;
+        font-size: var(--text-lg);
+    }
+
+    .demo-notes > :global(:first-child) {
+        margin-top: 0;
+    }
+
+    .demo-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        max-width: 46rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--border);
+    }
+</style>

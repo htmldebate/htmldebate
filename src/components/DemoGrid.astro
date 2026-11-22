@@ -1,0 +1,81 @@
+---
+import type { Demo } from '../config/demo';
+import { DemoStatus } from '../config/demo-status';
+import { demos } from '../config/demos';
+
+// A card for every demo: a link for each one that's ready, a quieter "coming next" card for each still being built.
+---
+<ul class="demo-grid" role="list">
+    {demos.map((demo: Demo) => (
+        <li>
+            {demo.status === DemoStatus.Ready ? (
+                <a class="tile demo-tile" href={demo.path}>
+                    <h3>{demo.title}</h3>
+                    <p>{demo.summary}</p>
+                    <p class="demo-shows">{demo.shows}</p>
+                </a>
+            ) : (
+                <div class="tile demo-tile is-planned">
+                    <p class="label label-muted">Coming next</p>
+                    <h3>{demo.title}</h3>
+                    <p>{demo.summary}</p>
+                    <p class="demo-shows">{demo.shows}</p>
+                </div>
+            )}
+        </li>
+    ))}
+</ul>
+
+<style>
+    .demo-grid {
+        display: grid;
+        gap: var(--tile-gap);
+        margin: 0;
+        padding: 0;
+    }
+
+    @media (min-width: 40rem) {
+        .demo-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .demo-grid li {
+        display: grid;
+        margin: 0;
+    }
+
+    .demo-tile {
+        display: grid;
+        align-content: start;
+        gap: 0.6rem;
+        padding: 1.5rem;
+    }
+
+    .demo-tile h3 {
+        margin: 0;
+        font-size: var(--text-xl);
+        font-weight: 600;
+    }
+
+    .demo-tile p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: var(--text-base);
+    }
+
+    .demo-tile .demo-shows {
+        color: var(--heading);
+        font-weight: 500;
+    }
+
+    .demo-tile.is-planned {
+        background: var(--surface-alt);
+        box-shadow: none;
+    }
+
+    .demo-tile.is-planned h3,
+    .demo-tile.is-planned .demo-shows {
+        color: var(--text-muted);
+    }
+</style>

@@ -1,0 +1,360 @@
+/*
+ * Design tokens: the Stride design system (onixlabs-stride, D26), mapped onto the website.
+ *
+ * Stride is a soft-UI language: surfaces sit raised above a mid-grey page with a light top edge and a dark bottom
+ * edge, very rounded (squircle) corners, soft shadows, a monochrome primary (near-black in light, near-white in dark)
+ * and Poppins for all text. The website keeps the same token names it always had (--bg, --surface, --heading…) so
+ * components read one vocabulary; each is set to its Stride value, and Stride's own extras (edges, fields, semantic
+ * intents, z-index) are added alongside.
+ *
+ * Accessibility adjustments to Stride: muted text, the coral label and the semantic fills are deepened where Stride's
+ * values fall below WCAG AA (4.5:1) on Stride's own surfaces. Each is marked "AA".
+ *
+ * The ONIXLabs brand (logo gradient, product families) layers on top for marketing moments.
+ */
+
+:root {
+    /* Brand: the eight stops of the logo orb. */
+    --brand-amber: #F79533;
+    --brand-coral: #F37055;
+    --brand-rose: #EF4E7B;
+    --brand-violet: #A166AB;
+    --brand-blue: #5073B8;
+    --brand-cyan: #1098AD;
+    --brand-teal: #07B39B;
+    --brand-green: #6FBA82;
+
+    /* ONIXLabs Studio's own semantic colours, which are Bootstrap's, for the Studio page. */
+    --bs-primary: #0d6efd;
+    --bs-success: #198754;
+    --bs-warning: #ffc107;
+    --bs-danger: #dc3545;
+    --brand-gradient: linear-gradient(90deg, var(--brand-amber), var(--brand-coral), var(--brand-rose), var(--brand-violet), var(--brand-blue), var(--brand-cyan), var(--brand-teal), var(--brand-green));
+    /* Stops for conic gradients; use as conic-gradient(from var(--angle), var(--brand-conic-stops)) on the element
+       itself, so the animated --angle is read there rather than frozen at :root. */
+    --brand-conic-stops: var(--brand-amber), var(--brand-rose), var(--brand-violet), var(--brand-blue), var(--brand-cyan), var(--brand-teal), var(--brand-green), var(--brand-amber);
+
+    /* Product families. Capstone products get their own pair; libraries share the older family pairs. */
+    --family-aero-from: var(--brand-amber);
+    --family-aero-to: var(--brand-rose);
+    --family-studio-from: var(--brand-violet);
+    --family-studio-to: var(--brand-blue);
+    --family-player-from: var(--brand-cyan);
+    --family-player-to: var(--brand-teal);
+    --family-dotnet-from: var(--brand-violet);
+    --family-dotnet-to: var(--brand-blue);
+    --family-corda-from: var(--brand-coral);
+    --family-corda-to: var(--brand-rose);
+    --family-kotlin-from: var(--brand-blue);
+    --family-kotlin-to: var(--brand-cyan);
+
+    /* Type (Stride): Poppins for all text; a monospace for code and technical labels. */
+    --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-body: var(--font-display);
+    --font-sans: var(--font-display);
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+
+    /* Stride's named scale, plus fluid display sizes for marketing headlines. */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.375rem;
+    --text-2xl: 1.75rem;
+    --text-3xl: 2.25rem;
+    --text-4xl: clamp(2.25rem, 1.55rem + 3vw, 3.5rem);
+    --text-5xl: clamp(2.75rem, 1.6rem + 4.8vw, 5rem);
+    --text-hero: clamp(3.25rem, 1.4rem + 7.4vw, 7rem);
+
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-loose: 1.75;
+
+    /* Spacing (Stride): a fixed 0.25rem-based scale for components, fluid tokens for page rhythm. */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 3rem;
+    --space-8: 4rem;
+    --space-section: clamp(4.5rem, 3rem + 5vw, 8.5rem);
+    --gutter: clamp(1.25rem, 0.8rem + 2vw, 2.75rem);
+    --tile-gap: clamp(0.75rem, 0.6rem + 0.6vw, 1.25rem);
+
+    /* Layout */
+    --container: 72rem;
+    --container-wide: 80rem;
+    --container-narrow: 43rem;
+    --lead-width: 56rem;                /* Every standfirst: wide enough to breathe, short of an unreadable line. */
+    --header-height: 4.5rem;            /* includes 0.5rem of vertical padding above and below the bar's content */
+
+    /* Radius (Stride). The scale is set in the @supports blocks at the end: wider for squircle corners, narrower for
+       circular ones, so the perceived roundness is the same either way. The pill is constant. */
+    --radius-pill: 9999px;
+
+    /* Borders and shadows (Stride) */
+    --border-width: 1px;
+    --shadow-sm: 0 0.125rem 0.25rem rgba(16, 24, 40, 0.075);
+    --shadow-md: 0 0.5rem 1rem rgba(16, 24, 40, 0.12);
+    --shadow-button-hover: 0 0.5rem 1rem rgba(16, 24, 40, 0.22);
+    /* The light top edge and dark bottom edge of a raised surface, as inset shadows: they follow a rounded corner, where
+       a top and bottom border taper away and render jagged. Elements set --edge-top and --edge-bottom. */
+    --edge-shadow: inset 0 var(--border-width) 0 var(--edge-top), inset 0 calc(-1 * var(--border-width)) 0 var(--edge-bottom);
+    --shadow-lg: 0 1rem 3rem rgba(16, 24, 40, 0.175);
+
+    /* Motion (Stride) */
+    --duration: 200ms;
+    --transition: var(--duration) ease;
+    --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+    /* Layering (Stride) */
+    --z-dropdown: 1000;
+    --z-sticky: 1010;
+    --z-overlay: 1040;
+    --z-modal: 1050;
+    --z-toast: 1080;
+}
+
+/* Light (Stride's default theme). */
+:root {
+    color-scheme: light;
+
+    /* Surfaces: a mid-grey page, so surfaces read as raised. */
+    --bg: #d8dde2;                      /* a touch lighter than Stride's #ced4da; surfaces still stand off it */
+    --bg-alt: #dee2e6;                 /* the alternate band: Stride's recessed grey */
+    --surface: #e9ecef;
+    --surface-raised: #e9ecef;
+    --surface-alt: #dee2e6;
+    --field: color-mix(in srgb, #dee2e6, white 25%);
+    --field-border: #6a7178;            /* AA: Stride uses #bcbec1 (1.6:1); a control's edge needs 3:1 */
+
+    /* The signature raised treatment: a light top edge and a dark bottom edge. */
+    --edge-light: #ffffff;
+    --edge-dark: #adb5bd;
+    --edge-button: #adb5bd;
+
+    /* Text */
+    --text: #343a40;
+    --heading: #212529;
+    --text-on-bloom: #000000;           /* AA: --heading falls to 4.3:1 on the hero bloom */
+    --text-muted: #4f565d;              /* AA: Stride uses #6c757d (3.1:1 on the page) */
+    --label: #9c3a24;                   /* AA: brand coral, deepened for the grey page */
+    --border: #c3c9cf;
+    --table-border: var(--border);
+    --footer-bg: var(--border);
+    --footer-text-muted: #484f56;       /* AA: --text-muted falls to 4.46:1 on the footer */
+    /* Colours as text (Studio's feature labels and headlines): each named colour deepened only as far as it must be to
+       clear 4.5:1 (--ink-*) or 3:1 for large headlines (--ink-*-large) on both bands, with a little headroom for the browser's rounding. AA. */
+    --ink-amber: color-mix(in srgb, var(--brand-amber), #000 44%);
+    --ink-amber-large: color-mix(in srgb, var(--brand-amber), #000 29%);
+    --ink-coral: color-mix(in srgb, var(--brand-coral), #000 37%);
+    --ink-coral-large: color-mix(in srgb, var(--brand-coral), #000 20%);
+    --ink-rose: color-mix(in srgb, var(--brand-rose), #000 30%);
+    --ink-rose-large: color-mix(in srgb, var(--brand-rose), #000 11%);
+    --ink-violet: color-mix(in srgb, var(--brand-violet), #000 23%);
+    --ink-violet-large: color-mix(in srgb, var(--brand-violet), #000 1%);
+    --ink-blue: color-mix(in srgb, var(--brand-blue), #000 17%);
+    --ink-blue-large: var(--brand-blue);
+    --ink-cyan: color-mix(in srgb, var(--brand-cyan), #000 31%);
+    --ink-cyan-large: color-mix(in srgb, var(--brand-cyan), #000 11%);
+    --ink-teal: color-mix(in srgb, var(--brand-teal), #000 40%);
+    --ink-teal-large: color-mix(in srgb, var(--brand-teal), #000 23%);
+    --ink-green: color-mix(in srgb, var(--brand-green), #000 44%);
+    --ink-green-large: color-mix(in srgb, var(--brand-green), #000 28%);
+    --ink-bs-primary: color-mix(in srgb, var(--bs-primary), #000 19%);
+    --ink-bs-primary-large: var(--bs-primary);
+    --ink-bs-success: color-mix(in srgb, var(--bs-success), #000 19%);
+    --ink-bs-success-large: var(--bs-success);
+    --ink-bs-warning: color-mix(in srgb, var(--bs-warning), #000 53%);
+    --ink-bs-warning-large: color-mix(in srgb, var(--bs-warning), #000 40%);
+    --ink-bs-danger: color-mix(in srgb, var(--bs-danger), #000 19%);
+    --ink-bs-danger-large: var(--bs-danger);
+    --border-strong: #a7aeb5;
+    --link: #212529;
+    --link-decoration: rgba(33, 37, 41, 0.4);
+    --focus: #212529;
+    --focus-ring: rgba(33, 37, 41, 0.3);
+
+    /* Monochrome primary */
+    --accent: #212529;
+    --accent-hover: #000000;
+    --on-accent: #ffffff;
+
+    /* Semantic intents: base fill, text on the fill, subtle background. */
+    --primary: #212529;
+    --primary-contrast: #ffffff;
+    --primary-subtle: #dee2e6;
+    --secondary: #5c636a;               /* AA: Stride uses #6c757d */
+    --secondary-contrast: #ffffff;
+    --secondary-subtle: #dee2e6;
+    --success: #1e7a4f;                 /* AA: Stride uses #34a16e */
+    --success-contrast: #ffffff;
+    --success-subtle: #d1e7dd;
+    --warning: #ffbe45;
+    --warning-contrast: #212529;
+    --warning-subtle: #fff3cd;
+    --danger: #a82633;                  /* AA: Stride uses #f1505f; deep enough for error text on the page */
+    --danger-contrast: #ffffff;
+    --danger-subtle: #f8d7da;
+    --info: #1f62cc;                    /* AA: Stride uses #287fff */
+    --info-contrast: #ffffff;
+    --info-subtle: #d6e5ff;
+    --error: var(--danger);
+
+    /* Site chrome */
+    --header-bg: var(--bg);             /* solid, in the page colour */
+    --header-text: #212529;
+    --code-bg: #dee2e6;
+    /* Syntax colours, from the brand palette, each deepened only as far as 4.5:1 on --code-bg needs. AA. */
+    --code-keyword: #44629c;            /* blue */
+    --code-string: #ac3859;             /* rose */
+    --code-number: #0b6c7b;             /* cyan */
+    --code-type: #046f60;               /* teal */
+    --code-function: #8d551d;           /* amber */
+    --code-comment: #406c4b;            /* green */
+    --code-operator: var(--text);
+    --code-attribute: #815289;          /* violet */
+    --selection: color-mix(in srgb, var(--brand-blue) 25%, transparent);
+    --glow: 0.3;
+    --shadow-tile: var(--shadow-sm);
+    --shadow-tile-hover: var(--shadow-md);
+    --shadow-product: 0 40px 70px -40px rgba(16, 24, 40, 0.45);
+}
+
+/* Dark, when the visitor's device asks for it. The site has no theme switch: a switch that remembers its choice needs
+   JavaScript, which this site never sends. */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+
+        --bg: #212529;
+        --bg-alt: #1b1f23;
+        --surface: #343a40;
+        --surface-raised: #343a40;
+        --surface-alt: #2b3036;
+        --field: #2b3036;
+        --field-border: #858b92;            /* AA: Stride uses #494d52 */
+
+        --edge-light: rgba(255, 255, 255, 0.08);
+        --edge-dark: #000000;
+        --edge-button: #14171a;             /* softer than the surfaces' black edge at a button's size */
+
+        --text: #e9ecef;
+        --heading: #f8f9fa;
+        --text-on-bloom: #ffffff;           /* AA: --heading falls to 4.3:1 on the hero bloom */
+        --text-muted: #b4bbc2;
+        --label: #f58a73;                   /* AA: brand coral, lifted for the dark surfaces */
+        --border: rgba(0, 0, 0, 0.6);
+        --table-border: color-mix(in srgb, var(--surface), #fff 8%);   /* a shade lighter than a table's header row */
+        --footer-bg: var(--border);         /* over the page grey, it settles to #0d0f10 */
+        --footer-text-muted: var(--text-muted);
+        /* Colours as text, lifted only as far as they must be to clear 4.5:1, or 3:1 for large headlines, on both bands. AA. */
+        --ink-amber: var(--brand-amber);
+        --ink-amber-large: var(--brand-amber);
+        --ink-coral: var(--brand-coral);
+        --ink-coral-large: var(--brand-coral);
+        --ink-rose: color-mix(in srgb, var(--brand-rose), #fff 4%);
+        --ink-rose-large: var(--brand-rose);
+        --ink-violet: color-mix(in srgb, var(--brand-violet), #fff 14%);
+        --ink-violet-large: var(--brand-violet);
+        --ink-blue: color-mix(in srgb, var(--brand-blue), #fff 19%);
+        --ink-blue-large: var(--brand-blue);
+        --ink-cyan: color-mix(in srgb, var(--brand-cyan), #fff 2%);
+        --ink-cyan-large: var(--brand-cyan);
+        --ink-teal: var(--brand-teal);
+        --ink-teal-large: var(--brand-teal);
+        --ink-green: var(--brand-green);
+        --ink-green-large: var(--brand-green);
+        --ink-bs-primary: color-mix(in srgb, var(--bs-primary), #fff 20%);
+        --ink-bs-primary-large: var(--bs-primary);
+        --ink-bs-success: color-mix(in srgb, var(--bs-success), #fff 18%);
+        --ink-bs-success-large: var(--bs-success);
+        --ink-bs-warning: var(--bs-warning);
+        --ink-bs-warning-large: var(--bs-warning);
+        --ink-bs-danger: color-mix(in srgb, var(--bs-danger), #fff 23%);
+        --ink-bs-danger-large: var(--bs-danger);
+        --border-strong: #5c636a;
+        --link: #f8f9fa;
+        --link-decoration: rgba(248, 249, 250, 0.4);
+        --focus: #f8f9fa;
+        --focus-ring: rgba(248, 249, 250, 0.35);
+
+        --accent: #f8f9fa;
+        --accent-hover: #ffffff;
+        --on-accent: #212529;
+
+        --primary: #f8f9fa;
+        --primary-contrast: #212529;
+        --primary-subtle: #2b3036;
+        --secondary: #adb5bd;
+        --secondary-contrast: #212529;
+        --secondary-subtle: #343a40;
+        --success: #5cc993;
+        --success-contrast: #0d2a1c;
+        --success-subtle: #0d2a1c;
+        --warning: #ffbe45;
+        --warning-contrast: #212529;
+        --warning-subtle: #332701;
+        --danger: #ff7b87;
+        --danger-contrast: #2c0b0e;
+        --danger-subtle: #2c0b0e;
+        --info: #7aaeff;
+        --info-contrast: #071a3a;
+        --info-subtle: #071a3a;
+        --error: var(--danger);
+
+        --header-bg: var(--bg);
+        --header-text: #f8f9fa;
+        --code-bg: #1b1f23;
+        --code-keyword: #6a88c3;            /* blue, lifted. AA */
+        --code-string: var(--brand-rose);
+        --code-number: var(--brand-cyan);
+        --code-type: var(--brand-teal);
+        --code-function: var(--brand-amber);
+        --code-comment: var(--brand-green);
+        --code-operator: var(--text);
+        --code-attribute: #a974b3;          /* violet, lifted. AA */
+        --selection: color-mix(in srgb, var(--brand-blue) 45%, transparent);
+        --glow: 0.45;
+        --shadow-tile: var(--shadow-sm);
+        --shadow-tile-hover: var(--shadow-md);
+        --shadow-product: 0 40px 80px -40px rgba(0, 0, 0, 0.9);
+}
+}
+
+/*
+ * Corner radii, branched on squircle support (Stride's single central feature query). A squircle corner pulls in
+ * tighter than a circular one, so the radii widen when corner-shape is available and narrow when it isn't.
+ */
+@supports (corner-shape: squircle) {
+    :root {
+        --radius-sm: 0.625rem;
+        --radius: 1.125rem;
+        --radius-lg: 1.625rem;
+        --radius-xl: 2.25rem;
+        --corner-shape: squircle;
+    }
+}
+
+@supports not (corner-shape: squircle) {
+    :root {
+        --radius-sm: 0.5rem;
+        --radius: 0.875rem;
+        --radius-lg: 1.25rem;
+        --radius-xl: 1.75rem;
+        --corner-shape: round;
+    }
+}
+
+/* Panels on the alt band use the raised surface so they still read as distinct from it. */
+.tone-alt {
+    --surface: var(--surface-raised);
+}

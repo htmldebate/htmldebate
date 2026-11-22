@@ -1,0 +1,354 @@
+---
+import type { OutlineEntry } from '../components/outline-entry';
+import ResultsTable from '../components/ResultsTable.astro';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { htmlResults } from '../config/html-results';
+import PartLayout from '../layouts/PartLayout.astro';
+
+const part: DebatePart | undefined = debateParts.find((candidate: DebatePart): boolean => candidate.path === '/HTML');
+
+if (part === undefined) {
+    throw new Error('src/config/debate-parts.ts has no part at /HTML.');
+}
+
+const outline: ReadonlyArray<OutlineEntry> = [
+    { id: 'what-it-does', text: 'More than marking up text' },
+    { id: 'try-it', text: 'Try it: no script required' },
+    { id: 'case-for', text: 'The case for' },
+    { id: 'case-against', text: 'The case against' },
+    { id: 'arguments', text: 'Four arguments, tested' },
+    { id: 'score', text: 'How HTML scores' },
+];
+
+const javascriptFibonacci: string = `function fibonacci(count) {
+    const numbers = [0, 1];
+
+    while (numbers.length < count) {
+        numbers.push(numbers.at(-2) + numbers.at(-1));
+    }
+
+    return numbers;
+}`;
+
+const markupFibonacci: string = `<function name="fibonacci">
+    <parameter name="count" type="int" />
+    <variable name="numbers" value="[0, 1]" />
+    <while>
+        <less-than left="numbers.length" right="count" />
+        <call function="numbers.push">
+            <add>
+                <item of="numbers" index="-2" />
+                <item of="numbers" index="-1" />
+            </add>
+        </call>
+    </while>
+    <return value="numbers" />
+</function>`;
+---
+<PartLayout part={part} outline={outline}>
+    <p>
+        Start with the half of the pair that takes the blame. This part looks at HTML with no CSS and no script: what it
+        does, what it can't, and the arguments people make about it. Then we score it against the four tests from <a href="/Programming">part 1</a>.
+    </p>
+
+    <h2 id="what-it-does">More than marking up text</h2>
+    <p>
+        The usual picture of HTML is of tags wrapped round text: this is a heading, that is a paragraph, this bit is
+        bold. That was roughly true in 1993. Today's HTML describes the whole structure of an application's screen:
+        navigation, sections and articles, images and video, tables, forms with a dozen kinds of input, and a growing
+        set of controls with behaviour built in.
+    </p>
+    <p>
+        Each element means something specific, and every browser agrees on what. Write <code>&lt;button&gt;</code> and
+        you get something that can be focused, pressed with a keyboard, announced by a screen reader and used to send a
+        form, without saying how any of that should happen.
+    </p>
+
+    <h2 id="try-it">Try it: no script required</h2>
+    <p>
+        Here are four things HTML can do on its own. We've styled them to match the site, but the behaviour is all
+        HTML: switch off the site's CSS and every one of them still works.
+    </p>
+
+    <div class="demo surface">
+        <p class="label">A section that opens and closes</p>
+        <details class="disclosure">
+            <summary>What is <code>&lt;details&gt;</code>?</summary>
+            <p>
+                An element the browser shows folded, with its summary as a button. Click the summary and it opens; click
+                again and it closes. The browser remembers which state it's in.
+            </p>
+        </details>
+    </div>
+
+    <div class="demo surface">
+        <p class="label">Only one open at a time</p>
+        <details class="disclosure" name="accordion">
+            <summary>Turing</summary>
+            <p>Described his imaginary machine in 1936.</p>
+        </details>
+        <details class="disclosure" name="accordion">
+            <summary>Berners-Lee</summary>
+            <p>Proposed the web at CERN in 1989, and HTML with it.</p>
+        </details>
+        <details class="disclosure" name="accordion">
+            <summary>Eich</summary>
+            <p>Wrote the first version of JavaScript in 1995, reportedly in ten days.</p>
+        </details>
+        <p class="demo-note">
+            Giving the three the same <code>name</code> tells the browser they're a group, so opening one closes the
+            others. That's a rule, and the browser enforces it.
+        </p>
+    </div>
+
+    <div class="demo surface">
+        <p class="label">A pop-up</p>
+        <button class="button" type="button" popovertarget="html-popover">Show the pop-up</button>
+        <div id="html-popover" class="popover-panel" popover>
+            <p>
+                This panel uses the <code>popover</code> attribute. Pressing Escape or clicking anywhere else closes
+                it, and the browser handles all of that.
+            </p>
+        </div>
+    </div>
+
+    <div class="demo surface">
+        <p class="label">A form that checks itself</p>
+        <form class="checked-form" action="/HTML#accepted" method="get">
+            <div class="field">
+                <label for="ticket">Ticket code</label>
+                <input
+                    class="input"
+                    id="ticket"
+                    name="ticket"
+                    required
+                    pattern="[A-Z]{3}-[0-9]{4}"
+                    placeholder="ABC-1234"
+                    title="Three capital letters, a dash, then four digits"
+                    autocomplete="off"
+                />
+            </div>
+            <div class="field">
+                <label for="seats">Seats (1 to 6)</label>
+                <input class="input" id="seats" name="seats" type="number" min="1" max="6" required />
+            </div>
+            <button class="button button-primary" type="submit">Check</button>
+        </form>
+        <p id="accepted" class="accepted">
+            The browser checked both fields and let the form through. (This message is shown by CSS, which notices the
+            page's address ends in <code>#accepted</code>; we come to CSS in <a href="/CSS">part 3</a>.)
+        </p>
+        <p class="demo-note">
+            The ticket code must match the pattern <code>[A-Z]{'{3}'}-[0-9]{'{4}'}</code>, a regular expression the browser
+            tests your input against. Until both fields are valid, the browser refuses to send the form and tells you
+            why.
+        </p>
+    </div>
+
+    <p>
+        None of that is decoration. The browser is holding state (which section is open), applying rules (only one at a
+        time; the code must match the pattern) and refusing to go on until they're met. The question is whether that
+        amounts to programming.
+    </p>
+
+    <h2 id="case-for">The case for</h2>
+    <p>
+        The strongest case for HTML comes from Professor David Brailsford of the University of Nottingham, in a <a href="https://www.youtube.com/watch?v=4A2mWqLUpzw">Computerphile video</a>.
+        He describes HTML as a very
+        restricted kind of programming language, and the restriction he means is that it's declarative rather than
+        imperative: it states what should result, not the steps to get there.
+    </p>
+    <p>
+        Seen that way, each element is a little like a function call. <code>&lt;h1&gt;</code> asks the browser to
+        draw a heading, attributes are its arguments (<code>&lt;img src="…" width="300"&gt;</code>), and putting one
+        element inside another combines them, the way functions are combined in a functional language. The browser is
+        the interpreter that evaluates the whole thing into the page you see.
+    </p>
+    <p>
+        Answering on Stack Overflow, Chris Pietschmann put the broadest version simply:
+    </p>
+    <blockquote>
+        <p>Any instruction that tells the computer to do something is a programming language.</p>
+        <p class="quote-source">
+            <a href="https://stackoverflow.com/a/145177/1033686">Chris Pietschmann, Stack Overflow</a>
+        </p>
+    </blockquote>
+
+    <h2 id="case-against">The case against</h2>
+    <p>
+        The case against is just as easy to state. Ben Romy, writing for Syracuse University's iSchool, lists what HTML
+        doesn't have:
+    </p>
+    <blockquote>
+        <p>
+            HTML contains no programming logic. It doesn't have common conditional statements such as If/Else. It can't
+            evaluate expressions or do any math. […] You can't declare variables and you can't write functions. […]
+            Think of it this way: you can't compute the sum of 2 + 2 in HTML; that's not what it's for.
+        </p>
+        <p class="quote-source">
+            <a href="https://ischool.syr.edu/why-html-is-not-a-programming-language/">Ben Romy, Syracuse University iSchool</a>
+        </p>
+    </blockquote>
+    <p>
+        On its own terms, that's right. HTML has no variables (and no, the <code>&lt;var&gt;</code> element, which
+        marks up the name of a variable in text, doesn't count). It can't add two numbers, repeat a step, or let you
+        define a piece of behaviour once and reuse it. It can take input through forms, but it can't do anything with
+        that input: it can only check it against fixed rules and hand it to a server, a script or a stylesheet.
+    </p>
+    <p>
+        Hold on to "you can't compute the sum of 2 + 2", though. In <a href="/Together">part 4</a>, HTML and CSS do
+        exactly that.
+    </p>
+
+    <h2 id="arguments">Four arguments, tested</h2>
+    <p>Some arguments come up whenever this debate does. Here's how they hold up.</p>
+
+    <h3>"If HTML is a programming language, so are XML and JSON"</h3>
+    <p>
+        Not quite. XML is HTML's sibling, but it has no vocabulary of its own: you invent the elements, and each program
+        that reads them decides what they mean. JSON is plain data. HTML is different because its elements have fixed,
+        published meanings that every browser carries out in the same way. That's what an interpreter does with a
+        language, and it's why a browser is sometimes compared to a very limited virtual machine. HTML's case may be
+        weak, but XML's and JSON's are weaker.
+    </p>
+
+    <h3>"If HTML is a programming language, so is a Word document"</h3>
+    <p>
+        A Word document is stored as XML too, and Word does have heading styles. But that XML is written by Word, for
+        Word: it's a record of formatting and layout, with no shared vocabulary that other programs carry out in the
+        same way, and nobody writes it by hand. HTML is written by people every day, in a published language that every
+        browser carries out alike. The comparison doesn't hold.
+    </p>
+
+    <h3>"If HTML were a programming language, we wouldn't need JavaScript"</h3>
+    <p>
+        JavaScript arrived in 1995, written by Brendan Eich at Netscape. Rather than add logic to HTML, browsers gained
+        a separate language for it, and there were good reasons. Logic written as markup would be painfully wordy.
+        Compare a short JavaScript function that lists the Fibonacci numbers:
+    </p>
+    <pre><code>{javascriptFibonacci}</code></pre>
+    <p>with the same thing in an imaginary HTML-style syntax:</p>
+    <pre><code>{markupFibonacci}</code></pre>
+    <p>
+        Nobody would choose to write that. Interestingly, it's close to how a compiler sees code internally, as a tree
+        of nested operations, but that's exactly why we write code as text and leave the tree to the machine. The
+        existence of JavaScript shows that logic was better kept out of HTML, not that HTML can't be a programming
+        language.
+    </p>
+
+    <h3>"The browser does all the real work"</h3>
+    <p>
+        True: HTML relies on the browser to turn its descriptions into a page. But every language relies on something
+        to run it. A Python script does nothing without the Python interpreter, and the interpreter relies on the
+        processor. Pointing out that HTML needs a browser tells us how it runs, not whether it's a programming
+        language. The fairer question is how much a language lets you express, and on its own, HTML lets you express
+        very little logic.
+    </p>
+
+    <h2 id="score">How HTML scores</h2>
+    <p>Against the four tests from part 1, HTML on its own comes out like this:</p>
+
+    <ResultsTable subject="HTML" results={htmlResults} />
+
+    <p>
+        So HTML passes the loosest test, fails the strictest, and only just gets a foot in the door of the middle one.
+        It can hold state, but it can't make choices of its own about it. That's where CSS comes in: it can read the
+        state HTML holds, and decide what happens next.
+    </p>
+</PartLayout>
+
+<style>
+    .demo {
+        display: grid;
+        gap: 1rem;
+        justify-items: start;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+    }
+
+    .demo > :global(*) {
+        margin-top: 0;
+    }
+
+    .demo-note {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+    }
+
+    .disclosure {
+        width: 100%;
+        border-radius: var(--radius);
+        corner-shape: var(--corner-shape);
+        background: var(--surface-alt);
+    }
+
+    .disclosure summary {
+        padding: 0.75rem 1rem;
+        color: var(--heading);
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .disclosure p {
+        padding: 0 1rem 1rem;
+        color: var(--text-muted);
+    }
+
+    .demo .disclosure + .disclosure {
+        margin-top: -0.5rem;
+    }
+
+    .popover-panel {
+        max-width: min(26rem, 100vw - 2rem);
+        padding: 1.25rem 1.5rem;
+        border: 0;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: var(--edge-shadow), var(--shadow-lg);
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+    }
+
+    .popover-panel::backdrop {
+        background: color-mix(in srgb, #000 25%, transparent);
+    }
+
+    .checked-form {
+        display: grid;
+        gap: 1rem;
+        width: 100%;
+    }
+
+    @media (min-width: 40rem) {
+        .checked-form {
+            grid-template-columns: 1fr 1fr auto;
+            align-items: end;
+        }
+    }
+
+    .accepted {
+        display: none;
+        padding: 0.85rem 1rem;
+        border-radius: var(--radius);
+        background: var(--success-subtle);
+        color: var(--success);
+        font-size: var(--text-sm);
+    }
+
+    .accepted:target {
+        display: block;
+    }
+
+    .accepted a,
+    .accepted code {
+        color: inherit;
+    }
+
+    .quote-source {
+        margin-top: 0.75rem;
+        font-size: var(--text-sm);
+    }
+</style>

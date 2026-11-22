@@ -1,0 +1,185 @@
+---
+import { buildRule110Selectors } from '../../demos/rule-110/build-rule-110-selectors';
+import { rule110CellId } from '../../demos/rule-110/rule-110-cell-id';
+import type { Rule110Selectors } from '../../demos/rule-110/rule-110-selectors';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const width: number = 16;
+const height: number = 12;
+const rows: ReadonlyArray<number> = Array.from({ length: height }, (_: unknown, index: number): number => index);
+const columns: ReadonlyArray<number> = Array.from({ length: width }, (_: unknown, index: number): number => index);
+
+// Rule 110 itself, as CSS: written at build time by src/demos/rule-110, for this size of grid.
+const selectors: Rule110Selectors = buildRule110Selectors(width, height);
+function prefixed(list: ReadonlyArray<string>): string {
+    return list.map((selector: string): string => `.rule-110 ${selector}`).join(',\n');
+}
+const ruleCss: string = [
+    `${prefixed(selectors.on)} { --state: var(--cell-on); }`,
+    `${prefixed(selectors.missing)} { --state: var(--cell-missing); }`,
+    `${prefixed(selectors.wrong)} { --state: var(--cell-wrong); }`,
+    `${prefixed(selectors.focus)} { outline: 2px solid var(--focus); outline-offset: 1px; }`,
+].join('\n');
+const ruleCount: number = selectors.on.length + selectors.missing.length + selectors.wrong.length;
+
+const cellExample: string = `/* Should be on, because the cell above is on and the one above-right is off */
+#r0c4:checked ~ #r0c5:not(:checked) ~ #r1c4:not(:checked) ~ [for="r1c4"] {
+    /* draw it as "click me" */
+}`;
+---
+<DemoLayout path="/Demos/Rule-110">
+    <div slot="demo" class="rule-110-stage">
+        <div class="rule-110">
+            {rows.map((row: number) => columns.map((column: number) => (
+                <input class="cell-box" type="checkbox" id={rule110CellId(row, column)} checked={row === 0 && column === width - 1} />
+            )))}
+            {rows.map((row: number) => columns.map((column: number) => (
+                <label class:list={['cell', { 'is-start': row === 0 }]} for={rule110CellId(row, column)}>
+                    <span class="visually-hidden">Row {row + 1}, cell {column + 1}</span>
+                </label>
+            )))}
+        </div>
+        <ul class="key" role="list">
+            <li><span class="swatch swatch-on"></span>On</li>
+            <li><span class="swatch swatch-missing"></span>Should be on: click it</li>
+            <li><span class="swatch swatch-wrong"></span>Should be off: click it</li>
+        </ul>
+    </div>
+    <Fragment set:html={`<style>${ruleCss}</style>`} />
+
+    <p>
+        The top row is the starting pattern: click its cells to change it. Every row below follows from the row above, by
+        Rule 110. CSS works out which cells should be on and marks them; your job is to click them, one row at a time.
+        Get one wrong and CSS shows it in red.
+    </p>
+
+    <h2>The rule</h2>
+    <p>
+        Each cell looks at the three cells above it: above-left, directly above, and above-right. There are eight possible
+        patterns, and Rule 110 says which of them switch the cell on:
+    </p>
+    <div class="table-responsive">
+        <table class="rule-table">
+            <thead>
+                <tr>
+                    <th scope="row">Above</th>
+                    <td>111</td><td>110</td><td>101</td><td>100</td><td>011</td><td>010</td><td>001</td><td>000</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Cell</th>
+                    <td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p>
+        Read the bottom row as a binary number, 01101110, and you get 110: that's where the name comes from. It looks
+        like a toy, but in 2004 Matthew Cook published a proof that Rule 110, given a wide enough row and long enough, can
+        compute anything a computer can. It's Turing-complete.
+    </p>
+
+    <h2>How it works</h2>
+    <p>
+        Every cell is a checkbox, so HTML holds the whole grid. The boxes all come first in the page, in reading order,
+        with the labels you see drawn after them. That order matters: CSS's sibling combinator, <code>~</code>, can only
+        look forward, so a cell's label can be reached from the three boxes above it and from its own box:
+    </p>
+    <pre><code>{cellExample}</code></pre>
+    <p>
+        Rule 110 needs three conditions to say when a cell should be on, and two to say when it should be off. Repeat
+        those for every cell in a grid of {width} by {height} and you get {ruleCount} selectors. Nobody wrote them by
+        hand: a small program wrote them when the site was built, and tests check that its conditions match the rule table
+        above exactly. That's no different from a compiler turning code into machine instructions; but it's worth saying,
+        because it's part of the honest answer.
+    </p>
+
+    <h2>You are the clock</h2>
+    <p>
+        CSS knows what every row should be, but it can't make it so. A rule can describe a state; it can't tick a box. So
+        the machine only moves forward when you click, and it stops when the grid runs out. That's why this demo is
+        both the strongest evidence that HTML and CSS can compute anything, and the clearest picture of what they can't
+        do: run on their own.
+    </p>
+</DemoLayout>
+
+<style>
+    .rule-110-stage {
+        display: grid;
+        gap: 1.25rem;
+        justify-items: center;
+    }
+
+    .rule-110 {
+        --cell-on: var(--heading);
+        --cell-missing: color-mix(in srgb, var(--brand-amber) 55%, transparent);
+        --cell-wrong: var(--danger);
+
+        display: grid;
+        grid-template-columns: repeat(16, minmax(0, 2rem));
+        gap: 3px;
+        width: 100%;
+        max-width: 36rem;
+    }
+
+    /* The boxes stay in the page, so the grid can be used with a keyboard, but out of sight behind their labels. */
+    .cell-box {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .cell {
+        --state: var(--surface-alt);
+        aspect-ratio: 1;
+        border-radius: 3px;
+        background: var(--state);
+        cursor: pointer;
+        corner-shape: round;
+    }
+
+    .cell.is-start {
+        box-shadow: inset 0 0 0 1px var(--border-strong);
+    }
+
+    .cell:hover {
+        outline: 2px solid var(--border-strong);
+    }
+
+    .key {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem 1.5rem;
+        margin: 0;
+        padding: 0;
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+    }
+
+    .key li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+    }
+
+    .swatch {
+        width: 1rem;
+        aspect-ratio: 1;
+        border-radius: 3px;
+        corner-shape: round;
+    }
+
+    .swatch-on { background: var(--heading); }
+    .swatch-missing { background: color-mix(in srgb, var(--brand-amber) 55%, transparent); }
+    .swatch-wrong { background: var(--danger); }
+
+    .rule-table td,
+    .rule-table th {
+        font-family: var(--font-mono);
+        text-align: center;
+    }
+</style>

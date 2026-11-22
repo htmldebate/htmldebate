@@ -1,0 +1,51 @@
+---
+import type { GetStaticPathsResult } from 'astro';
+
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { PartStatus } from '../config/part-status';
+import PartLayout from '../layouts/PartLayout.astro';
+
+// The parts still being written: each shows what it will cover. A written part has a page of its own in src/pages.
+export function getStaticPaths(): GetStaticPathsResult {
+    return debateParts
+        .filter((part: DebatePart): boolean => part.status === PartStatus.Planned)
+        .map((part: DebatePart) => ({ params: { part: part.path.slice(1) }, props: { part } }));
+}
+
+interface Props {
+    readonly part: DebatePart;
+}
+
+const { part }: Props = Astro.props;
+---
+<PartLayout part={part}>
+    <div class="surface plan">
+        <p class="label">Being rewritten</p>
+        <h2>What this part will cover</h2>
+        <ul class="plan-points">
+            {part.points.map((point: string) => <li>{point}</li>)}
+        </ul>
+    </div>
+</PartLayout>
+
+<style>
+    .plan {
+        display: grid;
+        gap: 1rem;
+        padding: clamp(1.75rem, 1.4rem + 1.5vw, 2.75rem);
+    }
+
+    .plan h2 {
+        margin-top: 0;
+        font-size: var(--text-3xl);
+    }
+
+    .plan-points {
+        display: grid;
+        gap: 0.75rem;
+        padding-left: 1.25rem;
+        color: var(--text);
+        line-height: 1.6;
+    }
+</style>

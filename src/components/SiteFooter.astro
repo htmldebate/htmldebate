@@ -1,0 +1,189 @@
+---
+import { navigation } from '../config/navigation';
+import type { NavigationItem } from '../config/navigation-item';
+import { site } from '../config/site';
+import Icon from './Icon.astro';
+
+const currentYear: number = new Date().getFullYear();
+---
+<footer class="site-footer">
+    <div class="container-wide">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a class="footer-logo-link" href={site.companyUrl}>
+                    <picture>
+                        <source srcset="/onixlabs/images/logo/logo-full-dark.webp" media="(prefers-color-scheme: dark)" />
+                        <img class="footer-logo" src="/onixlabs/images/logo/logo-full-light.webp" alt={site.companyName} width={153} height={29} loading="lazy" />
+                    </picture>
+                </a>
+                <p class="footer-tagline">{site.companyTagline}</p>
+                <p>
+                    {site.name} is written by <a href={site.authorUrl}>{site.author}</a>, and built from HTML and CSS
+                    alone: this site sends no JavaScript and no WebAssembly to your browser.
+                </p>
+                <ul class="social" role="list">
+                    <li>
+                        <a href={site.repositoryUrl} target="_blank" rel="noopener noreferrer">
+                            <Icon name="github-logo" />
+                            <span class="visually-hidden">The source of this site on GitHub (opens in a new tab)</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <nav class="footer-column" aria-labelledby="footer-debate">
+                <h2 id="footer-debate">The debate</h2>
+                <ul role="list">
+                    {navigation.map((item: NavigationItem) => <li><a href={item.path}>{item.label}</a></li>)}
+                </ul>
+            </nav>
+
+            <nav class="footer-column" aria-labelledby="footer-company">
+                <h2 id="footer-company">{site.companyName}</h2>
+                <ul role="list">
+                    <li><a href={site.companyUrl}>Home</a></li>
+                    <li><a href={`${site.companyUrl}/Products`}>Products</a></li>
+                    <li><a href={`${site.companyUrl}/About`}>About</a></li>
+                    <li><a href={site.authorUrl}>{site.author}</a></li>
+                    <li><a href={`${site.companyUrl}/Contact`}>Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <p class="footer-copyright">&copy; {site.firstPublished}&ndash;{currentYear} {site.companyName}. All rights reserved.</p>
+    </div>
+</footer>
+
+<style>
+    .site-footer {
+        margin-top: auto;
+        --text-muted: var(--footer-text-muted);
+
+        padding-block: clamp(2.5rem, 2rem + 2vw, 3.5rem) 2rem;
+        background: var(--footer-bg);
+        color: var(--text-muted);
+        font-size: var(--text-xs);
+        line-height: 1.5;
+    }
+
+    .footer-grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(2, auto);
+    }
+
+    .footer-brand {
+        display: grid;
+        gap: 1rem;
+        align-content: start;
+        grid-column: 1 / -1;
+        max-width: 24rem;
+    }
+
+    @media (min-width: 56rem) {
+        .footer-grid {
+            grid-template-columns: 2fr 1fr 1fr;
+        }
+
+        .footer-brand {
+            grid-column: auto;
+        }
+    }
+
+    .footer-logo-link,
+    .footer-logo-link picture {
+        display: flex;
+    }
+
+    .footer-logo {
+        width: auto;
+        height: 1.1rem;
+    }
+
+    /* The company tagline, tucked under the logo. */
+    .footer-tagline {
+        margin-top: -0.4rem;
+        color: var(--heading);
+        font-weight: 600;
+    }
+
+    .footer-brand a:not(.footer-logo-link) {
+        color: var(--heading);
+    }
+
+    .social {
+        display: flex;
+        gap: 0.25rem;
+        margin-left: -0.5rem;
+    }
+
+    .social a {
+        display: grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        transition: color var(--duration), background-color var(--duration);
+    }
+
+    .social a:hover {
+        background: color-mix(in srgb, var(--heading) 8%, transparent);
+        color: var(--heading);
+    }
+
+    .footer-column h2 {
+        margin-bottom: 0.75rem;
+        color: var(--heading);
+        font-family: var(--font-body);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        letter-spacing: 0;
+    }
+
+    .footer-column ul {
+        display: grid;
+        gap: 0.6rem;
+    }
+
+    .footer-column a {
+        color: var(--text-muted);
+    }
+
+    .footer-column a:hover {
+        color: var(--heading);
+    }
+
+    .footer-copyright {
+        margin-top: 2.5rem;
+    }
+
+    /* Narrow screens, where the brand sits above the columns: the brand is centred, and the social links wear their
+       hover tint from the start, since there's no hover to reveal it. */
+    @media (max-width: 55.99rem) {
+        .footer-brand {
+            justify-items: center;
+            max-width: none;
+            text-align: center;
+        }
+
+        .social {
+            justify-content: center;
+            margin-left: 0;
+        }
+
+        .social a {
+            background: color-mix(in srgb, var(--heading) 8%, transparent);
+            color: var(--heading);
+        }
+
+        .footer-grid {
+            justify-content: space-evenly;
+        }
+
+        .footer-copyright {
+            text-align: center;
+        }
+    }
+</style>

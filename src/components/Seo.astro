@@ -1,0 +1,24 @@
+---
+import { site } from '../config/site';
+
+interface Props {
+    readonly title: string;
+    readonly description: string;
+    readonly path: string;
+}
+
+const { title, description, path }: Props = Astro.props;
+const fullTitle: string = path === '/' ? site.name : `${title} | ${site.shortName}`;
+const canonical: string = new URL(path, site.url).href;
+---
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="author" content={site.author} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:locale" content={site.locale} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />

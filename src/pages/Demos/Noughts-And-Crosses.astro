@@ -1,0 +1,172 @@
+---
+import { buildNoughtsAndCrossesCss } from '../../demos/noughts-and-crosses/build-noughts-and-crosses-css';
+import { playerForMove } from '../../demos/noughts-and-crosses/player-for-move';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const moves: ReadonlyArray<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const squares: ReadonlyArray<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+const squareNames: ReadonlyArray<string> = [
+    'top left', 'top middle', 'top right',
+    'middle left', 'centre', 'middle right',
+    'bottom left', 'bottom middle', 'bottom right',
+];
+
+// The rules of the game, as CSS: written at build time by src/demos/noughts-and-crosses.
+const gameCss: string = buildNoughtsAndCrossesCss();
+
+function placement(square: number): string {
+    return `grid-area: ${String(Math.floor(square / 3) + 1)} / ${String((square % 3) + 1)}`;
+}
+
+const moveExample: string = `<label class="cell move-3 square-4">
+    <input type="radio" name="m3" value="4" class="x">
+    X
+</label>`;
+
+const winExample: string = `.game:has(.x[value="0"]:checked):has(.x[value="4"]:checked):has(.x[value="8"]:checked)
+    .status::before {
+    content: "X wins!";
+}`;
+---
+<DemoLayout path="/Demos/Noughts-And-Crosses">
+    <form slot="demo" class="game" aria-label="Noughts and crosses">
+        <p class="status" aria-live="polite"></p>
+
+        <div class="board">
+            {squares.map((square: number) => <span class="tile" style={placement(square)} aria-hidden="true"></span>)}
+            {moves.map((move: number) => squares.map((square: number) => (
+                <label class={`cell move-${String(move)} square-${String(square)}`} style={placement(square)}>
+                    <input type="radio" name={`m${String(move)}`} value={String(square)} class={playerForMove(move)} />
+                    <span class="visually-hidden">Put {playerForMove(move).toUpperCase()} in the {squareNames[square]}</span>
+                    <span class="mark" aria-hidden="true">{playerForMove(move).toUpperCase()}</span>
+                </label>
+            )))}
+        </div>
+
+        <button class="button" type="reset">New game</button>
+    </form>
+    <Fragment set:html={`<style>${gameCss}</style>`} />
+
+    <p>
+        Two players, one screen: X goes first, then take turns. The game refuses a square that's already taken, says
+        whose turn it is, and spots a line of three or a draw. "New game" clears the board.
+    </p>
+
+    <h2>How it works</h2>
+    <p>
+        The game's memory is nine groups of radio buttons, one group for each move, with an option in each group for every
+        square. Choosing the third move in the centre ticks this option:
+    </p>
+    <pre><code>{moveExample}</code></pre>
+    <p>
+        Radio buttons suit a game well: a group can only have one choice, so a move can only go in one square. Odd moves
+        belong to X and even moves to O, so the board never has to count whose turn it is; it only has to know which move
+        comes next.
+    </p>
+    <p>CSS supplies the rules:</p>
+    <ul>
+        <li>A move's squares appear only once the move before it has been made, and disappear once it has been made itself.</li>
+        <li>A square that has been played is hidden from every later move, so it can't be played twice.</li>
+        <li>
+            Each of the eight lines is a rule that looks for three of the same mark. When one matches, it announces the winner,
+            hides the rest of the board and marks the line. Here is the diagonal from top left:
+        </li>
+    </ul>
+    <pre><code>{winExample}</code></pre>
+    <p>
+        The "New game" button is HTML too: a reset button puts every input in the form back the way it started.
+    </p>
+    <p>
+        That's about seventy rules in all, written by a small program when the site is built, rather than by hand. Every
+        one is a plain CSS rule; the program just saves typing out the same pattern for every move, square and line.
+    </p>
+
+    <h2>What it doesn't do</h2>
+    <p>
+        It doesn't play against you. A computer opponent has to look ahead, imagining moves and their replies, and choose
+        the best; that's a search, and as <a href="/Together#limit">part 4</a> explains, searching is exactly what HTML
+        and CSS can't do. They can referee a game. They can't play one.
+    </p>
+</DemoLayout>
+
+<style>
+    .game {
+        display: grid;
+        gap: 1.25rem;
+        justify-items: center;
+    }
+
+    .status {
+        color: var(--heading);
+        font-size: var(--text-xl);
+        font-weight: 600;
+    }
+
+    .status::before {
+        content: 'X to play';
+    }
+
+    .board {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 6rem));
+        grid-template-rows: repeat(3, minmax(0, 6rem));
+        gap: 0.5rem;
+    }
+
+    .tile {
+        border-radius: var(--radius);
+        background: var(--surface-alt);
+    }
+
+    /* A cell is hidden until a rule opens it for the move in play, or until it's been chosen. */
+    .cell {
+        --winning: 0;
+        position: relative;
+        display: none;
+        place-items: center;
+        border-radius: var(--radius);
+        background: color-mix(in srgb, var(--brand-teal) calc(var(--winning) * 45%), transparent);
+        cursor: pointer;
+    }
+
+    .cell:has(:checked) {
+        display: grid;
+        cursor: default;
+    }
+
+    .cell input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .cell:has(:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    .mark {
+        font-size: 3.25rem;
+        font-weight: 700;
+        line-height: 1;
+        opacity: 0;
+    }
+
+    .cell:has(:checked) .mark {
+        opacity: 1;
+    }
+
+    /* A faint preview of the mark that would go here. */
+    .cell:not(:has(:checked)):hover .mark {
+        opacity: 0.25;
+    }
+
+    .cell:has(.x) .mark {
+        color: var(--ink-blue-large);
+    }
+
+    .cell:has(.o) .mark {
+        color: var(--ink-rose-large);
+    }
+</style>

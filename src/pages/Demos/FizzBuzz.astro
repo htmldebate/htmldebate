@@ -1,0 +1,102 @@
+---
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const numbers: ReadonlyArray<number> = Array.from({ length: 100 }, (_: unknown, index: number): number => index + 1);
+
+const fizzBuzzExample: string = `li { counter-increment: number; }
+
+li:not(:nth-child(3n)):not(:nth-child(5n))::after {
+    content: counter(number);
+}
+
+li:nth-child(3n)::before { content: "Fizz"; }
+li:nth-child(5n)::after { content: "Buzz"; }`;
+---
+<DemoLayout path="/Demos/FizzBuzz">
+    <ol slot="demo" class="fizzbuzz" role="list" aria-label="FizzBuzz from 1 to 100">
+        {numbers.map(() => <li></li>)}
+    </ol>
+
+    <p>
+        FizzBuzz began as a counting game for children and became a famous first test in programming interviews,
+        because solving it takes a loop, a counter and a couple of decisions: the basics of programming in miniature.
+        The list above is a hundred empty list items; everything you can read in it was put there by CSS.
+    </p>
+
+    <h2>How it works</h2>
+    <p>The whole of the logic is five rules:</p>
+    <pre><code>{fizzBuzzExample}</code></pre>
+    <ul>
+        <li>
+            A CSS counter goes up by one on each list item, so each item knows its number without the HTML saying so.
+        </li>
+        <li>
+            <code>:nth-child(3n)</code> matches every third item, which is the same as asking whether its number is
+            divisible by 3. Those items start with "Fizz".
+        </li>
+        <li><code>:nth-child(5n)</code> does the same for 5, and ends those items with "Buzz".</li>
+        <li>
+            An item divisible by both gets both, so 15, 30 and 45 read "FizzBuzz" without a rule of their own. Every other
+            item shows its number.
+        </li>
+    </ul>
+    <p>
+        Add more list items and the rules carry on; nothing in the CSS knows there are a hundred. What the CSS can't do
+        is make the list longer: the HTML decides how far it counts.
+    </p>
+</DemoLayout>
+
+<style>
+    .fizzbuzz {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        counter-reset: number;
+    }
+
+    .fizzbuzz li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.75rem;
+        padding-inline: 0.25rem;
+        border-radius: var(--radius-sm);
+        background: var(--surface-alt);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        counter-increment: number;
+    }
+
+    .fizzbuzz li:not(:nth-child(3n)):not(:nth-child(5n))::after {
+        content: counter(number);
+    }
+
+    .fizzbuzz li:nth-child(3n)::before {
+        content: 'Fizz';
+    }
+
+    .fizzbuzz li:nth-child(5n)::after {
+        content: 'Buzz';
+    }
+
+    .fizzbuzz li:nth-child(3n),
+    .fizzbuzz li:nth-child(5n) {
+        color: #000;
+        font-weight: 600;
+    }
+
+    .fizzbuzz li:nth-child(3n) {
+        background: var(--brand-amber);
+    }
+
+    .fizzbuzz li:nth-child(5n) {
+        background: var(--brand-teal);
+    }
+
+    .fizzbuzz li:nth-child(15n) {
+        background: linear-gradient(90deg, var(--brand-amber), var(--brand-teal));
+    }
+</style>
