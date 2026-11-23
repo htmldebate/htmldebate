@@ -67,8 +67,9 @@ export const debateParts: ReadonlyArray<DebatePart> = [
         number: 5,
         status: PartStatus.Written,
         path: '/Verdict',
-        title: 'The verdict:',
+        title: 'The verdict is',
         highlight: 'it depends',
+        shortTitle: 'The verdict',
         summary:
             'The answer changes with the test you choose. Here is how HTML, CSS and the two together score against ' +
             'each one, and why the honest conclusion is undecided.',

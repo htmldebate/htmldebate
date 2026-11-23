@@ -576,12 +576,17 @@ a.tile:hover {
     transform: none;
 }
 
+.button-ghost .button-leading-icon,
 .button-ghost .button-trailing-icon {
     transition: translate var(--transition);
 }
 
 .button-ghost:hover .button-trailing-icon {
     translate: 0.25rem 0;
+}
+
+.button-ghost:hover .button-leading-icon {
+    translate: -0.25rem 0;
 }
 
 .button-small {

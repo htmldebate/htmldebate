@@ -1,20 +1,19 @@
 ---
-// The hero that opens each page: a label, a two-part headline over the brand bloom, and a standfirst. `display` sets the
-// headline at the site's largest size, for the home page.
+// The hero that opens each page, as LibraryHero does on the ONIXLabs site: a label, a two-part headline at the site's
+// largest size over the brand bloom, and a standfirst.
 interface Props {
     readonly label?: string;
     readonly title: string;
     readonly highlight: string;
     readonly lead: string;
-    readonly display?: boolean;
 }
 
-const { label, title, highlight, lead, display = false }: Props = Astro.props;
+const { label, title, highlight, lead }: Props = Astro.props;
 ---
-<section class:list={['hero-bloom page-hero', { 'is-display': display }]} aria-labelledby="page-title">
+<section class="hero-bloom page-hero" aria-labelledby="page-title">
     <div class="page-hero-copy">
         {label !== undefined && <p class="label rise">{label}</p>}
-        <h1 id="page-title" class:list={['rise', { display }]}>
+        <h1 id="page-title" class="display rise">
             {title}{' '}
             <span class="gradient-text">{highlight}</span>
         </h1>
@@ -25,12 +24,8 @@ const { label, title, highlight, lead, display = false }: Props = Astro.props;
 
 <style>
     .page-hero {
-        padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem) clamp(4.5rem, 3rem + 6vw, 8.5rem);
-        overflow: clip;
-    }
-
-    .page-hero.is-display {
         padding-block: clamp(4rem, 3rem + 5vw, 7.5rem) clamp(5rem, 3.5rem + 7vw, 10rem);
+        overflow: clip;
     }
 
     .page-hero-copy {

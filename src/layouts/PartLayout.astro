@@ -15,6 +15,11 @@ interface Props {
 const { part, outline = [] }: Props = Astro.props;
 const previous: DebatePart | undefined = debateParts.find((other: DebatePart): boolean => other.number === part.number - 1);
 const next: DebatePart | undefined = debateParts.find((other: DebatePart): boolean => other.number === part.number + 1);
+
+// One string, rather than values spaced out in the template: Astro drops a lone space between two values in a slot.
+function buttonLabel(target: DebatePart): string {
+    return `Part ${String(target.number)}: ${target.shortTitle ?? `${target.title} ${target.highlight}`}`;
+}
 ---
 <BaseLayout title={`${part.title} ${part.highlight}`} description={part.summary} path={part.path}>
     <PageHero label={`Part ${part.number} of ${debateParts.length}`} title={part.title} highlight={part.highlight} lead={part.summary} />
@@ -35,11 +40,11 @@ const next: DebatePart | undefined = debateParts.find((other: DebatePart): boole
 
         <nav class="part-nav" aria-label="Parts">
             {previous === undefined
-                ? <Button href="/" variant="ghost">Introduction</Button>
-                : <Button href={previous.path} variant="ghost">Part {previous.number}: {previous.title} {previous.highlight}</Button>}
+                ? <Button href="/" variant="ghost" leadingIcon="arrow-left-bold">Introduction</Button>
+                : <Button href={previous.path} variant="ghost" leadingIcon="arrow-left-bold">{buttonLabel(previous)}</Button>}
             {next === undefined
                 ? <Button href="/Sources" variant="primary">Sources</Button>
-                : <Button href={next.path} variant="primary">Part {next.number}: {next.title} {next.highlight}</Button>}
+                : <Button href={next.path} variant="primary">{buttonLabel(next)}</Button>}
         </nav>
     </div>
 </BaseLayout>

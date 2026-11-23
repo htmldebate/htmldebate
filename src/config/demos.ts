@@ -29,6 +29,7 @@ export const demos: ReadonlyArray<Demo> = [
         summary: 'A page that shows its own source code, and nothing else.',
         shows: 'CSS can reproduce the document it styles.',
         status: DemoStatus.Ready,
+        isStandalone: true,
     },
     {
         path: '/Demos/Adder',

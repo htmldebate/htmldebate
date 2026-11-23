@@ -2,6 +2,7 @@
 import { buildRule110Selectors } from '../../demos/rule-110/build-rule-110-selectors';
 import { rule110CellId } from '../../demos/rule-110/rule-110-cell-id';
 import type { Rule110Selectors } from '../../demos/rule-110/rule-110-selectors';
+import Disclosure from '../../components/Disclosure.astro';
 import DemoLayout from '../../layouts/DemoLayout.astro';
 
 const width: number = 16;
@@ -22,91 +23,178 @@ const ruleCss: string = [
 ].join('\n');
 const ruleCount: number = selectors.on.length + selectors.missing.length + selectors.wrong.length;
 
-const cellExample: string = `/* Should be on, because the cell above is on and the one above-right is off */
-#r0c4:checked ~ #r0c5:not(:checked) ~ #r1c4:not(:checked) ~ [for="r1c4"] {
-    /* draw it as "click me" */
+// The real rules for one cell, so what's shown is what runs.
+const sampleCell: string = rule110CellId(1, 4);
+
+function rulesForSample(list: ReadonlyArray<string>, state: string): string {
+    return list
+        .filter((selector: string): boolean => selector.endsWith(`[for="${sampleCell}"]`))
+        .map((selector: string): string => `${selector} {\n    --state: var(${state});\n}`)
+        .join('\n\n');
+}
+
+const gridExample: string = `<input class="cell-box" type="checkbox" id="r0c0">
+<input class="cell-box" type="checkbox" id="r0c1">
+<!-- … every box, in reading order, then … -->
+
+<label class="cell" for="r0c0">Row 1, cell 1</label>
+<label class="cell" for="r0c1">Row 1, cell 2</label>
+<!-- … every label, in the same order -->`;
+const onExample: string = rulesForSample(selectors.on, '--cell-on');
+const missingExample: string = rulesForSample(selectors.missing, '--cell-missing');
+const wrongExample: string = rulesForSample(selectors.wrong, '--cell-wrong');
+
+const drawExample: string = `.cell {
+    --state: var(--surface-alt);
+    background: var(--state);
 }`;
 ---
 <DemoLayout path="/Demos/Rule-110">
-    <div slot="demo" class="rule-110-stage">
-        <div class="rule-110">
-            {rows.map((row: number) => columns.map((column: number) => (
-                <input class="cell-box" type="checkbox" id={rule110CellId(row, column)} checked={row === 0 && column === width - 1} />
-            )))}
-            {rows.map((row: number) => columns.map((column: number) => (
-                <label class:list={['cell', { 'is-start': row === 0 }]} for={rule110CellId(row, column)}>
-                    <span class="visually-hidden">Row {row + 1}, cell {column + 1}</span>
-                </label>
-            )))}
+    <Fragment slot="what">
+        <p>
+            Rule 110 is a row of cells, each on or off, and one rule for working out the next row from the last.
+        </p>
+        <p>
+            Each cell looks at the three cells above it: above-left, directly above, and above-right. There are eight possible
+            patterns, and Rule 110 says which of them switch the cell on:
+        </p>
+        <div class="table-responsive">
+            <table class="rule-table">
+                <thead>
+                    <tr>
+                        <th scope="row">Above</th>
+                        <td>111</td><td>110</td><td>101</td><td>100</td><td>011</td><td>010</td><td>001</td><td>000</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Cell</th>
+                        <td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <ul class="key" role="list">
-            <li><span class="swatch swatch-on"></span>On</li>
-            <li><span class="swatch swatch-missing"></span>Should be on: click it</li>
-            <li><span class="swatch swatch-wrong"></span>Should be off: click it</li>
-        </ul>
-    </div>
-    <Fragment set:html={`<style>${ruleCss}</style>`} />
+        <p>
+            Read the bottom row as a binary number, 01101110, and you get 110: that's where the name comes from.
+        </p>
+        <p>
+            The top row is the starting pattern: click its cells to change it. Every row below follows from the row above, by
+            Rule 110. CSS works out which cells should be on and marks them; your job is to click them, one row at a time.
+            Get one wrong and CSS shows it in red.
+        </p>
+    </Fragment>
 
-    <p>
-        The top row is the starting pattern: click its cells to change it. Every row below follows from the row above, by
-        Rule 110. CSS works out which cells should be on and marks them; your job is to click them, one row at a time.
-        Get one wrong and CSS shows it in red.
-    </p>
+    <Fragment slot="demo">
+        <div class="rule-110-stage">
+            <div class="rule-110">
+                {rows.map((row: number) => columns.map((column: number) => (
+                    <input class="cell-box" type="checkbox" id={rule110CellId(row, column)} checked={row === 0 && column === width - 1} />
+                )))}
+                {rows.map((row: number) => columns.map((column: number) => (
+                    <label class:list={['cell', { 'is-start': row === 0 }]} for={rule110CellId(row, column)}>
+                        <span class="visually-hidden">Row {row + 1}, cell {column + 1}</span>
+                    </label>
+                )))}
+            </div>
+            <ul class="key" role="list">
+                <li><span class="swatch swatch-on"></span>On</li>
+                <li><span class="swatch swatch-missing"></span>Should be on: click it</li>
+                <li><span class="swatch swatch-wrong"></span>Should be off: click it</li>
+            </ul>
+        </div>
+        <Fragment set:html={`<style>${ruleCss}</style>`} />
+    </Fragment>
 
-    <h2>The rule</h2>
-    <p>
-        Each cell looks at the three cells above it: above-left, directly above, and above-right. There are eight possible
-        patterns, and Rule 110 says which of them switch the cell on:
-    </p>
-    <div class="table-responsive">
-        <table class="rule-table">
-            <thead>
-                <tr>
-                    <th scope="row">Above</th>
-                    <td>111</td><td>110</td><td>101</td><td>100</td><td>011</td><td>010</td><td>001</td><td>000</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">Cell</th>
-                    <td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td><td>0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <p>
-        Read the bottom row as a binary number, 01101110, and you get 110: that's where the name comes from. It looks
-        like a toy, but in 2004 Matthew Cook published a proof that Rule 110, given a wide enough row and long enough, can
-        compute anything a computer can. It's Turing-complete.
-    </p>
+    <Fragment slot="how">
+        <p>
+            Every cell is a checkbox, so HTML holds the whole grid: ticked is on, unticked is off. Each box is hidden, and the
+            squares you see are its label. All the boxes come first in the page, in reading order, with all the labels after them,
+            and that order matters.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{gridExample}</code></pre>
+        </Disclosure>
 
-    <h2>How it works</h2>
-    <p>
-        Every cell is a checkbox, so HTML holds the whole grid. The boxes all come first in the page, in reading order,
-        with the labels you see drawn after them. That order matters: CSS's sibling combinator, <code>~</code>, can only
-        look forward, so a cell's label can be reached from the three boxes above it and from its own box:
-    </p>
-    <pre><code>{cellExample}</code></pre>
-    <p>
-        Rule 110 needs three conditions to say when a cell should be on, and two to say when it should be off. Repeat
-        those for every cell in a grid of {width} by {height} and you get {ruleCount} selectors. Nobody wrote them by
-        hand: a small program wrote them when the site was built, and tests check that its conditions match the rule table
-        above exactly. That's no different from a compiler turning code into machine instructions; but it's worth saying,
-        because it's part of the honest answer.
-    </p>
+        <h3>Reaching the cells above</h3>
+        <p>
+            CSS's sibling combinator, <code>~</code>, means "somewhere after this, in the same parent". It can only look forward,
+            so a label can be styled according to any box that comes before it, and here, every box does. Each rule is a chain:
+            it tests the boxes above a cell, then the cell's own box, and ends at the cell's label. The simplest has nothing to
+            test above it. It just draws a cell that's on.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Cell that's on source</Fragment>
+            <pre><code>{onExample}</code></pre>
+        </Disclosure>
 
-    <h2>You are the clock</h2>
-    <p>
-        CSS knows what every row should be, but here it can't make it so. A rule can describe a state; it can't tick a
-        box. So the machine only moves forward when you click, and it stops when the grid runs out. With the CSS every
-        browser supports, that's as far as it goes: proof that HTML and CSS can compute anything, as long as someone
-        turns the handle.
-    </p>
-    <p>
-        The newest CSS goes further. In 2026, x86CSS used a CSS animation as a clock, so that an emulated processor runs
-        without anyone touching it, in the browsers that support the features it needs.
-        <a href="/Together#limit">Part 4</a> tells that story.
-    </p>
+        <h3>When a cell should be on</h3>
+        <p>
+            Of the eight patterns, five switch a cell on. They could be written as five rules, but three conditions cover them
+            all: the cell directly above is on and the one above-right is off; the cell above is off and the one above-right is
+            on; or the cell above is on and the one above-left is off. If any of those holds and the cell's own box isn't
+            ticked, the cell is drawn as one you need to click.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Should be on source</Fragment>
+            <pre><code>{missingExample}</code></pre>
+        </Disclosure>
+
+        <h3>When a cell should be off</h3>
+        <p>
+            The other three patterns need two conditions: the cells above and above-right are both off; or all three are on. If
+            either holds and the cell's own box <em>is</em> ticked, it's drawn as a mistake.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Should be off source</Fragment>
+            <pre><code>{wrongExample}</code></pre>
+        </Disclosure>
+
+        <h3>Drawing the cells</h3>
+        <p>
+            None of those rules sets a colour. Each sets a custom property, <code>--state</code>, and every cell paints itself
+            with whatever that is. A mistake's rule tests more boxes than the plain "on" rule does, which makes it more specific,
+            so it wins when both match.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Drawing the cells source</Fragment>
+            <pre><code>{drawExample}</code></pre>
+        </Disclosure>
+
+        <h3>Written by a program</h3>
+        <p>
+            Every cell needs its own copy of those rules, naming its own boxes. Cells beyond the edges count as off, so the cells
+            along the sides need fewer. For a grid {width} cells wide and {height} tall, that comes to {ruleCount} selectors.
+            Nobody wrote them by hand: a small program wrote them when the site was built, and tests check that its conditions
+            match the rule table exactly. That's no different from a compiler turning code into machine instructions, but it's
+            worth saying, because it's part of the honest answer.
+        </p>
+
+        <h3>The end result</h3>
+        <p>
+            Change the top row, and CSS works out the second. Click the cells it marks, and it works out the third, and so on
+            down the grid. Each row is worked out from whatever is in the row above, right or wrong.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            Rule 110 looks like a toy, but in 2004 Matthew Cook published a proof that, given a wide enough row and long enough,
+            it can compute anything a computer can. It's Turing-complete. So anything that can run Rule 110 can, in principle,
+            compute anything, and here HTML and CSS are running it, with one condition: you are the clock.
+        </p>
+        <p>
+            CSS knows what every row should be, but here it can't make it so. A rule can describe a state; it can't tick a
+            box. So the machine only moves forward when you click, and it stops when the grid runs out. With the CSS every
+            browser supports, that's as far as it goes: proof that HTML and CSS can compute anything, as long as someone
+            turns the handle.
+        </p>
+        <p>
+            The newest CSS goes further. In 2026, x86CSS used a CSS animation as a clock, so that an emulated processor runs
+            without anyone touching it, in the browsers that support the features it needs.
+            <a href="/Together#limit">Part 4</a> tells that story.
+        </p>
+    </Fragment>
 </DemoLayout>
 
 <style>

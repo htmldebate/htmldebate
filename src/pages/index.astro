@@ -1,5 +1,6 @@
 ---
 import Button from '../components/Button.astro';
+import LogoAura from '../components/LogoAura.astro';
 import PageHero from '../components/PageHero.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import type { DebatePart } from '../config/debate-part';
@@ -9,20 +10,53 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title={site.name} description={site.description} path="/">
     <PageHero
-        display
         title="Is HTML a"
         highlight="programming language?"
         lead="It's one of the internet's longest-running arguments. Rather than pick a side, this site sets out what programming means, tests HTML and CSS against it, and lets the demos speak for themselves."
     >
         <Fragment slot="actions">
             <Button href={debateParts[0]?.path ?? '/'} variant="primary" size="large">Start reading</Button>
-            <Button href="/Together" variant="ghost" size="large" trailingIcon="arrow-right-bold">See the demos</Button>
+            <Button href="/Demos" variant="ghost" size="large" trailingIcon="arrow-right-bold">See the demos</Button>
         </Fragment>
     </PageHero>
 
+    <section class="section tone-alt intro-band" aria-labelledby="intro-title">
+        <div class="container-wide intro-layout">
+            <div class="intro-copy">
+                <SectionHeader id="intro-title" eyebrow="Introduction" title="The great" highlight="HTML debate">
+                    <p>
+                        Ask whether HTML is a programming language and you'll rarely get a calm answer. Designers, developers
+                        and engineers have argued over it for years, mostly on social media, and mostly without agreeing what
+                        the question means.
+                    </p>
+                </SectionHeader>
+
+                <div class="intro-details">
+                    <p>
+                        Some of it is trolling, and some of it is gatekeeping: a way of deciding who counts as a programmer.
+                        Underneath, though, is a good question. Where does describing something end, and programming it begin?
+                    </p>
+                    <p>
+                        HTML is only half of the story. CSS has quietly learnt to choose, count and calculate, and the two
+                        together can do things that neither can do alone. So this site looks at each in turn, then at what
+                        happens when they meet.
+                    </p>
+                    <p>
+                        You won't find a simple yes or no at the end. You will find the tests people use, the evidence for each,
+                        and enough working demos to make up your own mind.
+                    </p>
+                </div>
+            </div>
+
+            <div class="intro-logo zoom-arrive">
+                <LogoAura class="intro-aura" />
+            </div>
+        </div>
+    </section>
+
     <section class="section" aria-labelledby="parts-title">
         <div class="container-wide">
-            <SectionHeader id="parts-title" eyebrow="The case" title="Five parts," highlight="one question.">
+            <SectionHeader id="parts-title" eyebrow="The case" title="Five parts" highlight="One question">
                 <p>
                     Each part builds on the one before. We agree on the tests first, try HTML and CSS against them
                     separately, then put them together and see how far they go.
@@ -54,7 +88,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <section class="section tone-alt" aria-labelledby="no-script-title">
         <div class="container-wide split">
-            <SectionHeader id="no-script-title" eyebrow="The rules" title="Zero JavaScript." highlight="Really.">
+            <SectionHeader id="no-script-title" eyebrow="The rules" title="Zero" highlight="JavaScript">
                 <p>
                     Everything on this site, from the menu to the demos, is built from HTML and CSS. Your browser is told to
                     refuse scripts outright, and the site won't even build if one slips in. The site itself is part of the
@@ -73,7 +107,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
                 </li>
                 <li class="surface rule">
                     <h3>The demos</h3>
-                    <p>Every demo keeps its state in checkboxes and radio buttons, and CSS decides what happens next.</p>
+                    <p>When a demo has something to remember, it's in a checkbox or a radio button, and CSS decides what happens next.</p>
                 </li>
             </ul>
         </div>
@@ -81,8 +115,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <style>
-    .parts {
-        counter-reset: none;
+    /* Every row as tall as the tallest, so all six tiles match. A single column has no neighbours to match. */
+    @media (min-width: 40rem) {
+        .parts {
+            grid-auto-rows: 1fr;
+        }
     }
 
     .parts > li {
@@ -107,6 +144,62 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     .part-tile-sources {
         background: var(--surface-alt);
+    }
+
+    /* Copy beside the glowing logo, as the ONIXLabs site sets its glass icons. The glow spreads past the logo, so the band
+       clips it. Stacks on narrower screens, logo first. */
+    .intro-band {
+        overflow: clip;
+    }
+
+    .intro-layout {
+        display: grid;
+        gap: 2.5rem;
+    }
+
+    .intro-logo {
+        display: grid;
+        place-items: start center;
+        order: -1;
+        isolation: isolate;
+    }
+
+    .intro-logo :global(.intro-aura) {
+        width: min(15rem, 60vw);
+    }
+
+    @media (min-width: 60rem) {
+        .intro-layout {
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .intro-logo {
+            place-items: center;
+            order: 0;
+        }
+
+        .intro-logo :global(.intro-aura) {
+            width: min(100%, 24rem);
+        }
+    }
+
+    .intro-copy {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .intro-copy :global(.section-header) {
+        max-width: none;
+        margin-bottom: 0;
+    }
+
+    .intro-details {
+        display: grid;
+        gap: 1rem;
+        color: var(--text-muted);
+        line-height: 1.65;
     }
 
     .split {

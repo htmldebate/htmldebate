@@ -1,4 +1,5 @@
 ---
+import Icon from '../components/Icon.astro';
 import type { OutlineEntry } from '../components/outline-entry';
 import Scorecard from '../components/Scorecard.astro';
 import type { SubjectResults } from '../components/subject-results';
@@ -6,7 +7,12 @@ import { cssResults } from '../config/css-results';
 import type { DebatePart } from '../config/debate-part';
 import { debateParts } from '../config/debate-parts';
 import { htmlResults } from '../config/html-results';
+import type { ProgrammingTest } from '../config/programming-test';
+import { programmingTests } from '../config/programming-tests';
+import { Score } from '../config/score';
 import { site } from '../config/site';
+import type { TestVerdict } from '../config/test-verdict';
+import { testVerdicts } from '../config/test-verdicts';
 import { togetherResults } from '../config/together-results';
 import PartLayout from '../layouts/PartLayout.astro';
 
@@ -28,6 +34,18 @@ const subjects: ReadonlyArray<SubjectResults> = [
     { name: 'CSS', path: '/CSS', results: cssResults },
     { name: 'HTML and CSS', path: '/Together', results: togetherResults },
 ];
+
+const icons: Record<Score, string> = { [Score.Yes]: 'check-circle', [Score.Partly]: 'minus-circle', [Score.No]: 'x-circle' };
+
+function verdictFor(test: ProgrammingTest): TestVerdict {
+    const found: TestVerdict | undefined = testVerdicts.find((verdict: TestVerdict): boolean => verdict.testId === test.id);
+
+    if (found === undefined) {
+        throw new Error(`src/config/test-verdicts.ts has no verdict for the test "${test.id}".`);
+    }
+
+    return found;
+}
 ---
 <PartLayout part={part} outline={outline}>
     <p>
@@ -57,53 +75,32 @@ const subjects: ReadonlyArray<SubjectResults> = [
     <h2 id="choose">Choose your test</h2>
     <p>
         So pick the test you believe in, and see the verdict it gives. (This is HTML and CSS too: the choices are radio
-        buttons, and CSS shows the matching verdict.)
+        buttons, hidden inside their labels, and CSS shows the matching verdict.)
     </p>
 
-    <div class="choose surface">
+    <div class="choose">
         <fieldset class="choices">
             <legend class="visually-hidden">Which test makes something a programming language?</legend>
-            <label><input type="radio" name="test" id="choose-compute" /> It can compute anything</label>
-            <label><input type="radio" name="test" id="choose-instruct" /> It gives a machine instructions</label>
-            <label><input type="radio" name="test" id="choose-decide" /> It can decide and remember</label>
-            <label><input type="radio" name="test" id="choose-programs" /> People build programs with it</label>
+            {programmingTests.map((test: ProgrammingTest) => (
+                <label class={`choice is-${verdictFor(test).score}`}>
+                    <input type="radio" name="test" id={`choose-${test.id}`} />
+                    <span class="choice-name">{test.name}</span>
+                    <span class="choice-question">{test.question}</span>
+                </label>
+            ))}
         </fieldset>
 
         <div class="verdicts" aria-live="polite">
             <p class="verdict verdict-none">Choose a test to see its verdict.</p>
-            <div class="verdict verdict-compute">
-                <p class="verdict-headline">HTML: no. HTML and CSS: yes, with conditions.</p>
-                <p>
-                    HTML can't calculate anything at all. HTML and CSS together can run Rule 110, which can compute
-                    anything, as long as a person keeps clicking; and the newest CSS can run an emulated processor by
-                    itself, in some browsers. By the strictest test, HTML alone is out, and the pair have only just got in.
-                </p>
-            </div>
-            <div class="verdict verdict-instruct">
-                <p class="verdict-headline">Yes: HTML is a programming language, and so is CSS.</p>
-                <p>
-                    Every element and every rule is an instruction a browser carries out. The trouble with this test is
-                    how much else passes it: a knitting pattern, a sat-nav route, the settings on a washing machine. If you
-                    choose it, you've chosen a very big club.
-                </p>
-            </div>
-            <div class="verdict verdict-decide">
-                <p class="verdict-headline">Neither alone. Together: yes.</p>
-                <p>
-                    HTML remembers without deciding; CSS, in everyday use, decides without remembering. Put them together
-                    and you get choices, memory and logic, and every demo on this site is the proof. By this test, HTML on
-                    its own falls short, but HTML and CSS together are a programming language, if a very limited one.
-                </p>
-            </div>
-            <div class="verdict verdict-programs">
-                <p class="verdict-headline">Mostly not.</p>
-                <p>
-                    People build pages and applications' screens with HTML and CSS, and leave the logic to other languages.
-                    The demos show games and calculators can be built from them, and x86CSS even runs compiled programs,
-                    but nobody would build real software that way. By the test of everyday use, they're languages for
-                    describing, not for programming.
-                </p>
-            </div>
+            {testVerdicts.map((verdict: TestVerdict) => (
+                <div class={`verdict verdict-${verdict.testId} is-${verdict.score}`}>
+                    <p class="verdict-headline">
+                        <Icon name={icons[verdict.score]} />
+                        <span>{verdict.headline}</span>
+                    </p>
+                    <p>{verdict.body}</p>
+                </div>
+            ))}
         </div>
     </div>
 
@@ -167,56 +164,117 @@ const subjects: ReadonlyArray<SubjectResults> = [
         font-size: var(--text-sm);
     }
 
-    .choose {
-        display: grid;
-        gap: 1.25rem;
-        padding: 1.5rem 1.75rem;
-        border-radius: var(--radius-lg);
+    /* A choice and its verdict share a colour: green for yes, yellow for partly, red for no. */
+    .is-yes {
+        --ink: var(--success-text);
+        --tint: var(--success-subtle);
     }
 
-    .choose > :global(*) {
-        margin-top: 0;
+    .is-partly {
+        --ink: var(--ink-bs-warning);
+        --tint: var(--warning-subtle);
+    }
+
+    .is-no {
+        --ink: var(--danger);
+        --tint: var(--danger-subtle);
+    }
+
+    .choose {
+        display: grid;
+        gap: var(--tile-gap);
     }
 
     .choices {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-        gap: 0.5rem;
+        gap: var(--tile-gap);
+        min-width: 0;
         margin: 0;
         padding: 0;
         border: 0;
     }
 
-    .choices label {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.6rem 0.85rem;
-        border-radius: var(--radius);
-        background: var(--surface-alt);
-        color: var(--heading);
-        font-size: var(--text-base);
-        font-weight: 500;
+    @media (min-width: 40rem) {
+        .choices {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Each choice is a raised tile, with its radio button out of sight inside it. */
+    .choice {
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+        position: relative;
+        display: grid;
+        align-content: start;
+        gap: 0.35rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--surface);
+        box-shadow: var(--edge-shadow), var(--shadow-sm);
         cursor: pointer;
+        transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition);
     }
 
-    .choices label:has(:checked) {
-        box-shadow: inset 0 0 0 2px var(--brand-blue);
+    .choice:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--edge-shadow), var(--shadow-md);
     }
 
-    .choices input {
-        width: 1.1rem;
-        height: 1.1rem;
-        accent-color: var(--brand-blue);
+    .choice input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .choice-name {
+        color: var(--heading);
+        font-size: var(--text-lg);
+        font-weight: 600;
+    }
+
+    .choice-question {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        line-height: 1.5;
+    }
+
+    .choice:has(:checked) {
+        background: var(--tint);
+        box-shadow: inset 0 0 0 2px var(--ink);
+    }
+
+    .choice:has(:checked) .choice-name {
+        color: var(--ink);
+    }
+
+    .choice:has(:checked) .choice-question {
+        color: var(--text);
+    }
+
+    .choice:has(:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
     }
 
     /* Each verdict waits for its test to be chosen; until one is, a prompt shows instead. */
     .verdict {
         display: none;
+        gap: 0.75rem;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--tint);
+        color: var(--text);
     }
 
-    .verdict > :global(* + *) {
-        margin-top: 0.75rem;
+    .verdict-none {
+        border: 2px dashed var(--border-strong);
+        background: none;
+        color: var(--text-muted);
+        text-align: center;
     }
 
     .verdict-none,
@@ -224,20 +282,33 @@ const subjects: ReadonlyArray<SubjectResults> = [
     .choose:has(#choose-instruct:checked) .verdict-instruct,
     .choose:has(#choose-decide:checked) .verdict-decide,
     .choose:has(#choose-programs:checked) .verdict-programs {
-        display: block;
+        display: grid;
     }
 
     .choose:has(.choices :checked) .verdict-none {
         display: none;
     }
 
-    .verdict-none {
-        color: var(--text-muted);
+    .verdict-headline {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        color: var(--ink);
+        font-size: var(--text-2xl);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
     }
 
-    .verdict-headline {
-        color: var(--heading);
-        font-size: var(--text-xl);
-        font-weight: 600;
+    .verdict-headline :global(.icon) {
+        width: 1.25em;
+        height: 1.25em;
+    }
+
+    /* A verdict rises into place as it's chosen. */
+    @media (prefers-reduced-motion: no-preference) {
+        .verdict:not(.verdict-none) {
+            animation: rise 500ms var(--ease-out) both;
+        }
     }
 </style>

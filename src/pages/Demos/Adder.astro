@@ -1,15 +1,57 @@
 ---
+import Disclosure from '../../components/Disclosure.astro';
 import DemoLayout from '../../layouts/DemoLayout.astro';
 
 // Bits are listed most significant first, as numbers are written.
 const bits: ReadonlyArray<number> = [3, 2, 1, 0];
 const places: ReadonlyArray<number> = [16, 8, 4, 2, 1];
 
-const columnExample: string = `/* One column: add the two bits and the carry from the right. */
+const switchExample: string = `<input class="bit" type="checkbox" id="a1" checked>
+<label for="a1">A, the 2s bit</label>`;
+
+const numberExample: string = `.adder { --a1: 0; }
+.adder:has(#a1:checked) { --a1: 1; }`;
+
+const columnExample: string = `--s1: mod(var(--a1) + var(--b1) + var(--c1), 2);
+--c2: round(down, (var(--a1) + var(--b1) + var(--c1)) / 2, 1);`;
+
+const chainExample: string = `--c0: 0;
+--s0: mod(var(--a0) + var(--b0) + var(--c0), 2);
+--c1: round(down, (var(--a0) + var(--b0) + var(--c0)) / 2, 1);
 --s1: mod(var(--a1) + var(--b1) + var(--c1), 2);
---c2: round(down, (var(--a1) + var(--b1) + var(--c1)) / 2);`;
+--c2: round(down, (var(--a1) + var(--b1) + var(--c1)) / 2, 1);
+--s2: mod(var(--a2) + var(--b2) + var(--c2), 2);
+--c3: round(down, (var(--a2) + var(--b2) + var(--c2)) / 2, 1);
+--s3: mod(var(--a3) + var(--b3) + var(--c3), 2);
+--c4: round(down, (var(--a3) + var(--b3) + var(--c3)) / 2, 1);
+--s4: var(--c4);`;
+
+const answerExample: string = `.computed {
+    counter-reset: bit var(--bit);
+    background: color-mix(in srgb, var(--lit) calc(var(--bit) * 100%), var(--surface-alt));
+}
+
+.computed::before {
+    content: counter(bit);
+}`;
+
+const decimalExample: string = `.value-sum {
+    counter-reset: value calc(var(--s0) + 2 * var(--s1) + 4 * var(--s2) + 8 * var(--s3) + 16 * var(--s4));
+}
+
+.decimal::before {
+    content: '= ' counter(value);
+}`;
 ---
 <DemoLayout path="/Demos/Adder">
+    <Fragment slot="what">
+        <p>
+            An adding machine for two numbers, A and B, from 0 to 15. Click the switches to set them. CSS adds them in binary,
+            one column at a time, carrying as it goes, and writes the answer underneath.
+        </p>
+        <p>It starts on 2 + 2, for Ben Romy, who wrote that you can't compute it in HTML.</p>
+    </Fragment>
+
     <div slot="demo" class="adder">
         <div class="sum-grid">
             <span class="row-name" aria-hidden="true"></span>
@@ -58,33 +100,90 @@ const columnExample: string = `/* One column: add the two bits and the carry fro
         <p class="equation" aria-live="polite"></p>
     </div>
 
-    <p>
-        Click the switches to set two numbers, A and B, from 0 to 15. CSS adds them in binary, one column at a time,
-        carrying as it goes, and writes the answer underneath. It starts on 2 + 2, for Ben Romy.
-    </p>
+    <Fragment slot="how">
+        <p>
+            In binary, each column is worth twice the one to its right: 1, 2, 4, 8, 16. Adding works the way you learnt at
+            school, except that a column can only hold 0 or 1. Add the column's two bits and the carry from the right; write
+            down whether the total is odd or even, and carry the rest to the next column.
+        </p>
+        <p>
+            HTML's part is to hold the eight bits of A and B. Each switch is a checkbox, hidden behind a label that's drawn as a
+            0 or a 1.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{switchExample}</code></pre>
+        </Disclosure>
 
-    <h2>How it works</h2>
-    <p>
-        In binary, each column is worth twice the one to its right: 1, 2, 4, 8, 16. Adding works the way you learnt at
-        school, except that a column can only hold 0 or 1. Add the column's two bits and the carry from the right; write
-        down whether the total is odd or even, and carry the rest to the next column.
-    </p>
-    <p>
-        The switches are checkboxes, so HTML holds the eight bits of A and B. CSS turns each one into a number with a
-        rule like <code>.adder:has(#a1:checked) &#123; --a1: 1; &#125;</code>, then works out every column with its maths
-        functions:
-    </p>
-    <pre><code>{columnExample}</code></pre>
-    <p>
-        <code>mod(…, 2)</code> is the remainder after dividing by 2, the bit that's written down; dividing by 2 and
-        rounding down gives the carry. Each column's carry feeds the next, exactly as in an adding circuit in a
-        processor, and the result is printed with CSS counters. The decimal totals on the right are worked out
-        separately, from the bits, so you can check the binary answer.
-    </p>
-    <p>
-        So: you can compute the sum of 2 + 2 with HTML and CSS. What makes it work is the split from
-        <a href="/Together">part 4</a>: HTML remembers the inputs, and CSS does the arithmetic.
-    </p>
+        <h3>From switches to numbers</h3>
+        <p>
+            CSS can't calculate with a ticked box, so it first turns each one into a number. Every bit has a custom property that
+            starts at 0, and a rule that sets it to 1 when its box is checked. From here on, it's all arithmetic.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">From switches to numbers source</Fragment>
+            <pre><code>{numberExample}</code></pre>
+        </Disclosure>
+
+        <h3>Adding a column</h3>
+        <p>
+            A column adds three things: its bit of A, its bit of B, and the carry in. <code>mod(…, 2)</code> is the remainder
+            after dividing by 2, which is the bit that's written down. Dividing by 2 and rounding down gives the carry. If all
+            three are 1, for example, the total is 3: write down 1, and carry 1.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Adding a column source</Fragment>
+            <pre><code>{columnExample}</code></pre>
+        </Disclosure>
+
+        <h3>Passing the carry along</h3>
+        <p>
+            Each column's carry is the next column's carry in, so the four columns form a chain. Nothing is carried into the
+            first, and whatever is carried out of the last becomes the fifth bit of the answer. CSS works out the order for
+            itself: each property refers to the one before it, so the browser follows the chain from right to left.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Passing the carry along source</Fragment>
+            <pre><code>{chainExample}</code></pre>
+        </Disclosure>
+
+        <h3>Writing the answer</h3>
+        <p>
+            A custom property can't be printed directly, but a counter can. Each answer tile sets a counter to its bit and prints
+            it. The same bit sets how much colour is mixed into the tile: 0% for a 0, and 100% for a 1.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Writing the answer source</Fragment>
+            <pre><code>{answerExample}</code></pre>
+        </Disclosure>
+
+        <h3>Checking it in decimal</h3>
+        <p>
+            The decimal totals on the right are worked out by adding up the columns that are on. The sum's total comes from the
+            answer's bits, not from A and B, so if the adder went wrong, it would show.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Checking it in decimal source</Fragment>
+            <pre><code>{decimalExample}</code></pre>
+        </Disclosure>
+
+        <h3>The end result</h3>
+        <p>
+            Whatever you set, from 0 + 0 to 15 + 15, each column passes its carry to the next, and the answer is written in binary
+            and in decimal, exactly as an adding circuit in a processor would work it out.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            So you can compute the sum of 2 + 2 with HTML and CSS. What makes it work is the split from
+            <a href="/Together">part 4</a>: HTML remembers the inputs, and CSS does the arithmetic.
+        </p>
+        <p>
+            It's also arithmetic the way a computer does it. Nothing here knows what 2 + 2 is; the answer comes out of a chain
+            of columns, each passing a carry to the next, which is how adding is done in a processor.
+        </p>
+    </Fragment>
 </DemoLayout>
 
 <style>

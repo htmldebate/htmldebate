@@ -1,4 +1,5 @@
 ---
+import Disclosure from '../components/Disclosure.astro';
 import type { OutlineEntry } from '../components/outline-entry';
 import ResultsTable from '../components/ResultsTable.astro';
 import type { DebatePart } from '../config/debate-part';
@@ -73,29 +74,29 @@ const markupFibonacci: string = `<function name="fibonacci">
 
     <div class="demo surface">
         <p class="label">A section that opens and closes</p>
-        <details class="disclosure">
-            <summary>What is <code>&lt;details&gt;</code>?</summary>
+        <Disclosure>
+            <Fragment slot="summary">What is <code>&lt;details&gt;</code>?</Fragment>
             <p>
                 An element the browser shows folded, with its summary as a button. Click the summary and it opens; click
                 again and it closes. The browser remembers which state it's in.
             </p>
-        </details>
+        </Disclosure>
     </div>
 
     <div class="demo surface">
         <p class="label">Only one open at a time</p>
-        <details class="disclosure" name="accordion">
-            <summary>Turing</summary>
+        <Disclosure name="accordion">
+            <Fragment slot="summary">Turing</Fragment>
             <p>Described his imaginary machine in 1936.</p>
-        </details>
-        <details class="disclosure" name="accordion">
-            <summary>Berners-Lee</summary>
+        </Disclosure>
+        <Disclosure name="accordion">
+            <Fragment slot="summary">Berners-Lee</Fragment>
             <p>Proposed the web at CERN in 1989, and HTML with it.</p>
-        </details>
-        <details class="disclosure" name="accordion">
-            <summary>Eich</summary>
+        </Disclosure>
+        <Disclosure name="accordion">
+            <Fragment slot="summary">Eich</Fragment>
             <p>Wrote the first version of JavaScript in 1995, reportedly in ten days.</p>
-        </details>
+        </Disclosure>
         <p class="demo-note">
             Giving the three the same <code>name</code> tells the browser they're a group, so opening one closes the
             others. That's a rule, and the browser enforces it.
@@ -276,26 +277,7 @@ const markupFibonacci: string = `<function name="fibonacci">
         font-size: var(--text-sm);
     }
 
-    .disclosure {
-        width: 100%;
-        border-radius: var(--radius);
-        corner-shape: var(--corner-shape);
-        background: var(--surface-alt);
-    }
-
-    .disclosure summary {
-        padding: 0.75rem 1rem;
-        color: var(--heading);
-        font-weight: 500;
-        cursor: pointer;
-    }
-
-    .disclosure p {
-        padding: 0 1rem 1rem;
-        color: var(--text-muted);
-    }
-
-    .demo .disclosure + .disclosure {
+    .demo > :global(.disclosure + .disclosure) {
         margin-top: -0.5rem;
     }
 
@@ -334,7 +316,7 @@ const markupFibonacci: string = `<function name="fibonacci">
         padding: 0.85rem 1rem;
         border-radius: var(--radius);
         background: var(--success-subtle);
-        color: var(--success);
+        color: var(--success-text);
         font-size: var(--text-sm);
     }
 

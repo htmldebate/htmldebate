@@ -81,8 +81,8 @@ const countingExample: string = `.quiz { counter-reset: used; }
     <h2 id="counting">Counting</h2>
     <p>
         CSS counters, which <a href="/CSS#calculating">part 3</a> used to print the results of sums, can also count
-        ticked boxes, because a counter can go up only on elements that match a condition. Which of these HTML elements
-        have you used?
+        ticked boxes, because a counter can go up only on elements that match a condition. The boxes are hidden inside
+        their labels again, so you pick the labels themselves. Which of these HTML elements have you used?
     </p>
 
     <div class="demo surface quiz">
@@ -199,12 +199,6 @@ const countingExample: string = `.quiz { counter-reset: used; }
         margin-top: 0;
     }
 
-    .demo input[type='checkbox'] {
-        width: 1.2rem;
-        height: 1.2rem;
-        accent-color: var(--brand-blue);
-    }
-
     /*
      * The light switch: a checkbox hidden inside its label, with the label drawn as a wall plate and rocker. The box stays
      * in the page, out of sight, so it can still be reached with the keyboard and is announced as a switch.
@@ -230,19 +224,17 @@ const countingExample: string = `.quiz { counter-reset: used; }
         cursor: pointer;
     }
 
-    .room input.switch-input {
+    .switch-input,
+    .quiz-options input {
         position: absolute;
         width: 1px;
         height: 1px;
         opacity: 0;
     }
 
-    /* The fascia: a raised plate holding the rocker, with a screw either side. */
+    /* The fascia: a raised plate holding the rocker. */
     .plate {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.9rem 1.1rem;
+        padding: 0.9rem 1.5rem;
         border-radius: var(--radius);
         corner-shape: var(--corner-shape);
         background: var(--surface-raised);
@@ -251,18 +243,9 @@ const countingExample: string = `.quiz { counter-reset: used; }
         --edge-bottom: var(--edge-dark);
     }
 
-    .plate::before,
-    .plate::after {
-        content: '';
-        width: 0.6rem;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        corner-shape: round;
-        background: var(--border-strong);
-    }
-
     /* The rocker: the pressed half is in shadow. Off, the top is pressed in; on, the bottom. */
     .rocker {
+        display: block;
         width: 1.9rem;
         height: 3.2rem;
         border-radius: 0.45rem;
@@ -322,19 +305,40 @@ const countingExample: string = `.quiz { counter-reset: used; }
         margin: 0;
     }
 
+    /* Each option is its label: the box inside it is out of sight, and ticking it lights the label up. */
     .quiz-options label {
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
-        padding: 0.5rem 0.75rem;
+        position: relative;
+        display: grid;
+        place-items: center;
+        padding: 0.65rem 0.75rem;
         border-radius: var(--radius);
+        corner-shape: var(--corner-shape);
         background: var(--surface-alt);
         cursor: pointer;
+    }
+
+    .quiz-options label:hover {
+        box-shadow: inset 0 0 0 2px var(--border-strong);
+    }
+
+    .quiz-options label:has(:checked) {
+        background: var(--brand-blue);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .quiz-options label:has(:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
     }
 
     .quiz-options code {
         padding: 0;
         background: none;
+    }
+
+    .quiz-options label:has(:checked) code {
+        color: #fff;
+        font-weight: 600;
     }
 
     .quiz input:checked {

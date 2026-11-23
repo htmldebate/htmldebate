@@ -1,0 +1,56 @@
+---
+// The 3D HTML5 logo over its own glow, as the ONIXLabs site shows its glass icons (GlassAura there): the glow is rendered
+// ahead of time (scripts/generate-logo-images.ts), with grain over it to give it texture and break up its bands. Whatever
+// it sits in must isolate it and clip it; size it with width on the class.
+interface Props {
+    readonly class?: string;
+}
+
+const { class: className = '' }: Props = Astro.props;
+---
+<div class:list={['logo-aura', className]}>
+    <picture class="aura-glow">
+        <source srcset="/images/html5-aura-dark.webp" media="(prefers-color-scheme: dark)" />
+        <img src="/images/html5-aura.webp" alt="" width={512} height={512} loading="lazy" decoding="async" />
+    </picture>
+    <img class="logo" src="/images/html5.webp" alt="The HTML5 logo, drawn in 3D" width={800} height={800} loading="lazy" decoding="async" />
+</div>
+
+<style>
+    .logo-aura {
+        position: relative;
+        display: grid;
+    }
+
+    .logo {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Grain, fading out with the glow so it doesn't show on the plain page around it. */
+    .logo-aura::after {
+        content: '';
+        position: absolute;
+        inset: calc((2.2 * var(--aura-scale, 1.6) - 1) * -50%);
+        z-index: -1;
+        background: url('/onixlabs/images/noise-aura.png');
+        -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent);
+        mask-image: radial-gradient(closest-side, #000 45%, transparent);
+        pointer-events: none;
+    }
+
+    /* The glow's canvas is 2.2 times the logo, so spread 60% past it on every side the two line up. */
+    .aura-glow {
+        position: absolute;
+        inset: -60%;
+        z-index: -1;
+        opacity: 0.95;
+        transform: scale(var(--aura-scale, 1.6));
+        pointer-events: none;
+    }
+
+    .aura-glow img {
+        width: 100%;
+        height: auto;
+    }
+</style>

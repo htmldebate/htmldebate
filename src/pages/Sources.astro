@@ -39,7 +39,7 @@ function inGroup(group: SourceGroup): ReadonlyArray<Source> {
                         </div>
                         <p class="source-by">{source.by}</p>
                         <p>{source.summary}</p>
-                        {source.archived === true && <p class="source-note">The original has been taken down; this links to a copy in the Internet Archive.</p>}
+                        {source.archived === true && <p class="source-note">The original can no longer be reached; this links to a copy in the Internet Archive.</p>}
                     </li>
                 ))}
             </ul>
@@ -161,7 +161,7 @@ function inGroup(group: SourceGroup): ReadonlyArray<Source> {
 
     .stance-for {
         background: var(--success-subtle);
-        color: var(--success);
+        color: var(--success-text);
     }
 
     .stance-against {

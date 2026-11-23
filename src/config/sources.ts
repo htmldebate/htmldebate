@@ -24,7 +24,7 @@ export const sources: ReadonlyArray<Source> = [
     },
     {
         title: 'Answer to "Is HTML considered a programming language?"',
-        by: 'Brian D Foy, on Stack Overflow',
+        by: 'brian d foy, on Stack Overflow',
         url: 'https://stackoverflow.com/a/145179/1033686',
         group: SourceGroup.Opinions,
         stance: Stance.Against,

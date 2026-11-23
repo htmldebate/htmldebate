@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "lint": "astro sync && eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "images": "node scripts/generate-logo-images.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",
@@ -28,6 +29,7 @@
     "eslint-plugin-import-x": "4.17.1",
     "eslint-plugin-jsx-a11y-x": "0.2.0",
     "globals": "17.14.0",
+    "sharp": "0.35.5",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
     "vitest": "5.1.0"

@@ -198,6 +198,7 @@
     --success: #1e7a4f;                 /* AA: Stride uses #34a16e */
     --success-contrast: #ffffff;
     --success-subtle: #d1e7dd;
+    --success-text: color-mix(in srgb, var(--success), #000 15%);   /* AA: --success is 4.1:1 on --success-subtle */
     --warning: #ffbe45;
     --warning-contrast: #212529;
     --warning-subtle: #fff3cd;
@@ -300,6 +301,7 @@
         --success: #5cc993;
         --success-contrast: #0d2a1c;
         --success-subtle: #0d2a1c;
+        --success-text: var(--success);
         --warning: #ffbe45;
         --warning-contrast: #212529;
         --warning-subtle: #332701;

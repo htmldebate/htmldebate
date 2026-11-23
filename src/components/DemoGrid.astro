@@ -45,6 +45,17 @@ import { demos } from '../config/demos';
         margin: 0;
     }
 
+    /* Room to breathe between the tiles and the paragraphs around them. */
+    :global(.prose) > .demo-grid {
+        margin-block: 2.5rem;
+    }
+
+    /* A tile is a link, but long-form text underlines its links, which would underline every line of the tile. */
+    .demo-tile,
+    .demo-tile:hover {
+        text-decoration: none;
+    }
+
     .demo-tile {
         display: grid;
         align-content: start;
