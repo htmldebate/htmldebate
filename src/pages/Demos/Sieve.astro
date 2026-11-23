@@ -1,0 +1,262 @@
+---
+import Disclosure from '../../components/Disclosure.astro';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const numbers: ReadonlyArray<number> = Array.from({ length: 120 }, (_: unknown, index: number): number => index + 1);
+
+const listExample: string = `<input type="checkbox" id="primes-only">
+
+<ol class="numbers">
+    <li></li>
+    <li></li>
+    <li></li>
+    <!-- … and so on, up to 120 -->
+</ol>`;
+
+const numberExample: string = `.numbers { counter-reset: number; }
+.numbers li { counter-increment: number; }
+.numbers li::before { content: counter(number); }
+
+.numbers li:first-child { visibility: hidden; }`;
+
+const crossingExample: string = `.numbers li:nth-child(2n):not(:nth-child(2)) {
+    background: var(--brand-amber);
+}
+
+.numbers li:nth-child(3n):not(:nth-child(3)) {
+    background: var(--brand-rose);
+}
+
+.numbers li:nth-child(5n):not(:nth-child(5)) {
+    background: var(--brand-blue);
+}
+
+.numbers li:nth-child(7n):not(:nth-child(7)) {
+    background: var(--brand-green);
+}`;
+
+const primesExample: string = `.sieve:has(#primes-only:checked) .numbers li:nth-child(2n):not(:nth-child(2)),
+.sieve:has(#primes-only:checked) .numbers li:nth-child(3n):not(:nth-child(3)),
+.sieve:has(#primes-only:checked) .numbers li:nth-child(5n):not(:nth-child(5)),
+.sieve:has(#primes-only:checked) .numbers li:nth-child(7n):not(:nth-child(7)) {
+    visibility: hidden;
+}`;
+---
+<DemoLayout path="/Demos/Sieve">
+    <Fragment slot="what">
+        <p>
+            Around 2,200 years ago, the Greek mathematician Eratosthenes described a way to find prime numbers without
+            dividing anything. Write out the numbers; take the first prime, 2, and cross out all its multiples; move to the
+            next number not crossed out, which is the next prime, and cross out its multiples; and carry on. Whatever is
+            left is prime.
+        </p>
+        <p>
+            Below, CSS has done the crossing out: each colour marks the multiples of one prime, and the numbers left in plain
+            type are the primes from 2 to 113. Tick the box to hide everything that was crossed out.
+        </p>
+    </Fragment>
+
+    <div slot="demo" class="sieve">
+        <div class="sieve-controls">
+            <label class="primes-toggle">
+                <input type="checkbox" id="primes-only" />
+                Show the primes only
+            </label>
+            <ul class="legend" role="list">
+                <li class="legend-2">Multiple of 2</li>
+                <li class="legend-3">Multiple of 3</li>
+                <li class="legend-5">Multiple of 5</li>
+                <li class="legend-7">Multiple of 7</li>
+            </ul>
+        </div>
+        <ol class="numbers" role="list" aria-label="The numbers 1 to 120">
+            {numbers.map(() => <li></li>)}
+        </ol>
+    </div>
+
+    <Fragment slot="how">
+        <p>
+            The HTML is a checkbox and an ordered list of 120 empty list items. As in <a href="/Demos/FizzBuzz">FizzBuzz</a>,
+            CSS numbers the items with a counter and finds multiples with <code>:nth-child()</code>. The sieve adds two things:
+            an exception for the primes themselves, and a checkbox that changes what's shown.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{listExample}</code></pre>
+        </Disclosure>
+
+        <h3>Numbering</h3>
+        <p>
+            The counter goes up by one on every item, and each item prints it. The first item is 1, which is neither prime nor a
+            multiple of one, so it's made invisible rather than removed: it still takes up its place, so every other item's
+            position in the list stays the same as its number.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Numbering source</Fragment>
+            <pre><code>{numberExample}</code></pre>
+        </Disclosure>
+
+        <h3>Crossing out</h3>
+        <p>
+            Each prime, <em>P</em>, has one rule. <code>:nth-child(Pn)</code> matches every multiple of it, and
+            <code>:not(:nth-child(P))</code> leaves out the prime itself. So <code>:nth-child(2n):not(:nth-child(2))</code>
+            crosses out 4, 6, 8 and so on, but not 2. Whatever no rule matches is prime.
+        </p>
+        <p>
+            A number with more than one prime factor, such as 30, is matched by several rules. The rules are in the order 2, 3, 5
+            and 7, and the last one to match wins, so 30 takes the colour for 5.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Crossing out source</Fragment>
+            <pre><code>{crossingExample}</code></pre>
+        </Disclosure>
+
+        <h3>Showing only the primes</h3>
+        <p>
+            The checkbox is the only thing the sieve remembers. <code>:has()</code> lets the sieve as a whole see whether it's
+            ticked, and if it is, everything that was crossed out is hidden. The tests are the same ones again: a number that was
+            crossed out by a rule is hidden by the matching rule.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Showing only the primes source</Fragment>
+            <pre><code>{primesExample}</code></pre>
+        </Disclosure>
+
+        <h3>Why four primes are enough</h3>
+        <p>
+            Every number up to 120 that isn't prime has a prime factor no bigger than its square root, and the square root of 120
+            is just under 11. So crossing out the multiples of 2, 3, 5 and 7 catches all of them. A longer list needs more primes:
+            to go to 1,000, you'd add rules for 11 up to 31.
+        </p>
+
+        <h3>The end result</h3>
+        <p>
+            Every number that a smaller prime divides is coloured in, and the numbers left in plain type are the primes from 2 to
+            113. Ticking the box leaves just those on show.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            This is a real algorithm, more than two thousand years old, carried out from start to finish by rules that only
+            describe what each number should look like. But there's a catch. In a program, the sieve finds each next prime
+            itself and carries on. Here, someone had to know which primes to write rules for. The CSS carries out the algorithm,
+            but it can't extend itself: it computes within limits a person set in advance.
+        </p>
+    </Fragment>
+</DemoLayout>
+
+<style>
+    .sieve {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .sieve-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .primes-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--heading);
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .primes-toggle input {
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: var(--brand-blue);
+    }
+
+    .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0;
+        font-size: var(--text-sm);
+    }
+
+    .legend li {
+        padding: 0.2rem 0.7rem;
+        border-radius: var(--radius-pill);
+        corner-shape: round;
+        font-weight: 500;
+    }
+
+    .numbers {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+        gap: 0.4rem;
+        margin: 0;
+        padding: 0;
+        counter-reset: number;
+    }
+
+    .numbers li {
+        display: grid;
+        place-items: center;
+        aspect-ratio: 1;
+        border-radius: var(--radius-sm);
+        background: var(--surface-alt);
+        color: var(--heading);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        counter-increment: number;
+    }
+
+    .numbers li::before {
+        content: counter(number);
+    }
+
+    /* 1 is neither prime nor crossed out; it keeps its place so every other number keeps its position. */
+    .numbers li:first-child {
+        visibility: hidden;
+    }
+
+    .numbers li:nth-child(2n):not(:nth-child(2)),
+    .numbers li:nth-child(3n):not(:nth-child(3)),
+    .numbers li:nth-child(5n):not(:nth-child(5)),
+    .numbers li:nth-child(7n):not(:nth-child(7)) {
+        font-weight: 400;
+    }
+
+    /* Each colour's text is whichever of black and white reads better on it. */
+    .legend .legend-2,
+    .numbers li:nth-child(2n):not(:nth-child(2)) {
+        background: var(--brand-amber);
+        color: #000;
+    }
+
+    .legend .legend-3,
+    .numbers li:nth-child(3n):not(:nth-child(3)) {
+        background: var(--brand-rose);
+        color: #000;
+    }
+
+    .legend .legend-5,
+    .numbers li:nth-child(5n):not(:nth-child(5)) {
+        background: var(--brand-blue);
+        color: #fff;
+    }
+
+    .legend .legend-7,
+    .numbers li:nth-child(7n):not(:nth-child(7)) {
+        background: var(--brand-green);
+        color: #000;
+    }
+
+    .sieve:has(#primes-only:checked) .numbers li:nth-child(2n):not(:nth-child(2)),
+    .sieve:has(#primes-only:checked) .numbers li:nth-child(3n):not(:nth-child(3)),
+    .sieve:has(#primes-only:checked) .numbers li:nth-child(5n):not(:nth-child(5)),
+    .sieve:has(#primes-only:checked) .numbers li:nth-child(7n):not(:nth-child(7)) {
+        visibility: hidden;
+    }
+</style>

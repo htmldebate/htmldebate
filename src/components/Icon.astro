@@ -1,0 +1,23 @@
+---
+// Inlines a Phosphor icon (MIT licence: src/icons/LICENSE.txt) from src/icons: duotone, or bold where the name ends in
+// -bold. Names are Phosphor's own (https://phosphoricons.com). Icons are decorative: the element that contains one must
+// carry its own accessible name.
+interface Props {
+    readonly name: string;
+    readonly class?: string;
+}
+
+const icons: Record<string, string> = import.meta.glob<string>('../icons/*.svg', { query: '?raw', import: 'default', eager: true });
+const { name, class: className = '' }: Props = Astro.props;
+const svg: string | undefined = icons[`../icons/${name}.svg`];
+
+if (svg === undefined) {
+    throw new Error(`Unknown icon "${name}". Add ${name}.svg to src/icons.`);
+}
+
+// Phosphor SVGs already declare fill="currentColor"; drop any fill so the attribute isn't duplicated.
+const markup: string = svg
+    .replace(/\s+fill="[^"]*"/, '')
+    .replace('<svg ', `<svg class="icon ${className}" aria-hidden="true" focusable="false" fill="currentColor" `);
+---
+<Fragment set:html={markup} />

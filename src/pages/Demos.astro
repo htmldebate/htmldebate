@@ -1,0 +1,30 @@
+---
+import Button from '../components/Button.astro';
+import DemoGrid from '../components/DemoGrid.astro';
+import PageHero from '../components/PageHero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+    title="Demos"
+    searchTitle="CSS-only demos with no JavaScript"
+    description="Eight working programs built from nothing but HTML and CSS, including logic gates, FizzBuzz, Rule 110, noughts and crosses and a knight's tour."
+    path="/Demos"
+>
+    <PageHero
+        label="Demos"
+        title="Built from"
+        highlight="HTML and CSS alone"
+        lead="Each demo is a small program made from nothing but HTML and CSS: HTML holds the state, and CSS decides what follows. Each has its own page, with how it works and the one thing it proves."
+    >
+        <Fragment slot="actions">
+            <Button href="/Together" variant="ghost" trailingIcon="arrow-right-bold">Why they work: part 4</Button>
+        </Fragment>
+    </PageHero>
+
+    <section class="section" aria-labelledby="all-demos">
+        <div class="container-wide">
+            <h2 id="all-demos" class="visually-hidden">All the demos</h2>
+            <DemoGrid />
+        </div>
+    </section>
+</BaseLayout>

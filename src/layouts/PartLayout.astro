@@ -1,0 +1,163 @@
+---
+import Button from '../components/Button.astro';
+import type { OutlineEntry } from '../components/outline-entry';
+import PageHero from '../components/PageHero.astro';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { PageKind } from '../config/page-kind';
+import BaseLayout from './BaseLayout.astro';
+
+// A part of the debate: its hero, the text beside an "On this page" outline, and the way on to the parts either side.
+interface Props {
+    readonly part: DebatePart;
+    readonly outline?: ReadonlyArray<OutlineEntry>;
+}
+
+const { part, outline = [] }: Props = Astro.props;
+const previous: DebatePart | undefined = debateParts.find((other: DebatePart): boolean => other.number === part.number - 1);
+const next: DebatePart | undefined = debateParts.find((other: DebatePart): boolean => other.number === part.number + 1);
+
+// One string, rather than values spaced out in the template: Astro drops a lone space between two values in a slot.
+function buttonLabel(target: DebatePart): string {
+    return `Part ${String(target.number)}: ${target.shortTitle ?? `${target.title} ${target.highlight}`}`;
+}
+---
+<BaseLayout title={`${part.title} ${part.highlight}`} searchTitle={part.searchTitle} description={part.description} path={part.path} kind={PageKind.Article}>
+    <PageHero label={`Part ${part.number} of ${debateParts.length}`} title={part.title} highlight={part.highlight} lead={part.summary} />
+
+    <div class:list={['container-wide part', { 'has-outline': outline.length > 1 }]}>
+        <article class="prose part-body">
+            <slot />
+        </article>
+
+        {outline.length > 1 && (
+            <nav class="outline" aria-labelledby="outline-title">
+                <p id="outline-title" class="label label-muted">On this page</p>
+                <ul role="list">
+                    {outline.map((entry: OutlineEntry) => <li><a href={`#${entry.id}`}>{entry.text}</a></li>)}
+                </ul>
+            </nav>
+        )}
+
+        <nav class="part-nav" aria-label="Parts">
+            {previous === undefined
+                ? <Button href="/" variant="ghost" leadingIcon="arrow-left-bold">Introduction</Button>
+                : <Button href={previous.path} variant="ghost" leadingIcon="arrow-left-bold">{buttonLabel(previous)}</Button>}
+            {next === undefined
+                ? <Button href="/Sources" variant="primary">Sources</Button>
+                : <Button href={next.path} variant="primary">{buttonLabel(next)}</Button>}
+        </nav>
+    </div>
+</BaseLayout>
+
+<style>
+    .part {
+        display: grid;
+        gap: 2.5rem;
+        padding-block: var(--space-section);
+    }
+
+    .part-body {
+        min-width: 0;
+        max-width: 46rem;
+        font-size: var(--text-lg);
+    }
+
+    .part-body > :global(:first-child) {
+        margin-top: 0;
+    }
+
+    @media (min-width: 72rem) {
+        .part.has-outline {
+            grid-template-columns: minmax(0, 1fr) 14rem;
+            column-gap: 5rem;
+        }
+
+        .outline {
+            grid-row: 1;
+            grid-column: 2;
+            position: sticky;
+            top: calc(var(--header-height) + 2rem);
+            align-self: start;
+        }
+
+        .part-nav {
+            grid-column: 1;
+        }
+    }
+
+    .outline ul {
+        display: grid;
+        gap: 0.55rem;
+        margin-top: 0.85rem;
+        padding-left: 0.9rem;
+        border-left: 1px solid var(--border);
+        font-size: var(--text-sm);
+    }
+
+    .outline li {
+        position: relative;
+    }
+
+    .outline a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color var(--duration);
+    }
+
+    .outline a:hover {
+        color: var(--heading);
+        text-decoration: none;
+    }
+
+    /*
+     * The section being read is marked by CSS alone: scroll-target-group makes the outline's links scroll markers, and
+     * the browser gives :target-current to the one whose section is in view. Where that isn't supported, the outline is
+     * a plain list of links.
+     */
+    @supports selector(:target-current) {
+        .outline ul {
+            scroll-target-group: auto;
+        }
+
+        .outline a:target-current {
+            color: var(--heading);
+            font-weight: 500;
+        }
+
+        .outline a:target-current::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: calc(-0.9rem - 1px);
+            width: 2px;
+            border-radius: 1px;
+            background: var(--heading);
+        }
+    }
+
+    /* Below 72rem there's no room to keep the outline in view beside the text, so it isn't shown. */
+    @media (max-width: 71.99rem) {
+        .outline {
+            display: none;
+        }
+    }
+
+    .part-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        max-width: 46rem;
+        margin-top: 1.5rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    /* A long title wraps rather than running off a phone's screen. */
+    .part-nav :global(.button) {
+        max-width: 100%;
+        white-space: normal;
+    }
+</style>

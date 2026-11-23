@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "runConfigurations": [
+    {
+      "id": "dev",
+      "name": "Site (live reload)",
+      "providerKind": "node",
+      "mode": "run",
+      "default": true
+    },
+    {
+      "id": "preview",
+      "name": "Site (built preview)",
+      "providerKind": "node",
+      "program": "sh",
+      "args": [
+        "-c",
+        "npm run build && npx astro preview"
+      ],
+      "mode": "run"
+    },
+    {
+      "id": "test",
+      "name": "Unit tests",
+      "providerKind": "node",
+      "mode": "run"
+    }
+  ]
+}

@@ -1,0 +1,362 @@
+---
+import DemoGrid from '../components/DemoGrid.astro';
+import type { OutlineEntry } from '../components/outline-entry';
+import ResultsTable from '../components/ResultsTable.astro';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { togetherResults } from '../config/together-results';
+import PartLayout from '../layouts/PartLayout.astro';
+
+const part: DebatePart | undefined = debateParts.find((candidate: DebatePart): boolean => candidate.path === '/Together');
+
+if (part === undefined) {
+    throw new Error('src/config/debate-parts.ts has no part at /Together.');
+}
+
+const outline: ReadonlyArray<OutlineEntry> = [
+    { id: 'memory', text: 'Memory' },
+    { id: 'counting', text: 'Counting' },
+    { id: 'demos', text: 'The demos' },
+    { id: 'limit', text: 'The limit, and how it moved' },
+    { id: 'score', text: 'How they score together' },
+];
+
+const elements: ReadonlyArray<string> = ['<details>', '<dialog>', '<datalist>', '<meter>', '<progress>', '<output>', '<template>', '<search>'];
+
+const switchExample: string = `.bulb {
+    filter: grayscale(1);
+}
+
+.room:has(#light:checked) .bulb {
+    filter: none;
+}`;
+
+const countingExample: string = `.quiz { counter-reset: used; }
+.quiz input:checked { counter-increment: used; }
+
+.result::before {
+    content: "You've used " counter(used) " of 8.";
+}`;
+---
+<PartLayout part={part} outline={outline}>
+    <p>
+        <a href="/CSS">Part 3</a> ended on a mismatch. HTML can hold state, such as a ticked box or an open section, but
+        can't make decisions about it. CSS can make decisions all day, but has no state of its own. Put them together
+        and each fills the other's gap: HTML remembers, and CSS decides.
+    </p>
+
+    <h2 id="memory">Memory</h2>
+    <p>
+        A checkbox is a single bit of memory: it's either ticked or it isn't, and it stays that way until someone
+        changes it. A group of radio buttons is a little more: one choice out of several, like a variable that can hold
+        one of a fixed set of values. Labels let any part of the page flip them.
+    </p>
+    <p>
+        CSS reads that memory with <code>:checked</code>. Until recently it could only react in elements that came
+        after the checkbox; <code>:has()</code> removed that limit, so now any part of a page can respond to any box
+        on it. Here's the simplest possible example, a light switch:
+    </p>
+
+    <div class="demo surface room">
+        <label class="switch">
+            <input class="switch-input" type="checkbox" id="light" role="switch" />
+            <span class="plate" aria-hidden="true"><span class="rocker"></span></span>
+            <span class="switch-name">Light switch</span>
+        </label>
+        <div class="light">
+            <span class="bulb" aria-hidden="true">💡</span>
+            <p class="lamp-state"></p>
+        </div>
+    </div>
+
+    <p>
+        The switch is a checkbox in disguise: the box is hidden inside its label, and the label is drawn to look like a
+        switch. Clicking the label ticks the box, and CSS does the rest:
+    </p>
+    <pre><code>{switchExample}</code></pre>
+    <p>
+        One bit of memory in HTML, one decision in CSS. Everything that follows is built from more of the same.
+    </p>
+
+    <h2 id="counting">Counting</h2>
+    <p>
+        CSS counters, which <a href="/CSS#calculating">part 3</a> used to print the results of sums, can also count
+        ticked boxes, because a counter can go up only on elements that match a condition. The boxes are hidden inside
+        their labels again, so you pick the labels themselves. Which of these HTML elements have you used?
+    </p>
+
+    <div class="demo surface quiz">
+        <ul class="quiz-options" role="list">
+            {elements.map((element: string, index: number) => (
+                <li>
+                    <label>
+                        <input type="checkbox" id={`element-${index}`} />
+                        <code>{element}</code>
+                    </label>
+                </li>
+            ))}
+        </ul>
+        <p class="result"></p>
+    </div>
+
+    <pre><code>{countingExample}</code></pre>
+    <p>
+        That's input, memory, a calculation and output, with no script anywhere. Ben Romy wrote that HTML "can't take
+        input and produce output". On its own, no; with CSS, it just did.
+    </p>
+
+    <h2 id="demos">The demos</h2>
+    <p>
+        The demos push the same ideas further. Each one has its own page, with an explanation of how it works and the
+        one thing it proves.
+    </p>
+
+    <DemoGrid />
+
+    <p>All the demos are also listed on the <a href="/Demos">demos page</a>, linked from the top of every page.</p>
+
+    <h2 id="limit">The limit, and how it moved</h2>
+    <p>
+        So can HTML and CSS together compute anything? For years, the answer was "yes, with help". Rule 110 is a row of
+        cells, each on or off, where every new row follows from the one above by a single simple rule. In 2004 the
+        mathematician Matthew Cook published a proof that Rule 110 can compute anything a computer can: it's
+        Turing-complete. And Rule 110 has been built in HTML and CSS, notably by Eli Fox-Epstein in 2011; there's a
+        version you can <a href="/Demos/Rule-110">try in the demos</a>.
+    </p>
+    <p>That made HTML and CSS Turing-complete too, with two catches:</p>
+    <ul>
+        <li>
+            <strong>The page must be big enough.</strong> Every cell has to exist in the HTML before the page loads, so
+            the size of the computation is fixed in advance. That's a lesser objection than it sounds: every real
+            computer has a fixed amount of memory too.
+        </li>
+        <li>
+            <strong>A person has to keep clicking.</strong> CSS can work out what the next row should be, but with the
+            CSS most of us write, it can't make it happen. Someone has to click to move the machine on, every step. The
+            person is the clock.
+        </li>
+    </ul>
+    <p>
+        The second catch shows up in a simpler way too. HTML and CSS are very good at <em>checking</em> an answer: is
+        this game won, is this sum right, is this a valid move? <em>Searching</em> for one is another matter, because
+        searching means trying something, remembering the result, undoing it and trying again, over and over. In every
+        demo on this site, only the person clicking does that. A <a href="/Demos/Knights-Tour">knight's tour</a> is easy
+        to check in CSS; finding one is left to you.
+    </p>
+
+    <h3>Then CSS got a clock</h3>
+    <p>
+        In February 2026, Lyra Rebane published <a href="https://lyra.horse/x86css/">x86CSS</a>: an emulator, written in
+        CSS, of an Intel x86 processor, the family inside most desktop computers. It runs real programs, written in C and
+        compiled to x86 machine code, with no JavaScript at all. And it doesn't need anyone clicking: its clock is a CSS
+        animation, combined with the newest kind of container query, so the processor steps forward by itself. It builds
+        on Jane Ori's earlier CSS CPU, which needed the pointer held over the page to keep it running.
+    </p>
+    <p>
+        That removes the second catch. A processor that runs compiled programs can run one that searches, so in principle
+        CSS can now find a knight's tour by itself. It also means CSS is carrying its own state from one step to the next,
+        the memory <a href="/CSS#limits">part 3</a> says it lacks in everyday use.
+    </p>
+    <p>The new catches are practical ones:</p>
+    <ul>
+        <li>
+            <strong>It needs the very newest CSS.</strong> x86CSS relies on <code>if()</code>, custom
+            <code>@function</code>s and style queries, so for now it only runs in Chromium-based browsers, such as Chrome
+            and Edge, and in Ladybird.
+        </li>
+        <li>
+            <strong>It's slow and small.</strong> It has 1.5 KB of memory to start with, its author says it isn't
+            practical, and it doesn't support every x86 instruction.
+        </li>
+    </ul>
+    <p>
+        Neither matters to the question of what CSS <em>can</em> do. Slow and small is how every computer started. The
+        demos on this site stick to CSS that works in every browser, which is why they still need you to click; but the
+        line they show isn't where it was.
+    </p>
+
+    <h2 id="score">How they score together</h2>
+    <p>Against the four tests, HTML and CSS together come out like this:</p>
+
+    <ResultsTable subject="HTML and CSS" results={togetherResults} />
+
+    <p>
+        That's a very different picture from either on its own. Together they pass the middle test outright, and get
+        further on the strictest than most people would guess, further every year. Whether that's enough to call them a programming
+        language is what the <a href="/Verdict">verdict</a> is about.
+    </p>
+</PartLayout>
+
+<style>
+    .demo {
+        display: grid;
+        gap: 1rem;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+    }
+
+    .demo > :global(*) {
+        margin-top: 0;
+    }
+
+    /*
+     * The light switch: a checkbox hidden inside its label, with the label drawn as a wall plate and rocker. The box stays
+     * in the page, out of sight, so it can still be reached with the keyboard and is announced as a switch.
+     */
+    .room {
+        display: flex;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    /* The switch and the light are laid out alike, picture above caption, so the two captions line up. */
+    .switch,
+    .light {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        justify-items: center;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .switch {
+        cursor: pointer;
+    }
+
+    .switch-input,
+    .quiz-options input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    /* The fascia: a raised plate holding the rocker. */
+    .plate {
+        padding: 0.9rem 1.5rem;
+        border-radius: var(--radius);
+        corner-shape: var(--corner-shape);
+        background: var(--surface-raised);
+        box-shadow: var(--edge-shadow), var(--shadow-md);
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+    }
+
+    /* The rocker: the pressed half is in shadow. Off, the top is pressed in; on, the bottom. */
+    .rocker {
+        display: block;
+        width: 1.9rem;
+        height: 3.2rem;
+        border-radius: 0.45rem;
+        background: linear-gradient(to bottom, var(--surface-alt) 0 50%, var(--surface) 50% 100%);
+        box-shadow: inset 0 0 0 1px var(--border-strong), 0 0.15rem 0.3rem rgba(0, 0, 0, 0.25);
+    }
+
+    .switch-input:checked + .plate .rocker {
+        background: linear-gradient(to bottom, var(--surface) 0 50%, var(--surface-alt) 50% 100%);
+    }
+
+    .switch-input:focus-visible + .plate {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+    }
+
+    /* The switch's caption and the light's state share one style. */
+    .switch-name,
+    .lamp-state {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        font-weight: 500;
+    }
+
+    .bulb {
+        font-size: 4.5rem;
+        line-height: 1;
+        filter: grayscale(1) opacity(0.45);
+        transition: filter 300ms;
+    }
+
+    .room:has(#light:checked) .bulb {
+        filter: drop-shadow(0 0 1.25rem color-mix(in srgb, var(--brand-amber) 80%, transparent));
+    }
+
+    .lamp-state::before {
+        content: 'The light is off.';
+    }
+
+    .room:has(#light:checked) .lamp-state::before {
+        content: 'The light is on.';
+    }
+
+    /* The counting quiz: a counter that only ticked boxes add to, printed after them. */
+    .quiz {
+        counter-reset: used;
+    }
+
+    .quiz-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+        gap: 0.5rem;
+        padding: 0;
+    }
+
+    .quiz-options li {
+        margin: 0;
+    }
+
+    /* Each option is its label: the box inside it is out of sight, and ticking it lights the label up. */
+    .quiz-options label {
+        position: relative;
+        display: grid;
+        place-items: center;
+        padding: 0.65rem 0.75rem;
+        border-radius: var(--radius);
+        corner-shape: var(--corner-shape);
+        background: var(--surface-alt);
+        cursor: pointer;
+    }
+
+    .quiz-options label:hover {
+        box-shadow: inset 0 0 0 2px var(--border-strong);
+    }
+
+    .quiz-options label:has(:checked) {
+        background: var(--brand-blue);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .quiz-options label:has(:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    .quiz-options code {
+        padding: 0;
+        background: none;
+    }
+
+    .quiz-options label:has(:checked) code {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .quiz input:checked {
+        counter-increment: used;
+    }
+
+    .result {
+        color: var(--heading);
+        font-size: var(--text-lg);
+        font-weight: 600;
+    }
+
+    .result::before {
+        content: "You've used " counter(used) ' of 8.';
+    }
+
+    .quiz:not(:has(input:not(:checked))) .result::after {
+        content: ' Full marks.';
+        color: var(--success-text);
+    }
+</style>

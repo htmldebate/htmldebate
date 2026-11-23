@@ -1,0 +1,50 @@
+---
+import type { ProgrammingTest } from '../config/programming-test';
+import { programmingTests } from '../config/programming-tests';
+import type { TestResult } from '../config/test-result';
+import ScorePill from './ScorePill.astro';
+
+// A subject's results against the four tests, in the tests' order.
+interface Props {
+    readonly subject: string;
+    readonly results: ReadonlyArray<TestResult>;
+}
+
+const { subject, results }: Props = Astro.props;
+
+function resultFor(test: ProgrammingTest): TestResult | undefined {
+    return results.find((result: TestResult): boolean => result.testId === test.id);
+}
+---
+<div class="table-responsive">
+    <table class="results">
+        <caption class="visually-hidden">{subject} against the four tests</caption>
+        <thead>
+            <tr>
+                <th scope="col">Test</th>
+                <th scope="col">{subject}</th>
+                <th scope="col">Why</th>
+            </tr>
+        </thead>
+        <tbody>
+            {programmingTests.map((test: ProgrammingTest) => {
+                const result: TestResult | undefined = resultFor(test);
+
+                return (
+                    <tr>
+                        <th scope="row">{test.name}</th>
+                        <td>{result !== undefined && <ScorePill score={result.score} />}</td>
+                        <td>{result?.reason}</td>
+                    </tr>
+                );
+            })}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .results th[scope='row'] {
+        background: none;
+        white-space: nowrap;
+    }
+</style>

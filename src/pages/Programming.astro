@@ -1,0 +1,270 @@
+---
+import type { OutlineEntry } from '../components/outline-entry';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import type { ProgrammingTest } from '../config/programming-test';
+import { programmingTests } from '../config/programming-tests';
+import PartLayout from '../layouts/PartLayout.astro';
+
+const part: DebatePart | undefined = debateParts.find((candidate: DebatePart): boolean => candidate.path === '/Programming');
+
+if (part === undefined) {
+    throw new Error('src/config/debate-parts.ts has no part at /Programming.');
+}
+
+const outline: ReadonlyArray<OutlineEntry> = [
+    { id: 'definitions', text: 'What programming means' },
+    { id: 'languages', text: 'What a programming language is' },
+    { id: 'tests', text: 'Four tests' },
+    { id: 'markup', text: 'Markup or programming?' },
+    { id: 'declarative', text: 'Describing is not disqualifying' },
+    { id: 'next', text: 'Where this leaves us' },
+];
+---
+<PartLayout part={part} outline={outline}>
+    <p>
+        Ask ten developers whether HTML is a programming language and you'll get ten confident answers, most of them a
+        flat yes or no, and very few of them explained. The trouble usually isn't HTML. It's that each person has a
+        different idea of what a programming language is, and the argument never gets as far as comparing them.
+    </p>
+    <p>
+        So before we look at HTML or CSS at all, this part sets out what people mean by programming, and turns those
+        meanings into tests we can use for the rest of the debate.
+    </p>
+
+    <h2 id="definitions">What programming means</h2>
+    <p>
+        Start with the word itself. Here are four definitions: from a dictionary, a teaching site, a coding school and an
+        encyclopaedia.
+    </p>
+
+    <ul class="definitions" role="list">
+        <li>
+            <figure>
+                <blockquote><p>The process or activity of writing computer programs.</p></blockquote>
+                <figcaption><a href="https://www.google.com/search?q=programming+definition">Google</a>, from Oxford Languages</figcaption>
+            </figure>
+        </li>
+        <li>
+            <figure>
+                <blockquote><p>The process of creating a set of instructions that tell a computer how to perform a task.</p></blockquote>
+                <figcaption><a href="https://www.khanacademy.org/computing/computer-programming/programming/intro-to-programming/v/programming-intro">Khan Academy</a></figcaption>
+            </figure>
+        </li>
+        <li>
+            <figure>
+                <blockquote><p>Programming languages involve logical and arithmetic operations along with several algorithms.</p></blockquote>
+                <figcaption><a href="https://web.archive.org/web/20230317113439/https://kenzie.snhu.edu/blog/is-html-a-programming-language/">Kenzie Academy</a></figcaption>
+            </figure>
+        </li>
+        <li>
+            <figure>
+                <blockquote><p>The composition of sequences of instructions, called programs, that computers can follow to perform tasks.</p></blockquote>
+                <figcaption><a href="https://en.wikipedia.org/wiki/Computer_programming">Wikipedia</a></figcaption>
+            </figure>
+        </li>
+    </ul>
+
+    <p>
+        They don't agree. The first is circular: programming is writing programs, which tells us nothing about what a
+        program is. The second is broad, taking in any set of instructions that tells a computer how to do a task. The
+        third asks for logic. The fourth sits somewhere between. Pick the second and HTML looks like it's in; pick the
+        third and it looks like it's out.
+    </p>
+
+    <h2 id="languages">What a programming language is</h2>
+    <p>
+        Definitions of a programming language split the same way. Wikipedia calls it a formal language designed to express
+        computations, which leaves plenty of room to argue over what counts. Authors draw the line between programming
+        languages and the wider family of computer languages in different places:
+    </p>
+    <ul>
+        <li>Some count only languages that can compute anything (more on that below).</li>
+        <li>
+            Others count languages that can't, such as the 1992 version of SQL, the database query language, which is still
+            widely called a programming language.
+        </li>
+        <li>
+            The computer scientist John C. Reynolds went further, arguing that even input formats that change how a
+            computer behaves are programming languages, whether or not they can compute anything.
+        </li>
+        <li>
+            And some draw the line at markup. Wikipedia's own article says that "a markup language is not a programming
+            language per se".
+        </li>
+    </ul>
+    <p>
+        That last view is worth a second look. It rules HTML out by the kind of language it is, so it answers the question
+        before it has been asked. That isn't much use in a debate, so we'll set it aside and use tests that HTML could pass or
+        fail on its merits.
+    </p>
+
+    <h2 id="tests">Four tests</h2>
+    <p>
+        Pull those threads together and most arguments about HTML rest on one of four tests. People rarely say which
+        one they're using, which is why the arguments go round in circles.
+    </p>
+
+    <h3>1. Can it compute anything?</h3>
+    <p>
+        This is the strictest test, and the one computer scientists reach for first. In 1936 Alan Turing described a
+        very simple imaginary machine: a strip of tape, a head that reads and writes symbols on it, and a table of
+        rules saying what to do next. Simple as it is, a Turing machine can carry out any calculation that any computer
+        can. A language that can imitate one is called <strong>Turing-complete</strong>.
+    </p>
+    <p>
+        Almost every general-purpose language is Turing-complete: Python, JavaScript, C#, Kotlin and the rest.
+        Strictly speaking no real computer is, because Turing's tape never runs out and real memory does, so in
+        practice we ask whether the language could compute anything if it had the memory.
+    </p>
+    <p>
+        HTML on its own clearly fails this test. HTML with CSS is a more interesting case, which we come to in part 4.
+    </p>
+
+    <h3>2. Does it tell a machine what to do?</h3>
+    <p>
+        This is the loosest test, and it matches the Khan Academy definition: programming is writing instructions that
+        a machine carries out, whether or not those instructions could compute anything.
+    </p>
+    <p>
+        Plenty of things pass that we'd happily call programmable: the Jacquard loom, which wove patterns from punched
+        cards in the early 1800s, a lathe, a 3D printer, a washing machine. Each follows instructions to automate one
+        kind of task, but none can be made to do any task. The weakness of this test is that it lets in almost
+        anything, including, some would say, a shopping list handed to a robot.
+    </p>
+
+    <h3>3. Can it decide, and remember?</h3>
+    <p>
+        Between those two sits the test most developers apply without thinking: does the language have logic? Can it
+        choose between outcomes (if this, then that), and can it hold on to a value and use it later? Choices and
+        memory are what turn a fixed list of instructions into something that responds to what's happening.
+    </p>
+    <p>
+        This is the test behind the familiar complaints that HTML has no if statements and no variables. It's also
+        where CSS gets interesting, because CSS can do both, in its own way.
+    </p>
+
+    <h3>4. Would people call the result a program?</h3>
+    <p>
+        The last test is less formal, but it's how most people actually decide. Is the language used to build things
+        that run and do a job: tools, games, applications? A database query counts, a spreadsheet formula arguably
+        does, and a web page is the very thing in question.
+    </p>
+    <p>
+        This test rests on habit as much as on what a language can do, so it shifts over time. That doesn't make it
+        worthless: it's the reason nobody calls a recipe a program, however precisely it's written.
+    </p>
+
+    <h2 id="markup">Markup or programming? It can be both</h2>
+    <p>
+        One argument tries to skip the tests altogether: HTML stands for HyperText Markup Language, so it's a markup
+        language, so it isn't a programming language. That only works if the two can't overlap, and they can.
+    </p>
+    <p>
+        HTML belongs to a family of markup languages descended from SGML, the Standard Generalised Markup Language,
+        alongside XML. XSLT, a language for transforming one XML document into another, is itself written entirely in
+        XML markup, and it's Turing-complete: it passes the strictest test there is. So a language can be markup and
+        programming at the same time. HTML's name tells us what it was designed for, not what it can or can't do.
+    </p>
+
+    <h2 id="declarative">Describing is not disqualifying</h2>
+    <p>
+        A related argument says HTML only describes things; it doesn't do them. It's true that HTML is <strong>declarative</strong>:
+        you say what you want on the page, a heading here and a form there, and leave the browser to work out how to
+        draw it. But being declarative doesn't rule a language out. SQL is declarative too:
+        you describe the rows you want, not how to find them, and SQL is widely accepted as a programming language.
+        Describing the result instead of the steps is a style of programming, not the absence of it.
+    </p>
+    <p>
+        So the useful question isn't whether HTML is declarative, but how much it can declare: whether its
+        declarations can make choices, hold state and compute, or only describe a fixed document.
+    </p>
+
+    <h2 id="next">Where this leaves us</h2>
+    <p>We now have four tests, from the strictest to the loosest:</p>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Test</th>
+                    <th scope="col">The question it asks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {programmingTests.map((test: ProgrammingTest) => (
+                    <tr>
+                        <th scope="row">{test.name}</th>
+                        <td>{test.question}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+
+    <p>
+        None of them is the one right test, and the rest of this site doesn't pretend otherwise. Instead we'll hold HTML
+        and CSS up to all four: HTML on its own first, then CSS, then the two together. The verdict brings the scores
+        together at the end.
+    </p>
+</PartLayout>
+
+<style>
+    .definitions {
+        display: grid;
+        gap: var(--tile-gap);
+        padding-left: 0;
+    }
+
+    @media (min-width: 40rem) {
+        .definitions {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .definitions li + li {
+        margin-top: 0;
+    }
+
+    .definitions figure {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        gap: 0.85rem;
+        height: 100%;
+        padding: 1.4rem 1.5rem;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--surface);
+        box-shadow: var(--edge-shadow), var(--shadow-sm);
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+    }
+
+    .definitions blockquote {
+        padding: 0;
+        background: none;
+        color: var(--heading);
+        font-size: var(--text-lg);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.45;
+    }
+
+    .definitions blockquote p::before {
+        content: open-quote;
+    }
+
+    .definitions blockquote p::after {
+        content: close-quote;
+    }
+
+    .definitions figcaption {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+    }
+
+    .prose .table-responsive th[scope='row'] {
+        background: none;
+        white-space: nowrap;
+    }
+</style>

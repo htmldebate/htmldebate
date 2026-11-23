@@ -1,0 +1,347 @@
+---
+import { buildKnightsTourCss } from '../../demos/knights-tour/build-knights-tour-css';
+import { knightMoves } from '../../demos/knights-tour/knight-moves';
+import Disclosure from '../../components/Disclosure.astro';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const size: number = 5;
+const squareCount: number = size * size;
+const moves: ReadonlyArray<number> = Array.from({ length: squareCount }, (_: unknown, index: number): number => index + 1);
+const squares: ReadonlyArray<number> = Array.from({ length: squareCount }, (_: unknown, index: number): number => index);
+
+// The rules of the tour, as CSS: written at build time by src/demos/knights-tour.
+const tourCss: string = buildKnightsTourCss(size);
+const ruleCount: number = tourCss.split('{').length - 1;
+
+function placement(square: number): string {
+    return `grid-area: ${String(Math.floor(square / size) + 1)} / ${String((square % size) + 1)}`;
+}
+
+// Squares are named as on a chessboard: files a to e from the left, ranks 5 to 1 from the top.
+function squareName(square: number): string {
+    return `${'abcde'.charAt(square % size)}${String(size - Math.floor(square / size))}`;
+}
+
+function cellClasses(move: number, square: number): string {
+    const from: ReadonlyArray<string> = knightMoves(square, size).map((origin: number): string => `from-${String(origin)}`);
+
+    return ['cell', `move-${String(move)}`, `square-${String(square)}`, ...from].join(' ');
+}
+
+// The real rules that mention something, so what's shown is what runs.
+function rulesWith(part: string): string {
+    return tourCss
+        .split('\n')
+        .filter((line: string): boolean => line.startsWith('.tour') && line.includes(part))
+        .join('\n\n')
+        .replaceAll(' { ', ' {\n    ')
+        .replaceAll('; }', ';\n}');
+}
+
+const moveExample: string = `<label class="cell move-4 square-12 from-1 from-3 from-5 from-9 from-15 …">
+    <input type="radio" name="m4" value="12">
+    Move 4: c3
+</label>`;
+const firstExample: string = rulesWith('.move-1 { display: grid');
+const legalExample: string = rulesWith('[name="m3"][value="12"]');
+const closedExample: string = [
+    rulesWith('.tour:has([name="m4"]:checked) .move-4:not'),
+    rulesWith('.square-12:not'),
+].join('\n\n');
+const knightExample: string = `.tour:not(:has([name="m5"]:checked)) .move-4:has(:checked) .knight {
+    display: inline;
+}
+
+.tour:not(:has([name="m5"]:checked)) .move-4:has(:checked) .number {
+    display: none;
+}`;
+
+const countExample: string = `.tour { counter-reset: visited; }
+.tour input:checked { counter-increment: visited; }
+
+.visited::before {
+    content: 'Squares visited: ' counter(visited) ' of 25';
+}`;
+const completeExample: string = rulesWith('Tour complete');
+
+const resetExample: string = `<button class="button" type="reset">Start again</button>`;
+---
+<DemoLayout path="/Demos/Knights-Tour">
+    <Fragment slot="what">
+        <p>
+            Place the knight on any square, then keep moving it the way a knight moves in chess: two squares one way and one
+            the other. The aim is to visit all {squareCount} squares, each exactly once. Only legal moves are offered, and
+            each square you've visited shows the move that reached it.
+        </p>
+        <p>
+            A hint: a tour of this board can only start on one of the darker squares, the ones the same colour as the corners.
+            A corner is a good place to begin.
+        </p>
+    </Fragment>
+
+    <Fragment slot="demo">
+        <form class="tour" aria-label="Knight's tour">
+            <p class="status" aria-live="polite"></p>
+
+            <div class="board">
+                {squares.map((square: number) => (
+                    <span class:list={['tile', { 'is-dark': (Math.floor(square / size) + (square % size)) % 2 === 0 }]} style={placement(square)} aria-hidden="true"></span>
+                ))}
+                {moves.map((move: number) => squares.map((square: number) => (
+                    <label class={cellClasses(move, square)} style={placement(square)}>
+                        <input type="radio" name={`m${String(move)}`} value={String(square)} />
+                        <span class="visually-hidden">Move {move}: {squareName(square)}</span>
+                        <span class="number" aria-hidden="true">{move}</span>
+                        <span class="knight" aria-hidden="true">♞</span>
+                    </label>
+                )))}
+            </div>
+
+            <div class="tour-footer">
+                <p class="visited" aria-live="polite"></p>
+                <button class="button" type="reset">Start again</button>
+            </div>
+        </form>
+        <Fragment set:html={`<style>${tourCss}</style>`} />
+    </Fragment>
+
+    <Fragment slot="how">
+        <p>
+            The board works like <a href="/Demos/Noughts-And-Crosses">noughts and crosses</a>: one group of radio buttons for each
+            of the {squareCount} moves, with an option for every square. The difference is in what each option knows. Its label
+            carries a class for every square a knight could reach it from.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{moveExample}</code></pre>
+        </Disclosure>
+
+        <h3>The first move</h3>
+        <p>The knight can start anywhere, so until the first move is made, all of that move's options are shown.</p>
+        <Disclosure>
+            <Fragment slot="summary">The first move source</Fragment>
+            <pre><code>{firstExample}</code></pre>
+        </Disclosure>
+
+        <h3>Offering the legal moves</h3>
+        <p>
+            After that, only squares a knight can reach are offered. There's a rule for each move and each square it might have
+            landed on. If move 3 landed on square 12, the centre of the board, then move 4 offers every square that can be reached
+            from square 12. Squares are numbered from 0, in reading order.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Offering the legal moves source</Fragment>
+            <pre><code>{legalExample}</code></pre>
+        </Disclosure>
+
+        <h3>Closing moves and squares</h3>
+        <p>
+            Once a move has been made, its other options are hidden, so it can't be made twice. Once a square has been visited,
+            it's hidden from every later move. As in noughts and crosses, hiding a label hides the radio button inside it, so
+            neither can be chosen with the keyboard.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Closing moves and squares source</Fragment>
+            <pre><code>{closedExample}</code></pre>
+        </Disclosure>
+
+        <h3>Showing the knight and the trail</h3>
+        <p>
+            Every visited square shows the number of the move that reached it, except the latest, which shows the knight. A move is
+            the latest if it has been made and the one after it hasn't.
+        </p>
+        <p>
+            The message above the board and the count below it are written by CSS too. A screen reader can read them, but may not
+            announce them as they change, which would take a script.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Showing the knight source</Fragment>
+            <pre><code>{knightExample}</code></pre>
+        </Disclosure>
+
+        <h3>Counting the squares</h3>
+        <p>
+            A counter goes up by one for every radio button that's checked. The total is printed below the board, after all of
+            them, because a counter's value depends on where in the page it's read.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Counting the squares source</Fragment>
+            <pre><code>{countExample}</code></pre>
+        </Disclosure>
+
+        <h3>Recognising a tour</h3>
+        <p>
+            Since every move offered is legal and no square can be visited twice, there's nothing left to check at the end. If
+            move {squareCount} has been made, the tour is complete.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Recognising a tour source</Fragment>
+            <pre><code>{completeExample}</code></pre>
+        </Disclosure>
+
+        <h3>When the knight is stuck</h3>
+        <p>
+            Telling you you're stuck would be possible, but it would need a rule for every square at every move, checking all of
+            that square's neighbours, and the stylesheet would balloon. So when no squares are highlighted, the knight is stuck,
+            and it's time to start again. That button is HTML: a reset button puts every input in its form back the way it started.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Starting again source</Fragment>
+            <pre><code>{resetExample}</code></pre>
+        </Disclosure>
+
+        <h3>Written by a program</h3>
+        <p>
+            In all, it takes {ruleCount} rules, written by a small program when the site is built. Tests check that the moves it
+            allows are a knight's moves, stay on the board, and work in both directions.
+        </p>
+
+        <h3>The end result</h3>
+        <p>
+            Every move you make is a legal one, every square is visited at most once, and a full tour is recognised as soon as you
+            finish it.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            This demo shows the gap between checking and searching most clearly. CSS checks every move you make, instantly
+            and without fail. But this board can't find a tour for you, or even warn you that a move leads to a dead end.
+            Finding a tour means trying a move, following it until you're stuck, going back and trying another: a search,
+            with memory of what's been tried. Here, HTML has the memory, but only you do the going back.
+        </p>
+        <p>
+            That's a limit of rules like these, not of CSS itself. With the newest features, CSS can run an emulated processor
+            by itself (<a href="/Together#limit">x86CSS, in part 4</a>), and a processor can run a program that searches. But
+            look at the difference in effort: checking a tour takes a few hundred rules anyone could read, while searching for
+            one takes building a computer first. A programming language does it in a dozen lines.
+        </p>
+    </Fragment>
+</DemoLayout>
+
+<style>
+    .tour {
+        display: grid;
+        gap: 1.25rem;
+        justify-items: center;
+        counter-reset: visited;
+    }
+
+    .status {
+        max-width: 32rem;
+        color: var(--heading);
+        font-size: var(--text-lg);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .status::before {
+        content: 'Click any square to place the knight.';
+    }
+
+    .board {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 4.5rem));
+        grid-template-rows: repeat(5, minmax(0, 4.5rem));
+        gap: 3px;
+        padding: 3px;
+        border-radius: var(--radius);
+        background: var(--border-strong);
+    }
+
+    .tile {
+        aspect-ratio: 1;
+        border-radius: 3px;
+        background: var(--surface);
+        corner-shape: round;
+    }
+
+    .tile.is-dark {
+        background: var(--surface-alt);
+    }
+
+    /* A cell is hidden until a rule offers it as a legal move, or until it's been visited. */
+    .cell {
+        position: relative;
+        display: none;
+        place-items: center;
+        border-radius: 3px;
+        corner-shape: round;
+        cursor: pointer;
+    }
+
+    /* An offered move: a dot in the middle of the square. */
+    .cell:not(:has(:checked))::before {
+        content: '';
+        width: 0.9rem;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        corner-shape: round;
+        background: var(--ink-amber);
+    }
+
+    .cell:not(:has(:checked)):hover {
+        background: color-mix(in srgb, var(--brand-amber) 30%, transparent);
+    }
+
+    .cell:has(:checked) {
+        display: grid;
+        background: color-mix(in srgb, var(--brand-blue) 35%, transparent);
+        cursor: default;
+    }
+
+    .cell input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .tour input:checked {
+        counter-increment: visited;
+    }
+
+    .cell:has(:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
+
+    .number,
+    .knight {
+        grid-area: 1 / 1;
+        color: var(--heading);
+        font-family: var(--font-mono);
+        font-weight: 600;
+    }
+
+    .number {
+        display: none;
+    }
+
+    .cell:has(:checked) .number {
+        display: inline;
+    }
+
+    .knight {
+        display: none;
+        font-size: 2.5rem;
+        line-height: 1;
+    }
+
+    .tour-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem 2rem;
+    }
+
+    .visited {
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .visited::before {
+        content: 'Squares visited: ' counter(visited) ' of 25';
+    }
+</style>

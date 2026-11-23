@@ -1,0 +1,269 @@
+---
+import Disclosure from '../../components/Disclosure.astro';
+import type { Gate } from '../../demos/logic/gate';
+import { gates } from '../../demos/logic/gates';
+import { truthTable } from '../../demos/logic/truth-table';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const ruleCount: number = gates.reduce((total: number, gate: Gate): number => total + gate.css.split('.gate-').length - 1, 0);
+
+const gateExample: string = `<div class="gate gate-and">
+    <input class="bit a" type="checkbox" id="and-a">
+    <label for="and-a">AND, input A</label>
+    <input class="bit b" type="checkbox" id="and-b">
+    <label for="and-b">AND, input B</label>
+    <output class="output" for="and-a and-b"></output>
+</div>`;
+
+const tileExample: string = `.output { --bit: '0'; }
+.output::before { content: var(--bit); }`;
+---
+<DemoLayout path="/Demos/Logic">
+    <Fragment slot="what">
+        <p>
+            Boolean algebra is the branch of mathematics where every value is either true or false, usually written 1 and 0.
+            Instead of adding and multiplying, its main operations are AND (written A • B), OR (written A + B) and NOT
+            (written as a bar over A). George Boole introduced it in <em>The Mathematical Analysis of Logic</em> in 1847, and
+            set it out more fully in <em>An Investigation of the Laws of Thought</em> in 1854.
+        </p>
+        <p>
+            A logic gate is one of those operations made real: inputs go in, and a single output comes out. Below are seven of
+            them. Click the switches on the left of each row to set its inputs, A and B, to 0 or 1; CSS works out the output on
+            the right.
+        </p>
+    </Fragment>
+
+    <div slot="demo" class="gates">
+        {gates.map((gate: Gate) => (
+            <div class={`gate gate-${gate.id}`}>
+                <p class="gate-name">{gate.name}</p>
+                {gate.inputs.map((input: string) => (
+                    <Fragment>
+                        <input class={`bit ${input}`} type="checkbox" id={`${gate.id}-${input}`} />
+                        <label for={`${gate.id}-${input}`}><span class="visually-hidden">{gate.name}, input {input.toUpperCase()}</span></label>
+                    </Fragment>
+                ))}
+                <p class="gate-rule">{gate.rule}</p>
+                <output class="output" for={gate.inputs.map((input: string): string => `${gate.id}-${input}`).join(' ')}></output>
+            </div>
+        ))}
+    </div>
+
+    <Fragment slot="how">
+        <p>Every gate is built on the same principle, with the work split between HTML and CSS.</p>
+        <p>
+            HTML's part is memory. Each switch is an ordinary <code>&lt;input type="checkbox"&gt;</code>, hidden behind its
+            <code>&lt;label&gt;</code>. Clicking the label ticks or unticks the box: ticked is 1, unticked is 0. The tile on the
+            right is an <code>&lt;output&gt;</code> element, which is empty in the HTML.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{gateExample}</code></pre>
+        </Disclosure>
+
+        <h3>Drawing the tiles</h3>
+        <p>
+            CSS's part is logic. Each tile draws its number from a custom property, <code>--bit</code>, which starts at 0. A
+            gate's rules test its boxes with <code>:checked</code> and <code>:not(:checked)</code>, and <code>:has()</code>
+            lets the gate as a whole see what's been ticked inside it. When a rule matches, it sets the output's
+            <code>--bit</code> to 1 and changes the tile's colour; when none does, the output stays at 0.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Drawing the tiles source</Fragment>
+            <pre><code>{tileExample}</code></pre>
+        </Disclosure>
+        <p>
+            Only the rules differ from gate to gate. Here is each one, with its truth table: every combination of inputs, and
+            the output it should give.
+        </p>
+
+        {gates.map((gate: Gate) => (
+            <Fragment>
+                <h3>{gate.name}, written <span class:list={['notation', { 'is-negated': gate.isNegated }]}>{gate.notation}</span></h3>
+                <p>{gate.explanation}</p>
+                <Disclosure>
+                    <Fragment slot="summary">{gate.name} source and truth table</Fragment>
+                    <div class="gate-detail-body">
+                        <pre><code>{gate.css}</code></pre>
+                        <div class="table-responsive">
+                            <table class="truth-table">
+                                <caption class="visually-hidden">Truth table for {gate.name}</caption>
+                                <thead>
+                                    <tr>
+                                        {gate.inputs.map((input: string) => <th scope="col">{input.toUpperCase()}</th>)}
+                                        <th scope="col">Output</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {truthTable(gate).map((row: ReadonlyArray<string>) => (
+                                        <tr>{row.map((bit: string) => <td>{bit}</td>)}</tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </Disclosure>
+            </Fragment>
+        ))}
+
+        <h3>The end result</h3>
+        <p>
+            Seven gates, each giving the output its truth table asks for, from {ruleCount} selectors between them.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            These gates are the vocabulary of digital electronics. NAND alone is enough to build every other gate, and from
+            gates come adders, comparators and, eventually, a computer's processor. The
+            <a href="/Demos/Adder">adding machine</a> takes the next step.
+        </p>
+        <p>
+            A processor needs two more things: memory to hold its results, and a clock to move it from one step to the next.
+            Here, the checkboxes are the memory, and you are the clock.
+        </p>
+    </Fragment>
+</DemoLayout>
+
+<style>
+    .gates {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    /* The name and switches on the left; the explanation and the output on the right. */
+    .gate {
+        display: grid;
+        grid-template-columns: 4.5rem 3.5rem 3.5rem 1fr 3.5rem;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--surface-alt);
+    }
+
+    .gate-name {
+        color: var(--heading);
+        font-family: var(--font-mono);
+        font-weight: 600;
+    }
+
+    .gate-rule {
+        grid-column: 4;
+        grid-row: 1;
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        text-align: right;
+    }
+
+    .output {
+        grid-column: 5;
+        grid-row: 1;
+    }
+
+    /* No room beside the switches on a phone, so the explanation goes underneath. */
+    @media (max-width: 40rem) {
+        .gate {
+            grid-template-columns: 3.5rem 3rem 3rem 1fr 3rem;
+            gap: 0.5rem;
+        }
+
+        .gate-rule {
+            grid-column: 1 / -1;
+            grid-row: 2;
+        }
+    }
+
+    /* Boolean algebra writes "not" as a bar over the expression. */
+    .notation.is-negated {
+        text-decoration: overline;
+    }
+
+    /* Each gate's source, then its truth table, folded away until they're wanted. */
+    .gate-detail-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+
+    /* The panel is the colour a table's header usually has, so the header takes the code's instead. */
+    .gate-detail-body .truth-table thead th {
+        background: var(--code-bg);
+    }
+
+    .truth-table th,
+    .truth-table td {
+        padding: 0.4rem 0.75rem;
+        font-family: var(--font-mono);
+        text-align: center;
+    }
+
+    /* The checkbox stays in the page, so it can be focused and read out, but out of sight behind its label. */
+    .bit {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .bit + label,
+    .output {
+        --bit: '0';
+        display: grid;
+        place-items: center;
+        aspect-ratio: 1;
+        border-radius: var(--radius);
+        corner-shape: var(--corner-shape);
+        background: var(--surface);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-xl);
+        font-weight: 600;
+        box-shadow: var(--edge-shadow), var(--shadow-sm);
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+    }
+
+    .bit + label {
+        cursor: pointer;
+    }
+
+    .bit + label::before,
+    .output::before {
+        content: var(--bit);
+    }
+
+    .bit:checked + label {
+        --bit: '1';
+        background: var(--brand-blue);
+        color: #fff;
+    }
+
+    .bit:focus-visible + label {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    .output {
+        box-shadow: inset 0 0 0 2px var(--border-strong);
+    }
+
+    /* The gates. Each rule says when a gate's output is 1; otherwise it stays 0. */
+    .gate-and:has(.a:checked):has(.b:checked) .output,
+    .gate-or:has(.a:checked) .output,
+    .gate-or:has(.b:checked) .output,
+    .gate-xor:has(.a:checked):has(.b:not(:checked)) .output,
+    .gate-xor:has(.a:not(:checked)):has(.b:checked) .output,
+    .gate-nand:has(.a:not(:checked)) .output,
+    .gate-nand:has(.b:not(:checked)) .output,
+    .gate-nor:has(.a:not(:checked)):has(.b:not(:checked)) .output,
+    .gate-xnor:has(.a:checked):has(.b:checked) .output,
+    .gate-xnor:has(.a:not(:checked)):has(.b:not(:checked)) .output,
+    .gate-not:has(.a:not(:checked)) .output {
+        --bit: '1';
+        background: var(--brand-rose);
+        color: #000;
+        box-shadow: var(--shadow-sm);
+    }
+</style>

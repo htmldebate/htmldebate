@@ -1,0 +1,379 @@
+---
+import Disclosure from '../../components/Disclosure.astro';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+// Bits are listed most significant first, as numbers are written.
+const bits: ReadonlyArray<number> = [3, 2, 1, 0];
+const places: ReadonlyArray<number> = [16, 8, 4, 2, 1];
+
+const switchExample: string = `<input class="bit" type="checkbox" id="a1" checked>
+<label for="a1">A, the 2s bit</label>`;
+
+const numberExample: string = `.adder { --a1: 0; }
+.adder:has(#a1:checked) { --a1: 1; }`;
+
+const columnExample: string = `--s1: mod(var(--a1) + var(--b1) + var(--c1), 2);
+--c2: round(down, (var(--a1) + var(--b1) + var(--c1)) / 2, 1);`;
+
+const chainExample: string = `--c0: 0;
+--s0: mod(var(--a0) + var(--b0) + var(--c0), 2);
+--c1: round(down, (var(--a0) + var(--b0) + var(--c0)) / 2, 1);
+--s1: mod(var(--a1) + var(--b1) + var(--c1), 2);
+--c2: round(down, (var(--a1) + var(--b1) + var(--c1)) / 2, 1);
+--s2: mod(var(--a2) + var(--b2) + var(--c2), 2);
+--c3: round(down, (var(--a2) + var(--b2) + var(--c2)) / 2, 1);
+--s3: mod(var(--a3) + var(--b3) + var(--c3), 2);
+--c4: round(down, (var(--a3) + var(--b3) + var(--c3)) / 2, 1);
+--s4: var(--c4);`;
+
+const answerExample: string = `.computed {
+    counter-reset: bit var(--bit);
+    background: color-mix(in srgb, var(--lit) calc(var(--bit) * 100%), var(--surface-alt));
+}
+
+.computed::before {
+    content: counter(bit);
+}`;
+
+const decimalExample: string = `.value-sum {
+    counter-reset: value calc(var(--s0) + 2 * var(--s1) + 4 * var(--s2) + 8 * var(--s3) + 16 * var(--s4));
+}
+
+.decimal::before {
+    content: '= ' counter(value);
+}`;
+---
+<DemoLayout path="/Demos/Adder">
+    <Fragment slot="what">
+        <p>
+            An adding machine for two numbers, A and B, from 0 to 15. Click the switches to set them. CSS adds them in binary,
+            one column at a time, carrying as it goes, and writes the answer underneath.
+        </p>
+        <p>It starts on 2 + 2, for Ben Romy, who wrote that you can't compute it in HTML.</p>
+    </Fragment>
+
+    <div slot="demo" class="adder">
+        <div class="sum-grid">
+            <span class="row-name" aria-hidden="true"></span>
+            {places.map((place: number) => <span class="place" aria-hidden="true">{place}</span>)}
+            <span class="total" aria-hidden="true"></span>
+
+            <span class="row-name">Carry</span>
+            <span class="computed carry c4" aria-hidden="true"></span>
+            <span class="computed carry c3" aria-hidden="true"></span>
+            <span class="computed carry c2" aria-hidden="true"></span>
+            <span class="computed carry c1" aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span class="total" aria-hidden="true"></span>
+
+            <span class="row-name">A</span>
+            <span aria-hidden="true"></span>
+            {bits.map((bit: number) => (
+                <span class="bit-cell">
+                    <input class="bit" type="checkbox" id={`a${String(bit)}`} checked={bit === 1} />
+                    <label for={`a${String(bit)}`}><span class="visually-hidden">A, the {2 ** bit}s bit</span></label>
+                </span>
+            ))}
+            <span class="decimal total value-a"></span>
+
+            <span class="row-name">B</span>
+            <span aria-hidden="true"></span>
+            {bits.map((bit: number) => (
+                <span class="bit-cell">
+                    <input class="bit" type="checkbox" id={`b${String(bit)}`} checked={bit === 1} />
+                    <label for={`b${String(bit)}`}><span class="visually-hidden">B, the {2 ** bit}s bit</span></label>
+                </span>
+            ))}
+            <span class="decimal total value-b"></span>
+
+            <span class="sum-rule" aria-hidden="true"></span>
+
+            <span class="row-name">Sum</span>
+            <span class="computed sum s4"></span>
+            <span class="computed sum s3"></span>
+            <span class="computed sum s2"></span>
+            <span class="computed sum s1"></span>
+            <span class="computed sum s0"></span>
+            <span class="decimal total value-sum"></span>
+        </div>
+
+        <p class="equation" aria-live="polite"></p>
+    </div>
+
+    <Fragment slot="how">
+        <p>
+            In binary, each column is worth twice the one to its right: 1, 2, 4, 8, 16. Adding works the way you learnt at
+            school, except that a column can only hold 0 or 1. Add the column's two bits and the carry from the right; write
+            down whether the total is odd or even, and carry the rest to the next column.
+        </p>
+        <p>
+            HTML's part is to hold the eight bits of A and B. Each switch is a checkbox, hidden behind a label that's drawn as a
+            0 or a 1.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{switchExample}</code></pre>
+        </Disclosure>
+
+        <h3>From switches to numbers</h3>
+        <p>
+            CSS can't calculate with a ticked box, so it first turns each one into a number. Every bit has a custom property that
+            starts at 0, and a rule that sets it to 1 when its box is checked. From here on, it's all arithmetic.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">From switches to numbers source</Fragment>
+            <pre><code>{numberExample}</code></pre>
+        </Disclosure>
+
+        <h3>Adding a column</h3>
+        <p>
+            A column adds three things: its bit of A, its bit of B, and the carry in. <code>mod(…, 2)</code> is the remainder
+            after dividing by 2, which is the bit that's written down. Dividing by 2 and rounding down gives the carry. If all
+            three are 1, for example, the total is 3: write down 1, and carry 1.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Adding a column source</Fragment>
+            <pre><code>{columnExample}</code></pre>
+        </Disclosure>
+
+        <h3>Passing the carry along</h3>
+        <p>
+            Each column's carry is the next column's carry in, so the four columns form a chain. Nothing is carried into the
+            first, and whatever is carried out of the last becomes the fifth bit of the answer. CSS works out the order for
+            itself: each property refers to the one before it, so the browser follows the chain from right to left.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Passing the carry along source</Fragment>
+            <pre><code>{chainExample}</code></pre>
+        </Disclosure>
+
+        <h3>Writing the answer</h3>
+        <p>
+            A custom property can't be printed directly, but a counter can. Each answer tile sets a counter to its bit and prints
+            it. The same bit sets how much colour is mixed into the tile: 0% for a 0, and 100% for a 1.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Writing the answer source</Fragment>
+            <pre><code>{answerExample}</code></pre>
+        </Disclosure>
+
+        <p>
+            The sum underneath is written the same way, so a screen reader can read it, but may not announce it as it changes,
+            which would take a script.
+        </p>
+
+        <h3>Checking it in decimal</h3>
+        <p>
+            The decimal totals, beside the bits on wider screens and in the sum underneath, are worked out by adding up the
+            columns that are on. The sum's total comes from the
+            answer's bits, not from A and B, so if the adder went wrong, it would show.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Checking it in decimal source</Fragment>
+            <pre><code>{decimalExample}</code></pre>
+        </Disclosure>
+
+        <h3>The end result</h3>
+        <p>
+            Whatever you set, from 0 + 0 to 15 + 15, each column passes its carry to the next, and the answer is written in binary
+            and in decimal, exactly as an adding circuit in a processor would work it out.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            So you can compute the sum of 2 + 2 with HTML and CSS. What makes it work is the split from
+            <a href="/Together">part 4</a>: HTML remembers the inputs, and CSS does the arithmetic.
+        </p>
+        <p>
+            It's also arithmetic the way a computer does it. Nothing here knows what 2 + 2 is; the answer comes out of a chain
+            of columns, each passing a carry to the next, which is how adding is done in a processor.
+        </p>
+    </Fragment>
+</DemoLayout>
+
+<style>
+    /* HTML's part: a custom property for each switch, 1 when its box is ticked. */
+    .adder {
+        --a0: 0; --a1: 0; --a2: 0; --a3: 0;
+        --b0: 0; --b1: 0; --b2: 0; --b3: 0;
+
+        display: grid;
+        gap: 1.5rem;
+        justify-items: center;
+    }
+
+    .adder:has(#a0:checked) { --a0: 1; }
+    .adder:has(#a1:checked) { --a1: 1; }
+    .adder:has(#a2:checked) { --a2: 1; }
+    .adder:has(#a3:checked) { --a3: 1; }
+    .adder:has(#b0:checked) { --b0: 1; }
+    .adder:has(#b1:checked) { --b1: 1; }
+    .adder:has(#b2:checked) { --b2: 1; }
+    .adder:has(#b3:checked) { --b3: 1; }
+
+    /* CSS's part: the adder. Each column adds its bits and the carry in; writes down the remainder; carries the rest. */
+    .adder {
+        --c0: 0;
+        --s0: mod(var(--a0) + var(--b0) + var(--c0), 2);
+        --c1: round(down, (var(--a0) + var(--b0) + var(--c0)) / 2, 1);
+        --s1: mod(var(--a1) + var(--b1) + var(--c1), 2);
+        --c2: round(down, (var(--a1) + var(--b1) + var(--c1)) / 2, 1);
+        --s2: mod(var(--a2) + var(--b2) + var(--c2), 2);
+        --c3: round(down, (var(--a2) + var(--b2) + var(--c2)) / 2, 1);
+        --s3: mod(var(--a3) + var(--b3) + var(--c3), 2);
+        --c4: round(down, (var(--a3) + var(--b3) + var(--c3)) / 2, 1);
+        --s4: var(--c4);
+    }
+
+    .sum-grid {
+        display: grid;
+        grid-template-columns: 4rem repeat(5, 3.25rem) 4.5rem;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    /* On a phone there's no room for the totals beside the bits. The sum underneath gives them. */
+    @media (max-width: 40rem) {
+        .sum-grid {
+            grid-template-columns: auto repeat(5, minmax(1.5rem, 2.5rem));
+            gap: 0.4rem;
+        }
+
+        .total {
+            display: none;
+        }
+    }
+
+    .row-name {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        font-weight: 500;
+    }
+
+    .place {
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-xs);
+        text-align: center;
+    }
+
+    .sum-rule {
+        grid-column: 1 / -1;
+        height: 2px;
+        border-radius: 1px;
+        background: var(--border-strong);
+    }
+
+    .bit-cell {
+        display: grid;
+    }
+
+    /* The switches: a checkbox out of sight behind a label drawn as a 0 or a 1. */
+    .bit {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .bit + label,
+    .computed {
+        display: grid;
+        place-items: center;
+        aspect-ratio: 1;
+        border-radius: var(--radius);
+        font-family: var(--font-mono);
+        font-size: var(--text-xl);
+        font-weight: 600;
+    }
+
+    .bit + label {
+        background: var(--surface-raised);
+        color: var(--text-muted);
+        cursor: pointer;
+        box-shadow: var(--edge-shadow), var(--shadow-sm);
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+    }
+
+    .bit + label::before {
+        content: '0';
+    }
+
+    .bit:checked + label {
+        background: var(--brand-blue);
+        color: #fff;
+    }
+
+    .bit:checked + label::before {
+        content: '1';
+    }
+
+    .bit:focus-visible + label {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+    }
+
+    /* The computed bits: printed with a counter, and lit in proportion to their value (which is 0 or 1). */
+    .c1 { --bit: var(--c1); }
+    .c2 { --bit: var(--c2); }
+    .c3 { --bit: var(--c3); }
+    .c4 { --bit: var(--c4); }
+    .s0 { --bit: var(--s0); }
+    .s1 { --bit: var(--s1); }
+    .s2 { --bit: var(--s2); }
+    .s3 { --bit: var(--s3); }
+    .s4 { --bit: var(--s4); }
+
+    .computed {
+        counter-reset: bit var(--bit);
+        background: color-mix(in srgb, var(--lit) calc(var(--bit) * 100%), var(--surface-alt));
+        color: color-mix(in srgb, #000 calc(var(--bit) * 100%), var(--text-muted));
+    }
+
+    .computed::before {
+        content: counter(bit);
+    }
+
+    .sum {
+        --lit: var(--brand-teal);
+    }
+
+    .carry {
+        --lit: var(--brand-amber);
+        width: 70%;
+        justify-self: center;
+        font-size: var(--text-sm);
+    }
+
+    /* The values in decimal: A and B from their switches, and the sum from the bits the adder wrote. */
+    .decimal {
+        color: var(--heading);
+        font-family: var(--font-mono);
+        font-size: var(--text-lg);
+        font-weight: 600;
+    }
+
+    .value-a { counter-reset: value calc(var(--a0) + 2 * var(--a1) + 4 * var(--a2) + 8 * var(--a3)); }
+    .value-b { counter-reset: value calc(var(--b0) + 2 * var(--b1) + 4 * var(--b2) + 8 * var(--b3)); }
+    .value-sum { counter-reset: value calc(var(--s0) + 2 * var(--s1) + 4 * var(--s2) + 8 * var(--s3) + 16 * var(--s4)); }
+
+    .decimal::before {
+        content: '= ' counter(value);
+    }
+
+    .equation {
+        counter-reset:
+            a calc(var(--a0) + 2 * var(--a1) + 4 * var(--a2) + 8 * var(--a3))
+            b calc(var(--b0) + 2 * var(--b1) + 4 * var(--b2) + 8 * var(--b3))
+            sum calc(var(--s0) + 2 * var(--s1) + 4 * var(--s2) + 8 * var(--s3) + 16 * var(--s4));
+        color: var(--heading);
+        font-size: var(--text-2xl);
+        font-weight: 600;
+    }
+
+    .equation::before {
+        content: counter(a) ' + ' counter(b) ' = ' counter(sum);
+    }
+</style>

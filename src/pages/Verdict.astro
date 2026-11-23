@@ -1,0 +1,320 @@
+---
+import Icon from '../components/Icon.astro';
+import type { OutlineEntry } from '../components/outline-entry';
+import Scorecard from '../components/Scorecard.astro';
+import type { SubjectResults } from '../components/subject-results';
+import { cssResults } from '../config/css-results';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { htmlResults } from '../config/html-results';
+import type { ProgrammingTest } from '../config/programming-test';
+import { programmingTests } from '../config/programming-tests';
+import { Score } from '../config/score';
+import { site } from '../config/site';
+import type { TestVerdict } from '../config/test-verdict';
+import { testVerdicts } from '../config/test-verdicts';
+import { togetherResults } from '../config/together-results';
+import PartLayout from '../layouts/PartLayout.astro';
+
+const part: DebatePart | undefined = debateParts.find((candidate: DebatePart): boolean => candidate.path === '/Verdict');
+
+if (part === undefined) {
+    throw new Error('src/config/debate-parts.ts has no part at /Verdict.');
+}
+
+const outline: ReadonlyArray<OutlineEntry> = [
+    { id: 'scorecard', text: 'The scorecard' },
+    { id: 'choose', text: 'Choose your test' },
+    { id: 'where-i-land', text: 'Where I land' },
+    { id: 'question', text: 'The better question' },
+];
+
+const subjects: ReadonlyArray<SubjectResults> = [
+    { name: 'HTML', path: '/HTML', results: htmlResults },
+    { name: 'CSS', path: '/CSS', results: cssResults },
+    { name: 'HTML and CSS', path: '/Together', results: togetherResults },
+];
+
+const icons: Record<Score, string> = { [Score.Yes]: 'check-circle', [Score.Partly]: 'minus-circle', [Score.No]: 'x-circle' };
+
+function verdictFor(test: ProgrammingTest): TestVerdict {
+    const found: TestVerdict | undefined = testVerdicts.find((verdict: TestVerdict): boolean => verdict.testId === test.id);
+
+    if (found === undefined) {
+        throw new Error(`src/config/test-verdicts.ts has no verdict for the test "${test.id}".`);
+    }
+
+    return found;
+}
+---
+<PartLayout part={part} outline={outline}>
+    <p>
+        Four parts, four tests, and a lot of checkboxes later, here's where the evidence leaves us. The short version is
+        that "is HTML a programming language?" has no single answer, because it's really four questions in one. The
+        long version is below.
+    </p>
+
+    <h2 id="scorecard">The scorecard</h2>
+    <p>
+        Here are the results from parts 2, 3 and 4 side by side. Each column links to the part that explains its
+        scores.
+    </p>
+
+    <Scorecard subjects={subjects} />
+
+    <p>
+        Read down the columns and a pattern appears. HTML on its own passes the loosest test and little else. CSS on its
+        own does better than its reputation, and is still getting better. Together, they pass the middle test outright
+        and get a foot in the door of every other.
+    </p>
+    <p>
+        Read across the rows and a different pattern appears: the answer depends far more on the test than on the
+        language. Nobody disagrees about what HTML can do. They disagree about what counts.
+    </p>
+
+    <h2 id="choose">Choose your test</h2>
+    <p>
+        So pick the test you believe in, and see the verdict it gives. (This is HTML and CSS too: the choices are radio
+        buttons, hidden inside their labels, and CSS shows the matching verdict.)
+    </p>
+
+    <div class="choose">
+        <fieldset class="choices">
+            <legend class="visually-hidden">Which test makes something a programming language?</legend>
+            {programmingTests.map((test: ProgrammingTest) => (
+                <label class={`choice is-${verdictFor(test).score}`}>
+                    <input type="radio" name="test" id={`choose-${test.id}`} />
+                    <span class="choice-name">{test.name}</span>
+                    <span class="choice-question">{test.question}</span>
+                </label>
+            ))}
+        </fieldset>
+
+        <div class="verdicts" aria-live="polite">
+            <p class="verdict verdict-none">Choose a test to see its verdict.</p>
+            {testVerdicts.map((verdict: TestVerdict) => (
+                <div class={`verdict verdict-${verdict.testId} is-${verdict.score}`}>
+                    <p class="verdict-headline">
+                        <Icon name={icons[verdict.score]} />
+                        <span>{verdict.headline}</span>
+                    </p>
+                    <p>{verdict.body}</p>
+                </div>
+            ))}
+        </div>
+    </div>
+
+    <p>
+        None of the four is wrong. Each captures something real about programming. That's why the argument never ends:
+        two people who pick different tests can both be right, and both be sure the other is wrong.
+    </p>
+
+    <h2 id="where-i-land">Where I land</h2>
+    <p class="byline">My own view, as the author of this site: <a href={site.authorUrl}>{site.author}</a>.</p>
+    <p>
+        I'm undecided, and I think that's the honest position rather than a dodge. HTML can, in some sense, be considered
+        a programming language, albeit a very weak one. Professor Brailsford's view of it as a simple, declarative
+        language, in which elements are something like functions telling the browser what to render, is a fair
+        description of what HTML is. But HTML on its own could never crack the Enigma machine, or complete a knight's
+        tour, and I can't call something a programming language when it can't do either.
+    </p>
+    <p>
+        Where it gets interesting is when CSS steps in, and that's what the original version of this site got wrong: it
+        looked almost entirely at HTML. CSS has spent the last few years gaining exactly the things programming needs:
+        conditions, calculations, functions, and now, through animations, a clock and a kind of memory. HTML and CSS
+        together are already a programming system, a limited and awkward one. If CSS keeps going the way it is, the
+        debate may end up being settled not by an argument, but by CSS.
+    </p>
+
+    <h2 id="question">The better question</h2>
+    <p>
+        Much of this debate isn't really about HTML. "That's not real programming" is often a way of drawing a line
+        between people, not languages, and lines like that tend to move. Alvaro Montoro put it well:
+    </p>
+    <blockquote>
+        <p>
+            The definition of what programming is (or is not) changes with time. I bet someone sorting through punched
+            cards complained about how typing code in assembly was not real programming.
+        </p>
+        <p class="quote-source">
+            <a href="https://css-tricks.com/html-is-not-a-programming-language/">Alvaro Montoro, CSS-Tricks</a>
+        </p>
+    </blockquote>
+    <p>
+        So the label matters less than the question it makes us ask: <strong>when do descriptions, rules and state become
+        programming?</strong> HTML and CSS sit right on that line, which makes them the best place to think about it.
+        Whatever you decide, you'll have decided it about the tests, not the languages, and that's the most useful thing
+        this debate can teach.
+    </p>
+    <p>
+        If you want to go further, the <a href="/Sources">sources</a> collect the articles, talks and projects behind
+        everything here, and the <a href="/Demos">demos</a> are there to make up your own mind.
+    </p>
+</PartLayout>
+
+<style>
+    .byline {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        font-style: italic;
+    }
+
+    .quote-source {
+        margin-top: 0.75rem;
+        font-size: var(--text-sm);
+    }
+
+    /* A choice and its verdict share a colour: green for yes, yellow for partly, red for no. */
+    .is-yes {
+        --ink: var(--success-text);
+        --tint: var(--success-subtle);
+    }
+
+    .is-partly {
+        --ink: var(--ink-bs-warning);
+        --tint: var(--warning-subtle);
+    }
+
+    .is-no {
+        --ink: var(--danger);
+        --tint: var(--danger-subtle);
+    }
+
+    .choose {
+        display: grid;
+        gap: var(--tile-gap);
+    }
+
+    .choices {
+        display: grid;
+        gap: var(--tile-gap);
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    @media (min-width: 40rem) {
+        .choices {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Each choice is a raised tile, with its radio button out of sight inside it. */
+    .choice {
+        --edge-top: var(--edge-light);
+        --edge-bottom: var(--edge-dark);
+        position: relative;
+        display: grid;
+        align-content: start;
+        gap: 0.35rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--surface);
+        box-shadow: var(--edge-shadow), var(--shadow-sm);
+        cursor: pointer;
+        transition: transform var(--transition), box-shadow var(--transition), background-color var(--transition);
+    }
+
+    .choice:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--edge-shadow), var(--shadow-md);
+    }
+
+    .choice input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+    }
+
+    .choice-name {
+        color: var(--heading);
+        font-size: var(--text-lg);
+        font-weight: 600;
+    }
+
+    .choice-question {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        line-height: 1.5;
+    }
+
+    .choice:has(:checked) {
+        background: var(--tint);
+        box-shadow: inset 0 0 0 2px var(--ink);
+    }
+
+    .choice:has(:checked) .choice-name {
+        color: var(--ink);
+    }
+
+    .choice:has(:checked) .choice-question {
+        color: var(--text);
+    }
+
+    .choice:has(:focus-visible) {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+    }
+
+    /* Each verdict waits for its test to be chosen; until one is, a prompt shows instead. */
+    .verdict {
+        display: none;
+        gap: 0.75rem;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+        corner-shape: var(--corner-shape);
+        background: var(--tint);
+        color: var(--text);
+    }
+
+    .verdict-none {
+        border: 2px dashed var(--border-strong);
+        background: none;
+        color: var(--text-muted);
+        text-align: center;
+    }
+
+    .verdict-none,
+    .choose:has(#choose-compute:checked) .verdict-compute,
+    .choose:has(#choose-instruct:checked) .verdict-instruct,
+    .choose:has(#choose-decide:checked) .verdict-decide,
+    .choose:has(#choose-programs:checked) .verdict-programs {
+        display: grid;
+    }
+
+    .choose:has(.choices :checked) .verdict-none {
+        display: none;
+    }
+
+    .verdict-headline {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        color: var(--ink);
+        font-size: var(--text-2xl);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+    }
+
+    @media (max-width: 30rem) {
+        .verdict-headline {
+            font-size: var(--text-xl);
+        }
+    }
+
+    .verdict-headline :global(.icon) {
+        width: 1.25em;
+        height: 1.25em;
+    }
+
+    /* A verdict rises into place as it's chosen. */
+    @media (prefers-reduced-motion: no-preference) {
+        .verdict:not(.verdict-none) {
+            animation: rise 500ms var(--ease-out) both;
+        }
+    }
+</style>

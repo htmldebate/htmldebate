@@ -1,0 +1,367 @@
+---
+import type { OutlineEntry } from '../components/outline-entry';
+import ResultsTable from '../components/ResultsTable.astro';
+import { cssResults } from '../config/css-results';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import PartLayout from '../layouts/PartLayout.astro';
+
+const part: DebatePart | undefined = debateParts.find((candidate: DebatePart): boolean => candidate.path === '/CSS');
+
+if (part === undefined) {
+    throw new Error('src/config/debate-parts.ts has no part at /CSS.');
+}
+
+const outline: ReadonlyArray<OutlineEntry> = [
+    { id: 'rules', text: 'Every rule is an if' },
+    { id: 'choosing', text: 'Choosing' },
+    { id: 'calculating', text: 'Calculating' },
+    { id: 'limits', text: 'What CSS can\'t do alone, usually' },
+    { id: 'beyond-html', text: 'Not just for HTML' },
+    { id: 'score', text: 'How CSS scores' },
+];
+
+const positions: ReadonlyArray<number> = Array.from({ length: 24 }, (_: unknown, index: number): number => index + 1);
+
+const ruleExample: string = `li:nth-child(3n) {
+    background: coral;
+}`;
+
+const positionsExample: string = `li { counter-increment: position; }
+li::before { content: counter(position); }
+
+li:nth-child(3n) { /* every third: filled */ }
+li:nth-child(4n) { /* every fourth: ringed */ }`;
+
+const environmentExample: string = `@media (prefers-color-scheme: dark) {
+    .scheme::before { content: "Your device is set to dark mode."; }
+}
+
+@container (width < 30rem) {
+    .box::before { content: "This box is narrower than 30rem."; }
+}`;
+
+const arithmeticExample: string = `.times {
+    counter-reset: result calc(var(--a) * var(--b));
+}
+
+.times::after {
+    content: counter(result);
+}`;
+
+const emptyPageExample: string = `<!doctype html>
+<style>
+    html::before {
+        content: "There is no body text on this page.";
+    }
+</style>`;
+
+const xmlExample: string = `<?xml version="1.0"?>
+<?xml-stylesheet type="text/css" href="recipe.css"?>
+<recipe>
+    <title>Toast</title>
+    <step>Put bread in toaster.</step>
+</recipe>`;
+---
+<PartLayout part={part} outline={outline}>
+    <p>
+        Most people who've written CSS think of it as the paint: colours, fonts, spacing, the bit that makes a page look
+        right. That's what it was made for. But to do that job in a world of different screens, settings and states,
+        CSS has grown a surprising amount of logic. This part looks at CSS on its own, setting aside what the HTML
+        around it can do, and scores it against the four tests from <a href="/Programming">part 1</a>.
+    </p>
+    <p>
+        One thing to admit up front: CSS can't be looked at entirely alone, because it needs a document to apply to.
+        HTML works without CSS; CSS doesn't work without something to style. We'll come back to that at the end, because
+        the something doesn't have to be HTML.
+    </p>
+
+    <h2 id="rules">Every rule is an if</h2>
+    <p>A CSS rule has two halves: a selector, and the declarations that follow it.</p>
+    <pre><code>{ruleExample}</code></pre>
+    <p>
+        Read it as a condition: <em>if</em> an element is the third, sixth, ninth… child of its parent, <em>then</em> give
+        it a coral background. The browser checks that condition against every element in the document, all the time,
+        and applies the result. When several rules match the same element and disagree, the cascade decides which wins,
+        by fixed rules of precedence. So a stylesheet isn't a list of colours. It's a set of conditions and outcomes that
+        the browser keeps evaluating.
+    </p>
+
+    <h2 id="choosing">Choosing</h2>
+    <p>
+        Selectors are CSS's way of choosing. They can test an element's position (<code>:nth-child(3n)</code>), its
+        type and attributes, its state (<code>:hover</code>, <code>:checked</code>, <code>:invalid</code>), and, since
+        <code>:has()</code> reached every major browser in 2023, what it contains. They can be combined with "not"
+        (<code>:not()</code>), "or" (<code>:is()</code>) and "and" (simply writing two together), which is everything you
+        need to build any logical condition.
+    </p>
+    <p>
+        Here, the HTML is nothing but twenty-four empty list items. CSS numbers them, fills every third and rings every
+        fourth. The twelfth and twenty-fourth match both conditions, so they get both.
+    </p>
+
+    <div class="demo surface">
+        <ol class="positions" role="list" aria-label="Twenty-four numbered squares">
+            {positions.map(() => <li></li>)}
+        </ol>
+        <pre><code>{positionsExample}</code></pre>
+    </div>
+
+    <p>
+        CSS can also choose based on its surroundings. Media queries test the device and the visitor's preferences;
+        container queries test the size of the space an element sits in. Each is a branch: if this is true, use these
+        rules; otherwise, use those. The two sentences below are written by CSS, after checking your settings and the
+        width of the box.
+    </p>
+
+    <div class="demo surface">
+        <div class="environment">
+            <p class="scheme"></p>
+            <div class="box"></div>
+        </div>
+        <pre><code>{environmentExample}</code></pre>
+        <p class="demo-note">Resize the window, or switch your device between light and dark, and the sentences change.</p>
+    </div>
+
+    <h2 id="calculating">Calculating</h2>
+    <p>
+        CSS has been able to do sums since <code>calc()</code> arrived over a decade ago, so that a sidebar could be "a
+        third of the width, less a gap". Since then it has gained <code>min()</code>, <code>max()</code> and
+        <code>clamp()</code>; rounding and remainders with <code>round()</code>, <code>mod()</code> and
+        <code>rem()</code>; and powers, roots and trigonometry with <code>pow()</code>, <code>sqrt()</code>,
+        <code>sin()</code> and their relatives.
+    </p>
+    <p>
+        Custom properties (often called CSS variables) give values names, like <code>--gap: 1rem</code>, so they can be
+        reused and calculated with. And counters, made for numbering headings and list items, can hold the result of a
+        calculation and print it on the page. Put those together and CSS will do arithmetic in front of you. Each answer
+        below is worked out by the browser's CSS engine:
+    </p>
+
+    <div class="demo surface">
+        <ul class="sums" role="list">
+            <li class="times" style="--a: 7; --b: 6"></li>
+            <li class="remainder" style="--a: 17; --b: 5"></li>
+            <li class="power" style="--a: 2; --b: 10"></li>
+            <li class="root" style="--a: 144"></li>
+        </ul>
+        <pre><code>{arithmeticExample}</code></pre>
+        <p class="demo-note">
+            So, with respect to Ben Romy, CSS can work out 2 + 2. What it can't do is ask anyone which numbers to use:
+            the 7 and the 6 are written into the page.
+        </p>
+    </div>
+
+    <p>
+        And CSS keeps gaining logic. Newer versions of the language add an <code>if()</code> function, for choosing a
+        value inline, and <code>@function</code>, for defining reusable calculations of your own, and both have begun
+        arriving in browsers. Each release moves CSS a little further from "style sheet" and a little closer to
+        "language".
+    </p>
+
+    <h2 id="limits">What CSS can't do alone, usually</h2>
+    <p>For all that, CSS as most people write it is missing two things that programs depend on.</p>
+    <ul>
+        <li>
+            <strong>Input.</strong> CSS can only read the document it styles and the environment it's shown in: the
+            screen, the settings, where the pointer is. It can't be handed new information to work on.
+        </li>
+        <li>
+            <strong>Memory.</strong> A rule applies while its condition is true and stops the moment it isn't: move the
+            pointer away and <code>:hover</code> is forgotten. CSS can't change the document to leave a note for itself,
+            so in everyday use, nothing it works out is kept for a later step.
+        </li>
+    </ul>
+    <p>
+        Without memory there's no way to repeat a step and build on the result, which is what computing anything
+        requires. So for most of its life, CSS could decide and calculate, but only about a world it couldn't change.
+    </p>
+    <p>
+        The exception is animation. An animation is CSS changing values over time by itself, with nothing else involved,
+        and with enough ingenuity, and the newest features above, animations can act as a clock and carry values from one
+        step to the next. In 2026 that was enough for someone to build a working processor in CSS, which
+        <a href="/Together#limit">part 4</a> comes to. It's a long way from everyday CSS, and so far it only runs in some
+        browsers, but it means "CSS has no memory" is no longer simply true.
+    </p>
+
+    <h2 id="beyond-html">Not just for HTML</h2>
+    <p>
+        CSS needs a document, but it isn't tied to HTML. Browsers apply CSS to SVG graphics, and to plain XML documents
+        that point to a stylesheet, like this made-up recipe format:
+    </p>
+    <pre><code>{xmlExample}</code></pre>
+    <p>
+        Open that in a browser and <code>recipe.css</code> decides how a <code>&lt;recipe&gt;</code> and its steps are
+        shown, though the browser knows nothing about recipes.
+    </p>
+    <p>
+        You can even give CSS almost nothing to work with. A page whose only content is a stylesheet still has a
+        document: the browser quietly adds the <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code> and
+        <code>&lt;body&gt;</code> elements it expects, and CSS can draw on them.
+    </p>
+    <pre><code>{emptyPageExample}</code></pre>
+    <p>
+        So the honest picture is this: CSS needs some document, but it treats that document as raw material, the way a
+        program treats its input.
+    </p>
+
+    <h2 id="score">How CSS scores</h2>
+    <p>Against the four tests, CSS on its own comes out like this:</p>
+
+    <ResultsTable subject="CSS" results={cssResults} />
+
+    <p>
+        It's a closer result than most people expect, and a different shape from HTML's. HTML can hold state but can't
+        make decisions about it; CSS can make decisions all day, but in everyday use has no state of its own to make them
+        about. Each has exactly what the other is missing. <a href="/Together">Part 4</a> puts them together.
+    </p>
+</PartLayout>
+
+<style>
+    .demo {
+        display: grid;
+        gap: 1.25rem;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+    }
+
+    .demo > :global(*) {
+        margin-top: 0;
+    }
+
+    .demo pre {
+        background: var(--surface-alt);
+    }
+
+    .demo-note {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+    }
+
+    /* Choosing by position: numbered by a counter, filled every third, ringed every fourth. */
+    .positions {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+        gap: 0.5rem;
+        padding: 0;
+        counter-reset: position;
+    }
+
+    .positions li {
+        display: grid;
+        place-items: center;
+        aspect-ratio: 1;
+        margin: 0;
+        border-radius: var(--radius-sm);
+        background: var(--surface-alt);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        counter-increment: position;
+    }
+
+    .positions li::before {
+        content: counter(position);
+    }
+
+    .positions li:nth-child(3n) {
+        background: var(--brand-coral);
+        color: #000;
+        font-weight: 600;
+    }
+
+    .positions li:nth-child(4n) {
+        box-shadow: inset 0 0 0 3px var(--brand-blue);
+        color: var(--heading);
+        font-weight: 600;
+    }
+
+    .positions li:nth-child(3n):nth-child(4n) {
+        color: #000;
+    }
+
+    /* Choosing by surroundings: the visitor's colour scheme, and the width of the box. */
+    .environment {
+        container-type: inline-size;
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .scheme,
+    .box {
+        padding: 0.85rem 1rem;
+        border-radius: var(--radius);
+        background: var(--surface-alt);
+        color: var(--heading);
+        font-weight: 500;
+    }
+
+    .scheme::before {
+        content: 'Your device is set to light mode.';
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .scheme::before {
+            content: 'Your device is set to dark mode.';
+        }
+    }
+
+    .box::before {
+        content: 'This box is 30rem wide or more.';
+    }
+
+    @container (width < 30rem) {
+        .box::before {
+            content: 'This box is narrower than 30rem.';
+        }
+    }
+
+    /* Calculating: each line's numbers come from its style attribute; the answer is worked out here. */
+    .sums {
+        display: grid;
+        gap: 0.5rem;
+        padding: 0;
+        font-family: var(--font-mono);
+        font-size: var(--text-lg);
+    }
+
+    .sums li {
+        margin: 0;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius);
+        background: var(--surface-alt);
+        color: var(--heading);
+    }
+
+    .times {
+        counter-reset: a var(--a) b var(--b) result calc(var(--a) * var(--b));
+    }
+
+    .times::before {
+        content: counter(a) ' × ' counter(b) ' = ' counter(result);
+    }
+
+    .remainder {
+        counter-reset: a var(--a) b var(--b) result mod(var(--a), var(--b));
+    }
+
+    .remainder::before {
+        content: 'The remainder of ' counter(a) ' ÷ ' counter(b) ' = ' counter(result);
+    }
+
+    .power {
+        counter-reset: a var(--a) b var(--b) result pow(var(--a), var(--b));
+    }
+
+    .power::before {
+        content: counter(a) ' to the power ' counter(b) ' = ' counter(result);
+    }
+
+    .root {
+        counter-reset: a var(--a) result sqrt(var(--a));
+    }
+
+    .root::before {
+        content: 'The square root of ' counter(a) ' = ' counter(result);
+    }
+</style>

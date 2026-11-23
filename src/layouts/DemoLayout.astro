@@ -1,0 +1,120 @@
+---
+import Button from '../components/Button.astro';
+import PageHero from '../components/PageHero.astro';
+import type { Demo } from '../config/demo';
+import { DemoStatus } from '../config/demo-status';
+import { demos } from '../config/demos';
+import { PageKind } from '../config/page-kind';
+import BaseLayout from './BaseLayout.astro';
+
+// A demo: its hero, then four sections, always in the same order (what it is, a working example, how it works, and why it
+// matters), and the way on to the demos either side. Each section is a slot, and all four are required.
+interface Props {
+    readonly path: string;
+}
+
+const { path }: Props = Astro.props;
+const steps: ReadonlyArray<Demo> = demos.filter((demo: Demo): boolean => demo.status === DemoStatus.Ready && demo.isStandalone !== true);
+const index: number = steps.findIndex((demo: Demo): boolean => demo.path === path);
+const demo: Demo | undefined = steps[index];
+
+if (demo === undefined) {
+    throw new Error(`src/config/demos.ts has no ready demo at ${path}.`);
+}
+
+for (const section of ['what', 'demo', 'how', 'why']) {
+    if (!Astro.slots.has(section)) {
+        throw new Error(`The demo at ${path} has no "${section}" section.`);
+    }
+}
+
+const previous: Demo | undefined = steps[index - 1];
+const next: Demo | undefined = steps[index + 1];
+---
+<BaseLayout title={demo.title} searchTitle={demo.searchTitle} description={demo.description} path={demo.path} kind={PageKind.Article}>
+    <PageHero label="Demo" title={demo.title} highlight="in HTML and CSS" lead={demo.summary} />
+
+    <div class="container-wide demo-page">
+        <section class="prose demo-notes" aria-labelledby="what-it-is">
+            <h2 id="what-it-is">What it is</h2>
+            <slot name="what" />
+        </section>
+
+        <section class="demo-example" aria-labelledby="working-example">
+            <h2 id="working-example">Working example</h2>
+            <div class="surface demo-stage">
+                <slot name="demo" />
+            </div>
+        </section>
+
+        <section class="prose demo-notes" aria-labelledby="how-it-works">
+            <h2 id="how-it-works">How it works</h2>
+            <slot name="how" />
+        </section>
+
+        <section class="prose demo-notes" aria-labelledby="why-it-matters">
+            <h2 id="why-it-matters">Why it matters</h2>
+            <slot name="why" />
+        </section>
+
+        <nav class="demo-nav" aria-label="Demos">
+            {previous === undefined
+                ? <Button href="/Demos" variant="ghost" leadingIcon="arrow-left-bold">All demos</Button>
+                : <Button href={previous.path} variant="ghost" leadingIcon="arrow-left-bold">{previous.title}</Button>}
+            {next === undefined
+                ? <Button href="/Demos" variant="primary">All demos</Button>
+                : <Button href={next.path} variant="primary">Next: {next.title}</Button>}
+        </nav>
+    </div>
+</BaseLayout>
+
+<style>
+    .demo-page {
+        display: grid;
+        gap: clamp(2.5rem, 2rem + 2vw, 4rem);
+        padding-block: var(--space-section);
+    }
+
+    .demo-example {
+        display: grid;
+        gap: 1.25rem;
+        min-width: 0;
+    }
+
+    .demo-example h2 {
+        font-size: var(--text-3xl);
+        letter-spacing: -0.025em;
+    }
+
+    .demo-stage {
+        padding: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+    }
+
+    .demo-notes {
+        --disclosure-bg: var(--surface);
+
+        min-width: 0;
+        max-width: 46rem;
+        font-size: var(--text-lg);
+    }
+
+    .demo-notes > :global(:first-child) {
+        margin-top: 0;
+    }
+
+    .demo-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        max-width: 46rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    /* A long title wraps rather than running off a phone's screen. */
+    .demo-nav :global(.button) {
+        max-width: 100%;
+        white-space: normal;
+    }
+</style>

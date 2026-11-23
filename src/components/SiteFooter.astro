@@ -1,0 +1,205 @@
+---
+import type { FooterColumn } from '../config/footer-column';
+import { footerColumns } from '../config/footer-columns';
+import type { FooterLink } from '../config/footer-link';
+import { site } from '../config/site';
+import type { SocialLink } from '../config/social-link';
+import Icon from './Icon.astro';
+
+// The ONIXLabs website's footer: the same links, copyright and layout, with its links made absolute.
+const currentYear: number = new Date().getFullYear();
+---
+<footer class="site-footer">
+    <div class="container-wide">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <picture>
+                    <source srcset="/onixlabs/images/logo/logo-full-dark.webp" media="(prefers-color-scheme: dark)" />
+                    <img class="footer-logo" src="/onixlabs/images/logo/logo-full-light.webp" alt={site.companyName} width={153} height={29} loading="lazy" />
+                </picture>
+                <p class="footer-tagline">{site.companyTagline}</p>
+                <ul class="social" role="list">
+                    {site.socialLinks.map((link: SocialLink) => (
+                        <li>
+                            <a href={link.url} target="_blank" rel="noopener noreferrer">
+                                <Icon name={link.icon} />
+                                <span class="visually-hidden">{site.companyName} on {link.name} (opens in a new tab)</span>
+                            </a>
+                        </li>
+                    ))}
+                    <li><a class="footer-email" href={`mailto:${site.companyEmail}`}>{site.companyEmail}</a></li>
+                </ul>
+            </div>
+
+            {footerColumns.map((column: FooterColumn) => (
+                <nav class="footer-column" aria-labelledby={`footer-${column.id}`}>
+                    <h2 id={`footer-${column.id}`}>{column.name}</h2>
+                    <ul role="list">
+                        {column.links.map((link: FooterLink) => <li><a href={`${site.companyUrl}${link.path}`}>{link.label}</a></li>)}
+                    </ul>
+                </nav>
+            ))}
+        </div>
+
+        <p class="footer-copyright">&copy; {site.companyFounded}&ndash;{currentYear} {site.companyName}. All rights reserved.</p>
+    </div>
+</footer>
+
+<style>
+    .site-footer {
+        margin-top: auto;
+        --text-muted: var(--footer-text-muted);
+
+        padding-block: clamp(2.5rem, 2rem + 2vw, 3.5rem) 2rem;
+        background: var(--footer-bg);
+        color: var(--text-muted);
+        font-size: var(--text-xs);
+        line-height: 1.5;
+    }
+
+    .footer-grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(2, auto);
+    }
+
+    .footer-brand {
+        display: grid;
+        gap: 1rem;
+        align-content: start;
+        grid-column: 1 / -1;
+        max-width: 22rem;
+    }
+
+    /* Phones: two columns under the brand, filled down rather than across, so the site's links (Products, Company) sit on
+       the left and the policies (Legal, Responsibility) on the right. */
+    .footer-column:nth-of-type(1) { grid-area: 2 / 1; }
+    .footer-column:nth-of-type(2) { grid-area: 3 / 1; }
+    .footer-column:nth-of-type(3) { grid-area: 2 / 2; }
+    .footer-column:nth-of-type(4) { grid-area: 3 / 2; }
+
+    @media (min-width: 40rem) {
+        .footer-grid {
+            grid-template-columns: repeat(4, auto);
+        }
+
+        .footer-column:nth-of-type(n) {
+            grid-area: auto;
+        }
+    }
+
+    @media (min-width: 56rem) {
+        .footer-grid {
+            grid-template-columns: 1.6fr repeat(4, 1fr);
+        }
+
+        .footer-brand {
+            grid-column: auto;
+        }
+    }
+
+    .footer-logo {
+        width: auto;
+        height: 1.1rem;
+    }
+
+    /* The company tagline, tucked under the logo. */
+    .footer-tagline {
+        margin-top: -0.4rem;
+        color: var(--heading);
+        font-weight: 600;
+    }
+
+    .footer-brand picture {
+        display: flex;
+    }
+
+    .social {
+        display: flex;
+        gap: 0.25rem;
+        margin-left: -0.5rem;
+    }
+
+    .social a {
+        display: grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        transition: color var(--duration), background-color var(--duration);
+    }
+
+    .social a:hover {
+        background: color-mix(in srgb, var(--heading) 8%, transparent);
+        color: var(--heading);
+    }
+
+    /* The address sits in the row with the social icons, as a pill rather than a circle. */
+    .social a.footer-email {
+        width: auto;
+        padding-inline: 0.75rem;
+        border-radius: 999px;
+        font-size: var(--text-sm);
+        text-decoration: none;
+    }
+
+    .footer-column h2 {
+        margin-bottom: 0.75rem;
+        color: var(--heading);
+        font-family: var(--font-body);
+        font-size: var(--text-xs);
+        font-weight: 600;
+        letter-spacing: 0;
+    }
+
+    .footer-column ul {
+        display: grid;
+        gap: 0.6rem;
+    }
+
+    .footer-column a {
+        color: var(--text-muted);
+    }
+
+    .footer-column a:hover {
+        color: var(--heading);
+    }
+
+    .footer-copyright {
+        margin-top: 2.5rem;
+    }
+
+    /* Narrow screens, where the brand sits above the columns: the brand and groups are centred, and the social links wear their hover
+       tint from the start, since there's no hover to reveal it. */
+    @media (max-width: 55.99rem) {
+        .footer-brand {
+            justify-items: center;
+            max-width: none;
+            text-align: center;
+        }
+
+        .social {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-left: 0;
+        }
+
+        .social a {
+            background: color-mix(in srgb, var(--heading) 8%, transparent);
+            color: var(--heading);
+        }
+
+        /* Each column is as wide as its widest group and the columns are spread evenly, so the groups sit centred while
+           their headings and links stay left-aligned, sharing a left edge with the group above or below. */
+        .footer-grid {
+            justify-content: space-evenly;
+        }
+
+        .footer-copyright {
+            text-align: center;
+        }
+    }
+</style>

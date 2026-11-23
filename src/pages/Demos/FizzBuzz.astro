@@ -1,0 +1,204 @@
+---
+import Disclosure from '../../components/Disclosure.astro';
+import DemoLayout from '../../layouts/DemoLayout.astro';
+
+const numbers: ReadonlyArray<number> = Array.from({ length: 100 }, (_: unknown, index: number): number => index + 1);
+
+const listExample: string = `<ol>
+    <li></li>
+    <li></li>
+    <li></li>
+    <!-- … and so on, up to 100 -->
+</ol>`;
+
+const counterExample: string = `ol { counter-reset: number; }
+li { counter-increment: number; }`;
+
+const numberExample: string = `li:not(:nth-child(3n)):not(:nth-child(5n))::after {
+    content: counter(number);
+}`;
+
+const fizzExample: string = `li:nth-child(3n)::before {
+    content: "Fizz";
+}`;
+
+const buzzExample: string = `li:nth-child(5n)::after {
+    content: "Buzz";
+}`;
+
+const colourExample: string = `li:nth-child(3n)  { background: var(--brand-rose); }
+li:nth-child(5n)  { background: var(--brand-blue); }
+li:nth-child(15n) { background: var(--brand-violet); }`;
+---
+<DemoLayout path="/Demos/FizzBuzz">
+    <Fragment slot="what">
+        <p>
+            FizzBuzz began as a counting game for children. Players count upwards in turn, saying "fizz" instead of any
+            number divisible by 3, "buzz" instead of any number divisible by 5, and "fizzbuzz" for numbers divisible by
+            both. It became a famous first test in programming interviews, because solving it takes a loop, a counter and
+            a couple of decisions: the basics of programming in miniature.
+        </p>
+        <p>The list below is a hundred empty list items. Everything you can read in it was put there by CSS.</p>
+    </Fragment>
+
+    <ol slot="demo" class="fizzbuzz" role="list" aria-label="FizzBuzz from 1 to 100">
+        {numbers.map(() => <li></li>)}
+    </ol>
+
+    <Fragment slot="how">
+        <p>
+            The HTML is an ordered list, <code>&lt;ol&gt;</code>, of a hundred list items, <code>&lt;li&gt;</code>, with
+            nothing in any of them. The CSS has to work out each item's number, test what that number is divisible by, and
+            write the answer. It does it without ever dividing, using three features: a counter, the
+            <code>:nth-child()</code> selector, and generated content.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">The HTML</Fragment>
+            <pre><code>{listExample}</code></pre>
+        </Disclosure>
+
+        <h3>Counting</h3>
+        <p>
+            A CSS counter is a number the browser keeps while it reads through the page. The list sets one called
+            <code>number</code> to 0, and every item adds 1 to it, so the first item's number is 1, the second's is 2, and so
+            on. The HTML never says which item is which.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Counting source</Fragment>
+            <pre><code>{counterExample}</code></pre>
+        </Disclosure>
+
+        <h3>Testing for divisibility</h3>
+        <p>
+            <code>:nth-child(3n)</code> matches every third child of its parent. The <code>n</code> stands for every whole
+            number in turn, so <code>3n</code> is 3, 6, 9, 12 and so on: exactly the numbers divisible by 3. Matching it is
+            the same as asking whether the item's number leaves no remainder when divided by 3, which most programming
+            languages write as <code>number % 3 == 0</code>. <code>:nth-child(5n)</code> asks the same about 5.
+        </p>
+
+        <h3>Plain numbers</h3>
+        <p>
+            Items divisible by neither should show their number. <code>:not()</code> turns a test round, so
+            <code>:not(:nth-child(3n))</code> matches items that aren't divisible by 3. Writing two of them together means
+            both must hold: not divisible by 3, and not divisible by 5. Those items get an <code>::after</code>, a piece of
+            content that CSS adds at the end of an element, holding the counter's value.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Plain numbers source</Fragment>
+            <pre><code>{numberExample}</code></pre>
+        </Disclosure>
+
+        <h3>Fizz</h3>
+        <p>
+            Items divisible by 3 get the word "Fizz" in their <code>::before</code>, the content CSS adds at the start of an
+            element.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Fizz source</Fragment>
+            <pre><code>{fizzExample}</code></pre>
+        </Disclosure>
+
+        <h3>Buzz</h3>
+        <p>
+            Items divisible by 5 get the word "Buzz" in their <code>::after</code>. It's free for them to use, because the
+            plain numbers rule leaves out anything divisible by 5.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Buzz source</Fragment>
+            <pre><code>{buzzExample}</code></pre>
+        </Disclosure>
+
+        <h3>FizzBuzz</h3>
+        <p>
+            There's no rule for FizzBuzz, because it doesn't need one. A number divisible by both 3 and 5, such as 15, 30 or
+            45, matches the Fizz rule and the Buzz rule, so it gets both. Fizz is at the start of the element and Buzz is at
+            the end, with nothing in between, so together they read "FizzBuzz". That's why one uses <code>::before</code> and
+            the other <code>::after</code>: two rules writing to the same place would overwrite each other.
+        </p>
+        <p>
+            The colours do need a rule each, because an element has only one background. Multiples of 3 are rose and multiples
+            of 5 are blue; a multiple of 15 is both, so a last rule, which wins because it comes last, makes it violet.
+        </p>
+        <Disclosure>
+            <Fragment slot="summary">Colours source</Fragment>
+            <pre><code>{colourExample}</code></pre>
+        </Disclosure>
+
+        <h3>The end result</h3>
+        <p>
+            Every item divisible by neither 3 nor 5 shows its number. Every item divisible by 3 starts with Fizz, every item
+            divisible by 5 ends with Buzz, and every item divisible by both says FizzBuzz. The list here has a hundred items,
+            but the rules work for a list of any length.
+        </p>
+    </Fragment>
+
+    <Fragment slot="why">
+        <p>
+            If FizzBuzz is a fair first test of a programmer, it's a fair first test of a language. CSS has everything it
+            needs: the counter counts, <code>:nth-child()</code> tests for divisibility, and the selectors choose what to
+            show. There's no loop to write, because the browser already applies every rule to every item.
+        </p>
+        <p>
+            What the CSS can't do is make the list longer. The rules would carry on for ever, but the HTML decides how far
+            they count.
+        </p>
+    </Fragment>
+</DemoLayout>
+
+<style>
+    .fizzbuzz {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        counter-reset: number;
+    }
+
+    .fizzbuzz li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.75rem;
+        padding-inline: 0.25rem;
+        border-radius: var(--radius-sm);
+        background: var(--surface-alt);
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        counter-increment: number;
+    }
+
+    .fizzbuzz li:not(:nth-child(3n)):not(:nth-child(5n))::after {
+        content: counter(number);
+    }
+
+    .fizzbuzz li:nth-child(3n)::before {
+        content: 'Fizz';
+    }
+
+    .fizzbuzz li:nth-child(5n)::after {
+        content: 'Buzz';
+    }
+
+    .fizzbuzz li:nth-child(3n),
+    .fizzbuzz li:nth-child(5n) {
+        color: #000;
+        font-weight: 600;
+    }
+
+    .fizzbuzz li:nth-child(3n) {
+        background: var(--brand-rose);
+    }
+
+    /* Blue is the one colour here that reads better under white text than black. */
+    .fizzbuzz li:nth-child(5n) {
+        background: var(--brand-blue);
+        color: #fff;
+    }
+
+    .fizzbuzz li:nth-child(15n) {
+        background: var(--brand-violet);
+        color: #000;
+    }
+</style>

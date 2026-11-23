@@ -1,0 +1,424 @@
+/*
+ * Motion. Everything here is CSS-only and progressive: scroll-driven animations run only where the browser
+ * supports animation-timeline and the visitor hasn't asked for reduced motion. Everywhere else the content is
+ * simply there, fully visible, in its final state.
+ */
+
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(1.25rem);
+    }
+}
+
+/* Text-bearing reveals move but never fade, so text keeps its full contrast at every point of the animation. */
+@keyframes reveal {
+    from {
+        transform: translateY(4rem);
+    }
+}
+
+@keyframes reveal-scale {
+    from {
+        transform: translateY(2.5rem) scale(0.9);
+    }
+}
+
+@keyframes settle {
+    from {
+        opacity: 0.25;
+        transform: translateY(18%) scale(0.9);
+    }
+}
+
+/* Zoom in: grows into place from smaller as it arrives. */
+@keyframes zoom-arrive {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+}
+
+@keyframes shimmer {
+    to { background-position: 200% center; }
+}
+
+@property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes rotate-angle {
+    to { --angle: 360deg; }
+}
+
+@keyframes marquee {
+    to { transform: translateX(calc(-100% - var(--marquee-gap))); }
+}
+
+@keyframes progress {
+    from { clip-path: inset(0 100% 0 0); opacity: 0; }
+    1% { opacity: 1; }
+    to { clip-path: inset(0 0 0 0); }
+}
+
+/*
+ * Brand-gradient text for one phrase per headline. On dark the full spectrum has contrast to spare; on light the
+ * amber, coral, teal and green stops are too pale for text, so the light version runs rose, violet, blue and cyan.
+ */
+.gradient-text {
+    --text-gradient: linear-gradient(90deg, var(--brand-amber), var(--brand-rose), var(--brand-violet), var(--brand-blue), var(--brand-teal), var(--brand-green), var(--brand-amber));
+    background: var(--text-gradient);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* The text is painted by the background, which stops at the box, and descenders and accents reach past it. Padding
+       extends the background over them, and the matching negative margin keeps the layout where it was; on inline text
+       neither moves anything. A rule that sets this element's margin must subtract --text-bleed itself. */
+    --text-bleed: 0.2em;
+    padding-block: var(--text-bleed);
+    margin-block: calc(-1 * var(--text-bleed));
+}
+
+@media (prefers-color-scheme: light) {
+    .gradient-text {
+        --text-gradient: linear-gradient(90deg, var(--brand-rose), var(--brand-violet), var(--brand-blue), var(--brand-cyan), var(--brand-violet), var(--brand-rose));
+    }
+}
+
+/*
+ * Named colours for a single element: .label-<colour> colours its .label, and a .from-<colour> with a .to-<colour> give
+ * it a pair, --from and --to as the colours themselves and --from-ink and --to-ink as headline text. A .gradient-text
+ * with .text-pair runs from one to the other. The names are the brand colours and Studio's bs-primary, bs-success,
+ * bs-warning and bs-danger.
+ */
+.label-amber { --label: var(--ink-amber); }
+.label-coral { --label: var(--ink-coral); }
+.label-rose { --label: var(--ink-rose); }
+.label-violet { --label: var(--ink-violet); }
+.label-blue { --label: var(--ink-blue); }
+.label-cyan { --label: var(--ink-cyan); }
+.label-teal { --label: var(--ink-teal); }
+.label-green { --label: var(--ink-green); }
+.label-bs-primary { --label: var(--ink-bs-primary); }
+.label-bs-success { --label: var(--ink-bs-success); }
+.label-bs-warning { --label: var(--ink-bs-warning); }
+.label-bs-danger { --label: var(--ink-bs-danger); }
+
+.from-amber { --from: var(--brand-amber); --from-ink: var(--ink-amber-large); }
+.from-coral { --from: var(--brand-coral); --from-ink: var(--ink-coral-large); }
+.from-rose { --from: var(--brand-rose); --from-ink: var(--ink-rose-large); }
+.from-violet { --from: var(--brand-violet); --from-ink: var(--ink-violet-large); }
+.from-blue { --from: var(--brand-blue); --from-ink: var(--ink-blue-large); }
+.from-cyan { --from: var(--brand-cyan); --from-ink: var(--ink-cyan-large); }
+.from-teal { --from: var(--brand-teal); --from-ink: var(--ink-teal-large); }
+.from-green { --from: var(--brand-green); --from-ink: var(--ink-green-large); }
+.from-bs-primary { --from: var(--bs-primary); --from-ink: var(--ink-bs-primary-large); }
+.from-bs-success { --from: var(--bs-success); --from-ink: var(--ink-bs-success-large); }
+.from-bs-warning { --from: var(--bs-warning); --from-ink: var(--ink-bs-warning-large); }
+.from-bs-danger { --from: var(--bs-danger); --from-ink: var(--ink-bs-danger-large); }
+
+.to-amber { --to: var(--brand-amber); --to-ink: var(--ink-amber-large); }
+.to-coral { --to: var(--brand-coral); --to-ink: var(--ink-coral-large); }
+.to-rose { --to: var(--brand-rose); --to-ink: var(--ink-rose-large); }
+.to-violet { --to: var(--brand-violet); --to-ink: var(--ink-violet-large); }
+.to-blue { --to: var(--brand-blue); --to-ink: var(--ink-blue-large); }
+.to-cyan { --to: var(--brand-cyan); --to-ink: var(--ink-cyan-large); }
+.to-teal { --to: var(--brand-teal); --to-ink: var(--ink-teal-large); }
+.to-green { --to: var(--brand-green); --to-ink: var(--ink-green-large); }
+.to-bs-primary { --to: var(--bs-primary); --to-ink: var(--ink-bs-primary-large); }
+.to-bs-success { --to: var(--bs-success); --to-ink: var(--ink-bs-success-large); }
+.to-bs-warning { --to: var(--bs-warning); --to-ink: var(--ink-bs-warning-large); }
+.to-bs-danger { --to: var(--bs-danger); --to-ink: var(--ink-bs-danger-large); }
+
+.gradient-text.text-pair {
+    background-image: linear-gradient(90deg, var(--from-ink), var(--to-ink));
+    background-size: 100% auto;
+}
+
+/* The eight brand swatches: the logo gradient broken into its stops, used to mark structure. */
+.swatches {
+    display: flex;
+    height: var(--swatch-height, 4px);
+    overflow: hidden;
+    border-radius: 999px;
+}
+
+.swatches span {
+    flex: 1;
+}
+
+.swatches span:nth-child(1) { background: var(--brand-amber); }
+.swatches span:nth-child(2) { background: var(--brand-coral); }
+.swatches span:nth-child(3) { background: var(--brand-rose); }
+.swatches span:nth-child(4) { background: var(--brand-violet); }
+.swatches span:nth-child(5) { background: var(--brand-blue); }
+.swatches span:nth-child(6) { background: var(--brand-cyan); }
+.swatches span:nth-child(7) { background: var(--brand-teal); }
+.swatches span:nth-child(8) { background: var(--brand-green); }
+
+/*
+ * Family colour block: a product family's gradient as a solid, confident block. The colours are deepened by a
+ * quarter so white text on them clears 4.5:1.
+ */
+.family-block {
+    --block-from: color-mix(in srgb, var(--family-from, var(--brand-violet)) 72%, #000);
+    --block-to: color-mix(in srgb, var(--family-to, var(--brand-blue)) 72%, #000);
+    position: relative;
+    background: linear-gradient(135deg, var(--block-from), var(--block-to));
+    color: #ffffff;
+    isolation: isolate;
+    overflow: hidden;
+    --heading: #ffffff;
+    --text: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.82);
+    --label: #ffffff;
+    --link: #ffffff;
+    --link-decoration: rgba(255, 255, 255, 0.5);
+}
+
+/* A soft light in the block's top corner keeps it from looking flat. */
+.family-block::after {
+    content: '';
+    position: absolute;
+    inset: -40% -20% auto auto;
+    z-index: -1;
+    width: 70%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 65%);
+}
+
+/*
+ * The bloom: the brand spectrum rises from the bottom edge almost to the header, behind a fade of the page grey. The
+ * fade follows an exponential curve, like the falloff of a soft shadow, because a linear ramp shows a visible line where
+ * it starts: 1 - (e^(3.4y) - 1) / (e^3.4 - 1), sampled here since CSS gradients have no easing. The fade overlaps the
+ * spectrum's top edge, so no spectrum sits under the hero's top edge to bleed through where it meets the header, and the
+ * spectrum runs a pixel past the bottom edge so the page grey can't show there when the hero ends on a fractional pixel.
+ * A page can set --bloom-gradient to bloom in its own colours instead of the whole spectrum.
+ */
+.hero-bloom {
+    --bloom-fade: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--bg) 100%, transparent) 0%,
+        color-mix(in srgb, var(--bg) 99.3%, transparent) 5.6%,
+        color-mix(in srgb, var(--bg) 98.4%, transparent) 11.1%,
+        color-mix(in srgb, var(--bg) 97.4%, transparent) 16.7%,
+        color-mix(in srgb, var(--bg) 96.1%, transparent) 22.2%,
+        color-mix(in srgb, var(--bg) 94.6%, transparent) 27.8%,
+        color-mix(in srgb, var(--bg) 92.7%, transparent) 33.3%,
+        color-mix(in srgb, var(--bg) 90.5%, transparent) 38.9%,
+        color-mix(in srgb, var(--bg) 87.8%, transparent) 44.4%,
+        color-mix(in srgb, var(--bg) 84.6%, transparent) 50%,
+        color-mix(in srgb, var(--bg) 80.6%, transparent) 55.6%,
+        color-mix(in srgb, var(--bg) 75.9%, transparent) 61.1%,
+        color-mix(in srgb, var(--bg) 70.1%, transparent) 66.7%,
+        color-mix(in srgb, var(--bg) 63.2%, transparent) 72.2%,
+        color-mix(in srgb, var(--bg) 54.9%, transparent) 77.8%,
+        color-mix(in srgb, var(--bg) 44.8%, transparent) 83.3%,
+        color-mix(in srgb, var(--bg) 32.5%, transparent) 88.9%,
+        color-mix(in srgb, var(--bg) 17.8%, transparent) 94.4%,
+        color-mix(in srgb, var(--bg) 0%, transparent) 100%
+    );
+    position: relative;
+    isolation: isolate;
+    background:
+        var(--bloom-fade) bottom / 100% 98% no-repeat,
+        var(--bloom-gradient, var(--brand-gradient)) left 0 bottom -1px / 100% calc(96% + 1px) no-repeat,
+        var(--bg);
+}
+
+/* Logo marquee. The list is duplicated (the copy is aria-hidden) so the loop is seamless. */
+.marquee {
+    --marquee-gap: 3.5rem;
+    display: flex;
+    gap: var(--marquee-gap);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.marquee-track {
+    display: flex;
+    flex: none;
+    gap: var(--marquee-gap);
+    min-width: max-content;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marquee {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .marquee-track {
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        justify-content: center;
+        min-width: 0;
+    }
+
+    .marquee-track[aria-hidden='true'] {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    /* Page-load entrance for hero copy, staggered with --delay. */
+    .rise {
+        animation: rise 1s var(--ease-out) both;
+        animation-delay: var(--delay, 0ms);
+    }
+
+    .rise-2 { --delay: 100ms; }
+    .rise-3 { --delay: 200ms; }
+    .rise-4 { --delay: 300ms; }
+
+    
+
+    
+    
+
+    
+    
+    
+
+    .button-spectral,
+.pill {
+        animation: rotate-angle 8s linear infinite;
+    }
+
+    .marquee-track {
+        animation: marquee 45s linear infinite;
+    }
+
+    .gradient-text {
+        animation: shimmer 10s linear infinite;
+    }
+
+    /*
+     * The timelines are passed through custom properties on purpose: the CSS minifier otherwise folds
+     * animation-timeline into the animation shorthand, where browsers treat it as reset-only and drop the rule.
+     */
+    :root {
+        --timeline-view: view();
+        --timeline-page: scroll(root);
+    }
+
+    @supports (animation-timeline: view()) {
+        /* The brand spectrum along the bottom of the header is revealed, left to right, as the page scrolls. */
+        .scroll-progress {
+            animation: progress linear both;
+            animation-timeline: var(--timeline-page);
+        }
+
+        /*
+         * Fill backwards only, here and on the zoom: an animation still in effect at rest keeps its layer at a low
+         * resolution, which softens text and images. These keyframes all end on the element's own style.
+         */
+
+        /* Content slides up and fades in as it enters the viewport. */
+        .reveal {
+            animation: reveal linear backwards;
+            animation-timeline: var(--timeline-view);
+            animation-range: entry 0% cover 30%;
+        }
+
+        /* Tiles and images grow into place. */
+        .reveal-scale {
+            animation: reveal-scale linear backwards;
+            animation-timeline: var(--timeline-view);
+            animation-range: entry 0% cover 35%;
+        }
+
+        /* A product shot that settles up into frame as it scrolls in. */
+        .settle {
+            animation: settle linear backwards;
+            animation-timeline: var(--timeline-view);
+            animation-range: entry 0% cover 45%;
+        }
+
+        /* An icon or visual that zooms into place as it arrives. */
+        .zoom-arrive {
+            animation: zoom-arrive linear backwards;
+            animation-timeline: var(--timeline-view);
+            animation-range: entry 0% cover 40%;
+        }
+
+        
+
+        
+    }
+
+    /* Native cross-document view transitions: the header stays put while the page beneath it changes. */
+    @view-transition {
+        navigation: auto;
+    }
+
+    /*
+     * A fade-through rather than a crossfade: the old page fades away on top of the new one, which is already in place
+     * underneath with its entrances held, so two unrelated layouts never show at once. Once the old page has gone, the
+     * new one builds itself in as it does on a first visit.
+     */
+    ::view-transition-old(root) {
+        z-index: 1;
+        animation: 300ms ease-out both view-fade-out;
+    }
+
+    ::view-transition-new(root) {
+        animation: none;
+    }
+
+    /*
+     * The new page's entrances wait for the old page to finish fading. Running together, they made the browser redraw
+     * the page's blurs on every frame of the fade, which dropped frames, and both pages were moving at once.
+     */
+    :root:active-view-transition :is(.rise, .blur-in) {
+        animation-play-state: paused;
+    }
+}
+
+.site-header {
+    view-transition-name: site-header;
+}
+
+@keyframes view-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+/* Blur-in: on load, an element rises into place while it sharpens. It never fades from nothing: hero copy is usually
+   the largest thing on a phone's first screen, and hiding it would hold back the page's largest paint. Set --blur-delay,
+   --blur-rise, --blur-duration and --blur-easing to tune it. The rise and the sharpening are separate animations on one
+   clock: a blur can only be drawn on the main thread, and sharing an animation with it would keep the rise there too,
+   where it stutters while a first visit is still loading. Apart, the rise runs on the compositor. */
+@keyframes blur-in-rise {
+    from {
+        transform: translateY(var(--blur-rise, 1.75rem));
+    }
+}
+
+@keyframes blur-in-sharpen {
+    from {
+        filter: blur(14px);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .blur-in {
+        animation: blur-in-rise, blur-in-sharpen;
+        animation-duration: var(--blur-duration, 1.1s);
+        animation-timing-function: var(--blur-easing, var(--ease-out));
+        animation-fill-mode: backwards;
+        animation-delay: var(--blur-delay, 0ms);
+    }
+
+}

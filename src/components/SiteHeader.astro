@@ -1,0 +1,250 @@
+---
+import { navigation } from '../config/navigation';
+import type { NavigationItem } from '../config/navigation-item';
+import { site } from '../config/site';
+import Icon from './Icon.astro';
+
+// At build time pages are addressed by their files (/index.html, /Demos/Logic.html); compare them as the visitor sees them.
+const currentPath: string = Astro.url.pathname.replace(/(\/index)?\.html$/, '') || '/';
+
+// A page is current on its own address and on any address beneath it (Demos on /Demos/Logic); the introduction only on
+// its own, since every address is beneath /.
+function isCurrent(item: NavigationItem): boolean {
+    return currentPath === item.path || (item.path !== '/' && currentPath.startsWith(`${item.path}/`));
+}
+---
+<header class="site-header">
+    <div class="header-inner">
+        <a class="brand" href={site.companyUrl}>
+            <picture>
+                <source srcset="/onixlabs/images/logo/logo-full-dark.webp" media="(prefers-color-scheme: dark)" />
+                <img class="brand-logo" src="/onixlabs/images/logo/logo-full-light.webp" alt={`${site.companyName} home`} width={153} height={29} />
+            </picture>
+        </a>
+
+        <nav class="primary-nav" aria-label="Main">
+            <ul role="list">
+                {navigation.map((item: NavigationItem) => (
+                    <li>
+                        <a class="nav-link" href={item.path} aria-current={isCurrent(item) ? 'page' : undefined}>{item.label}</a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+
+        <!-- The menu opens and closes with the popover attribute: HTML alone, no script. -->
+        <button class="header-icon menu-button" type="button" popovertarget="mobile-menu" aria-label="Toggle navigation">
+            <Icon name="list" class="menu-icon-open" />
+            <Icon name="x" class="menu-icon-close" />
+        </button>
+    </div>
+
+    <div class="header-progress scroll-progress" aria-hidden="true"></div>
+
+    <div id="mobile-menu" class="mobile-menu" popover>
+        <nav aria-label="Mobile">
+            <ul role="list">
+                {navigation.map((item: NavigationItem) => (
+                    <li>
+                        <a href={item.path} aria-current={isCurrent(item) ? 'page' : undefined}>{item.label}</a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<style>
+    /*
+     * The brand spectrum along the bottom of the header. It's painted at full width and uncovered from left to
+     * right as the page scrolls, so each colour stays put and more of the spectrum appears. It stays hidden where
+     * it can't be scroll-driven (where effects.css drives it), so it never sits under the header as a fixed rule.
+     */
+    .header-progress {
+        position: absolute;
+        inset: auto 0 0;
+        height: 2px;
+        background: var(--brand-gradient);
+        visibility: hidden;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        @supports (animation-timeline: view()) {
+            .header-progress {
+                visibility: visible;
+            }
+        }
+    }
+
+    /* A thin bar that stays at the top while the page scrolls beneath it. */
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--header-bg);
+        color: var(--header-text);
+    }
+
+    .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        width: min(100% - 2 * var(--tile-gap) - 1rem, var(--container-wide));
+        height: var(--header-height);
+        padding-block: var(--space-2);
+        margin-inline: auto;
+    }
+
+    .brand {
+        display: flex;
+        flex: none;
+        border-radius: 4px;
+        opacity: 0.92;
+        transition: opacity var(--duration);
+    }
+
+    .brand:hover {
+        opacity: 1;
+    }
+
+    .brand picture {
+        display: flex;
+    }
+
+    .brand-logo {
+        width: auto;
+        height: 1.5rem;
+    }
+
+    .primary-nav {
+        margin-left: auto;
+    }
+
+    .primary-nav ul {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.25rem;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 0.35rem 0.75rem;
+        color: var(--header-text);
+        font-size: 0.8rem;
+        letter-spacing: -0.005em;
+        opacity: 0.8;
+        transition: opacity var(--duration);
+    }
+
+    .nav-link:hover,
+    .nav-link[aria-current='page'] {
+        opacity: 1;
+        text-decoration: none;
+    }
+
+    .nav-link[aria-current='page'] {
+        font-weight: 600;
+    }
+
+    .header-icon {
+        display: grid;
+        place-items: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--header-text);
+        font-size: 0.875rem;
+        opacity: 0.8;
+        cursor: pointer;
+        transition: opacity var(--duration), background-color var(--duration);
+    }
+
+    .header-icon:hover {
+        opacity: 1;
+        background: color-mix(in srgb, var(--header-text) 8%, transparent);
+    }
+
+    .menu-button {
+        display: none;
+    }
+
+    /* The button shows a cross while the menu is open: :has() reads the popover's state, no script involved. */
+    .menu-button :global(.icon) {
+        grid-area: 1 / 1;
+    }
+
+    .menu-button :global(.menu-icon-close),
+    .site-header:has(.mobile-menu:popover-open) .menu-button :global(.menu-icon-open) {
+        display: none;
+    }
+
+    .site-header:has(.mobile-menu:popover-open) .menu-button :global(.menu-icon-close) {
+        display: block;
+    }
+
+    .mobile-menu {
+        inset: var(--header-height) 0 auto;
+        width: 100%;
+        max-width: none;
+        min-height: calc(100dvh - var(--header-height));
+        margin: 0;
+        padding: 1.5rem var(--gutter) 3rem;
+        border: 0;
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .mobile-menu::backdrop {
+        background: transparent;
+    }
+
+    .mobile-menu ul {
+        display: grid;
+        gap: 0.25rem;
+    }
+
+    .mobile-menu a {
+        display: block;
+        padding: 0.4rem 0.5rem;
+        color: var(--heading);
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+
+    .mobile-menu a:hover {
+        text-decoration: none;
+        color: var(--text-muted);
+    }
+
+    .mobile-menu a[aria-current='page'] {
+        color: var(--text-muted);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .mobile-menu:popover-open li {
+            animation: rise 500ms var(--ease-out) both;
+        }
+
+        .mobile-menu:popover-open li:nth-child(2) { animation-delay: 30ms; }
+        .mobile-menu:popover-open li:nth-child(3) { animation-delay: 60ms; }
+        .mobile-menu:popover-open li:nth-child(4) { animation-delay: 90ms; }
+        .mobile-menu:popover-open li:nth-child(5) { animation-delay: 120ms; }
+        .mobile-menu:popover-open li:nth-child(6) { animation-delay: 150ms; }
+        .mobile-menu:popover-open li:nth-child(7) { animation-delay: 180ms; }
+        .mobile-menu:popover-open li:nth-child(8) { animation-delay: 210ms; }
+    }
+
+    @media (max-width: 64rem) {
+        .primary-nav {
+            display: none;
+        }
+
+        .menu-button {
+            display: grid;
+        }
+    }
+</style>

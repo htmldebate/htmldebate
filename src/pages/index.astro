@@ -1,0 +1,241 @@
+---
+import Button from '../components/Button.astro';
+import LogoAura from '../components/LogoAura.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { PageKind } from '../config/page-kind';
+import { site } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title={site.name} searchTitle={site.searchTitle} description={site.description} path="/" kind={PageKind.Site}>
+    <PageHero
+        title="Is HTML a"
+        highlight="programming language?"
+        lead="It's one of the internet's longest-running arguments. Rather than pick a side, this site sets out what programming means, tests HTML and CSS against it, and lets the demos speak for themselves."
+    >
+        <Fragment slot="actions">
+            <Button href={debateParts[0]?.path ?? '/'} variant="primary" size="large">Start reading</Button>
+            <Button href="/Demos" variant="ghost" size="large" trailingIcon="arrow-right-bold">See the demos</Button>
+        </Fragment>
+    </PageHero>
+
+    <section class="section tone-alt intro-band" aria-labelledby="intro-title">
+        <div class="container-wide intro-layout">
+            <div class="intro-copy">
+                <SectionHeader id="intro-title" eyebrow="Introduction" title="The great" highlight="HTML debate">
+                    <p>
+                        Ask whether HTML is a programming language and you'll rarely get a calm answer. Designers, developers
+                        and engineers have argued over it for years, mostly on social media, and mostly without agreeing what
+                        the question means.
+                    </p>
+                </SectionHeader>
+
+                <div class="intro-details">
+                    <p>
+                        Some of it is trolling, and some of it is gatekeeping: a way of deciding who counts as a programmer.
+                        Underneath, though, is a good question. Where does describing something end, and programming it begin?
+                    </p>
+                    <p>
+                        HTML is only half of the story. CSS has quietly learnt to choose, count and calculate, and the two
+                        together can do things that neither can do alone. So this site looks at each in turn, then at what
+                        happens when they meet.
+                    </p>
+                    <p>
+                        You won't find a simple yes or no at the end. You will find the tests people use, the evidence for each,
+                        and enough working demos to make up your own mind.
+                    </p>
+                </div>
+            </div>
+
+            <div class="intro-logo zoom-arrive">
+                <LogoAura class="intro-aura" />
+            </div>
+        </div>
+    </section>
+
+    <section class="section" aria-labelledby="parts-title">
+        <div class="container-wide">
+            <SectionHeader id="parts-title" eyebrow="The case" title="Five parts" highlight="One question">
+                <p>
+                    Each part builds on the one before. We agree on the tests first, try HTML and CSS against them
+                    separately, then put them together and see how far they go.
+                </p>
+            </SectionHeader>
+
+            <ol class="grid grid-3 parts" role="list">
+                {debateParts.map((part: DebatePart) => (
+                    <li class="reveal-scale">
+                        <a class="tile part-tile" href={part.path}>
+                            <span class="label">Part {part.number}</span>
+                            <h3>{part.title} {part.highlight}</h3>
+                            <p>{part.summary}</p>
+                            <span class="link-cta">Read part {part.number}</span>
+                        </a>
+                    </li>
+                ))}
+                <li class="reveal-scale">
+                    <a class="tile part-tile part-tile-sources" href="/Sources">
+                        <span class="label label-muted">Further reading</span>
+                        <h3>Sources</h3>
+                        <p>The articles, talks and definitions behind the debate: who said what, and which side they came down on.</p>
+                        <span class="link-cta">See the sources</span>
+                    </a>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <section class="section tone-alt" aria-labelledby="no-script-title">
+        <div class="container-wide split">
+            <SectionHeader id="no-script-title" eyebrow="The rules" title="Zero" highlight="JavaScript">
+                <p>
+                    Everything on this site, from the menu to the demos, is built from HTML and CSS. Your browser is told to
+                    refuse scripts outright, and the site won't even build if one slips in. The site itself is part of the
+                    evidence.
+                </p>
+            </SectionHeader>
+
+            <ul class="grid rules" role="list">
+                <li class="surface rule">
+                    <h3>The menu</h3>
+                    <p>On a phone, the menu opens and closes with HTML's <code>popover</code> attribute. No script toggles it.</p>
+                </li>
+                <li class="surface rule">
+                    <h3>Light and dark</h3>
+                    <p>The colours follow your device's setting through a CSS media query, so there's no switch to remember.</p>
+                </li>
+                <li class="surface rule">
+                    <h3>The demos</h3>
+                    <p>When a demo has something to remember, it's in a checkbox or a radio button, and CSS decides what happens next.</p>
+                </li>
+            </ul>
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    /* Every row as tall as the tallest, so all six tiles match. A single column has no neighbours to match. */
+    @media (min-width: 40rem) {
+        .parts {
+            grid-auto-rows: 1fr;
+        }
+    }
+
+    .parts > li {
+        display: grid;
+    }
+
+    .part-tile {
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: 0.85rem;
+        padding: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
+    }
+
+    .part-tile h3 {
+        font-size: var(--text-2xl);
+        font-weight: 600;
+    }
+
+    .part-tile p {
+        color: var(--text-muted);
+    }
+
+    .part-tile-sources {
+        background: var(--surface-alt);
+    }
+
+    /* Copy beside the glowing logo, as the ONIXLabs site sets its glass icons. The glow spreads past the logo, so the band
+       clips it. Stacks on narrower screens, logo first. */
+    .intro-band {
+        overflow: clip;
+    }
+
+    .intro-layout {
+        display: grid;
+        gap: 2.5rem;
+    }
+
+    .intro-logo {
+        display: grid;
+        place-items: start center;
+        order: -1;
+        isolation: isolate;
+    }
+
+    .intro-logo :global(.intro-aura) {
+        width: min(15rem, 60vw);
+    }
+
+    @media (min-width: 60rem) {
+        .intro-layout {
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .intro-logo {
+            place-items: center;
+            order: 0;
+        }
+
+        .intro-logo :global(.intro-aura) {
+            width: min(100%, 24rem);
+        }
+    }
+
+    .intro-copy {
+        display: grid;
+        gap: 2rem;
+    }
+
+    .intro-copy :global(.section-header) {
+        max-width: none;
+        margin-bottom: 0;
+    }
+
+    .intro-details {
+        display: grid;
+        gap: 1rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+    }
+
+    .split {
+        display: grid;
+        gap: 2rem;
+    }
+
+    @media (min-width: 64rem) {
+        .split {
+            grid-template-columns: 1fr 1fr;
+            align-items: start;
+            column-gap: 4rem;
+        }
+
+        .split :global(.section-header) {
+            margin-bottom: 0;
+        }
+    }
+
+    .rules {
+        gap: var(--tile-gap);
+    }
+
+    .rule {
+        display: grid;
+        gap: 0.5rem;
+        padding: 1.5rem 1.75rem;
+    }
+
+    .rule p {
+        color: var(--text-muted);
+    }
+
+    .rule code {
+        font-family: var(--font-mono);
+        font-size: 0.9em;
+    }
+</style>

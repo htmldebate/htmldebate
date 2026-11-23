@@ -1,0 +1,38 @@
+---
+import { Score } from '../config/score';
+
+// A Yes, Partly or No, coloured to match.
+interface Props {
+    readonly score: Score;
+}
+
+const { score }: Props = Astro.props;
+const labels: Record<Score, string> = { [Score.Yes]: 'Yes', [Score.Partly]: 'Partly', [Score.No]: 'No' };
+---
+<span class:list={['score', `score-${score}`]}>{labels[score]}</span>
+
+<style>
+    .score {
+        display: inline-block;
+        padding: 0.1rem 0.6rem;
+        border-radius: var(--radius-pill);
+        corner-shape: round;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .score-yes {
+        background: var(--success-subtle);
+        color: var(--success-text);
+    }
+
+    .score-partly {
+        background: var(--warning-subtle);
+        color: var(--ink-bs-warning);
+    }
+
+    .score-no {
+        background: var(--danger-subtle);
+        color: var(--danger);
+    }
+</style>

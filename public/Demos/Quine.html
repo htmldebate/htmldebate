@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en-GB">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A web page that shows its own source code with no JavaScript: every tag you can see is drawn by the stylesheet, which is itself on show.">
+    <title>A quine in HTML and CSS | HTML Debate</title>
+    <link rel="canonical" href="https://www.htmldebate.com/Demos/Quine">
+</head>
+
+<body>
+    <main>
+    <h1>This page is a quine: a program that shows its own source code.</h1>
+    <p>A quine is a computer program which takes no input and produces a copy of its own source code as its only
+        output. Everything you can see here, the tags included, is drawn by the stylesheet at the end of this page,
+        which is itself on show. There is no JavaScript, and nothing was copied into the page twice.</p>
+    <a href="https://en.wikipedia.org/wiki/Quine_(computing)">Quines on Wikipedia</a>
+    <a href="/Demos">Back to the demos</a>
+    <style>
+        * {
+            display: block;
+            font-family: monospace;
+            font-size: 1em;
+            padding: 0;
+            text-decoration: none;
+        }
+
+        *::before,
+        *::after {
+            color: firebrick;
+            font-weight: 100;
+            font-size: 1.0em;
+        }
+
+        html {
+            max-width: 120ch;
+            margin: auto;
+            padding: 1em;
+        }
+
+        style {
+            color: gray;
+            white-space: pre-wrap;
+        }
+
+        html::before {
+            content: "<!doctype html>\A<html lang='" attr(lang) "'>";
+            white-space: pre-line;
+        }
+
+        html::after {
+            content: "</html>";
+        }
+
+        head::before {
+            content: "<head>";
+        }
+
+        head::after {
+            content: "</head>";
+        }
+
+        meta[charset]::before {
+            content: "<meta charset='" attr(charset) "'>";
+        }
+
+        meta[name]::before {
+            content: "<meta name='" attr(name) "' content='" attr(content) "'>";
+        }
+
+        link::before {
+            content: "<link rel='" attr(rel) "' href='" attr(href) "'>";
+        }
+
+        title::before {
+            content: "<title>";
+        }
+
+        title::after {
+            content: "</title>";
+        }
+
+        body::before {
+            content: "<body>";
+        }
+
+        body::after {
+            content: "</body>";
+        }
+
+        main::before {
+            content: "<main>";
+        }
+
+        main::after {
+            content: "</main>";
+        }
+
+        h1::before {
+            content: "<h1>";
+        }
+
+        h1::after {
+            content: "</h1>";
+        }
+
+        p::before {
+            content: '<p>';
+        }
+
+        p::after {
+            content: '</p>';
+        }
+
+        a[href]::before {
+            content: "<a href='" attr(href) "'>";
+        }
+
+        a::after {
+            content: '</a>';
+        }
+
+        style::before {
+            content: "<style>";
+        }
+
+        style::after {
+            content: "<\/style>";
+        }
+
+        @media (prefers-color-scheme: dark) {
+            html {
+                background: #212529;
+                color: #e9ecef;
+            }
+
+            *::before,
+            *::after {
+                color: #f58a73;
+            }
+
+            style {
+                color: #b4bbc2;
+            }
+        }
+    </style>
+    </main>
+</body>
+
+</html>
