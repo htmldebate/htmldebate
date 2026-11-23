@@ -1,0 +1,243 @@
+---
+import type { OutlineEntry } from '../components/outline-entry';
+import Scorecard from '../components/Scorecard.astro';
+import type { SubjectResults } from '../components/subject-results';
+import { cssResults } from '../config/css-results';
+import type { DebatePart } from '../config/debate-part';
+import { debateParts } from '../config/debate-parts';
+import { htmlResults } from '../config/html-results';
+import { site } from '../config/site';
+import { togetherResults } from '../config/together-results';
+import PartLayout from '../layouts/PartLayout.astro';
+
+const part: DebatePart | undefined = debateParts.find((candidate: DebatePart): boolean => candidate.path === '/Verdict');
+
+if (part === undefined) {
+    throw new Error('src/config/debate-parts.ts has no part at /Verdict.');
+}
+
+const outline: ReadonlyArray<OutlineEntry> = [
+    { id: 'scorecard', text: 'The scorecard' },
+    { id: 'choose', text: 'Choose your test' },
+    { id: 'where-i-land', text: 'Where I land' },
+    { id: 'question', text: 'The better question' },
+];
+
+const subjects: ReadonlyArray<SubjectResults> = [
+    { name: 'HTML', path: '/HTML', results: htmlResults },
+    { name: 'CSS', path: '/CSS', results: cssResults },
+    { name: 'HTML and CSS', path: '/Together', results: togetherResults },
+];
+---
+<PartLayout part={part} outline={outline}>
+    <p>
+        Four parts, four tests, and a lot of checkboxes later, here's where the evidence leaves us. The short version is
+        that "is HTML a programming language?" has no single answer, because it's really four questions in one. The
+        long version is below.
+    </p>
+
+    <h2 id="scorecard">The scorecard</h2>
+    <p>
+        Here are the results from parts 2, 3 and 4 side by side. Each column links to the part that explains its
+        scores.
+    </p>
+
+    <Scorecard subjects={subjects} />
+
+    <p>
+        Read down the columns and a pattern appears. HTML on its own passes the loosest test and little else. CSS on its
+        own does better than its reputation, and is still getting better. Together, they pass the middle test outright
+        and get a foot in the door of every other.
+    </p>
+    <p>
+        Read across the rows and a different pattern appears: the answer depends far more on the test than on the
+        language. Nobody disagrees about what HTML can do. They disagree about what counts.
+    </p>
+
+    <h2 id="choose">Choose your test</h2>
+    <p>
+        So pick the test you believe in, and see the verdict it gives. (This is HTML and CSS too: the choices are radio
+        buttons, and CSS shows the matching verdict.)
+    </p>
+
+    <div class="choose surface">
+        <fieldset class="choices">
+            <legend class="visually-hidden">Which test makes something a programming language?</legend>
+            <label><input type="radio" name="test" id="choose-compute" /> It can compute anything</label>
+            <label><input type="radio" name="test" id="choose-instruct" /> It gives a machine instructions</label>
+            <label><input type="radio" name="test" id="choose-decide" /> It can decide and remember</label>
+            <label><input type="radio" name="test" id="choose-programs" /> People build programs with it</label>
+        </fieldset>
+
+        <div class="verdicts" aria-live="polite">
+            <p class="verdict verdict-none">Choose a test to see its verdict.</p>
+            <div class="verdict verdict-compute">
+                <p class="verdict-headline">HTML: no. HTML and CSS: yes, with conditions.</p>
+                <p>
+                    HTML can't calculate anything at all. HTML and CSS together can run Rule 110, which can compute
+                    anything, as long as a person keeps clicking; and the newest CSS can run an emulated processor by
+                    itself, in some browsers. By the strictest test, HTML alone is out, and the pair have only just got in.
+                </p>
+            </div>
+            <div class="verdict verdict-instruct">
+                <p class="verdict-headline">Yes: HTML is a programming language, and so is CSS.</p>
+                <p>
+                    Every element and every rule is an instruction a browser carries out. The trouble with this test is
+                    how much else passes it: a knitting pattern, a sat-nav route, the settings on a washing machine. If you
+                    choose it, you've chosen a very big club.
+                </p>
+            </div>
+            <div class="verdict verdict-decide">
+                <p class="verdict-headline">Neither alone. Together: yes.</p>
+                <p>
+                    HTML remembers without deciding; CSS, in everyday use, decides without remembering. Put them together
+                    and you get choices, memory and logic, and every demo on this site is the proof. By this test, HTML on
+                    its own falls short, but HTML and CSS together are a programming language, if a very limited one.
+                </p>
+            </div>
+            <div class="verdict verdict-programs">
+                <p class="verdict-headline">Mostly not.</p>
+                <p>
+                    People build pages and applications' screens with HTML and CSS, and leave the logic to other languages.
+                    The demos show games and calculators can be built from them, and x86CSS even runs compiled programs,
+                    but nobody would build real software that way. By the test of everyday use, they're languages for
+                    describing, not for programming.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <p>
+        None of the four is wrong. Each captures something real about programming. That's why the argument never ends:
+        two people who pick different tests can both be right, and both be sure the other is wrong.
+    </p>
+
+    <h2 id="where-i-land">Where I land</h2>
+    <p class="byline">My own view, as the author of this site: <a href={site.authorUrl}>{site.author}</a>.</p>
+    <p>
+        I'm undecided, and I think that's the honest position rather than a dodge. HTML can, in some sense, be considered
+        a programming language, albeit a very weak one. Professor Brailsford's view of it as a simple, declarative
+        language, in which elements are something like functions telling the browser what to render, is a fair
+        description of what HTML is. But HTML on its own could never crack the Enigma machine, or complete a knight's
+        tour, and I can't call something a programming language when it can't do either.
+    </p>
+    <p>
+        Where it gets interesting is when CSS steps in, and that's what the original version of this site got wrong: it
+        looked almost entirely at HTML. CSS has spent the last few years gaining exactly the things programming needs:
+        conditions, calculations, functions, and now, through animations, a clock and a kind of memory. HTML and CSS
+        together are already a programming system, a limited and awkward one. If CSS keeps going the way it is, the
+        debate may end up being settled not by an argument, but by CSS.
+    </p>
+
+    <h2 id="question">The better question</h2>
+    <p>
+        Much of this debate isn't really about HTML. "That's not real programming" is often a way of drawing a line
+        between people, not languages, and lines like that tend to move. Alvaro Montoro put it well:
+    </p>
+    <blockquote>
+        <p>
+            The definition of what programming is (or is not) changes with time. I bet someone sorting through punched
+            cards complained about how typing code in assembly was not real programming.
+        </p>
+        <p class="quote-source">
+            <a href="https://css-tricks.com/html-is-not-a-programming-language/">Alvaro Montoro, CSS-Tricks</a>
+        </p>
+    </blockquote>
+    <p>
+        So the label matters less than the question it makes us ask: <strong>when do descriptions, rules and state become
+        programming?</strong> HTML and CSS sit right on that line, which makes them the best place to think about it.
+        Whatever you decide, you'll have decided it about the tests, not the languages, and that's the most useful thing
+        this debate can teach.
+    </p>
+    <p>
+        If you want to go further, the <a href="/Sources">sources</a> collect the articles, talks and projects behind
+        everything here, and the <a href="/Demos">demos</a> are there to make up your own mind.
+    </p>
+</PartLayout>
+
+<style>
+    .byline {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        font-style: italic;
+    }
+
+    .quote-source {
+        margin-top: 0.75rem;
+        font-size: var(--text-sm);
+    }
+
+    .choose {
+        display: grid;
+        gap: 1.25rem;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+    }
+
+    .choose > :global(*) {
+        margin-top: 0;
+    }
+
+    .choices {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    .choices label {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.6rem 0.85rem;
+        border-radius: var(--radius);
+        background: var(--surface-alt);
+        color: var(--heading);
+        font-size: var(--text-base);
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .choices label:has(:checked) {
+        box-shadow: inset 0 0 0 2px var(--brand-blue);
+    }
+
+    .choices input {
+        width: 1.1rem;
+        height: 1.1rem;
+        accent-color: var(--brand-blue);
+    }
+
+    /* Each verdict waits for its test to be chosen; until one is, a prompt shows instead. */
+    .verdict {
+        display: none;
+    }
+
+    .verdict > :global(* + *) {
+        margin-top: 0.75rem;
+    }
+
+    .verdict-none,
+    .choose:has(#choose-compute:checked) .verdict-compute,
+    .choose:has(#choose-instruct:checked) .verdict-instruct,
+    .choose:has(#choose-decide:checked) .verdict-decide,
+    .choose:has(#choose-programs:checked) .verdict-programs {
+        display: block;
+    }
+
+    .choose:has(.choices :checked) .verdict-none {
+        display: none;
+    }
+
+    .verdict-none {
+        color: var(--text-muted);
+    }
+
+    .verdict-headline {
+        color: var(--heading);
+        font-size: var(--text-xl);
+        font-weight: 600;
+    }
+</style>

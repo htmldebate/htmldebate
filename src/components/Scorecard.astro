@@ -1,0 +1,66 @@
+---
+import type { ProgrammingTest } from '../config/programming-test';
+import { programmingTests } from '../config/programming-tests';
+import type { TestResult } from '../config/test-result';
+import ScorePill from './ScorePill.astro';
+import type { SubjectResults } from './subject-results';
+
+// The four tests against several subjects at once: each subject's results, as its part of the debate scored them.
+interface Props {
+    readonly subjects: ReadonlyArray<SubjectResults>;
+}
+
+const { subjects }: Props = Astro.props;
+
+function resultFor(subject: SubjectResults, test: ProgrammingTest): TestResult | undefined {
+    return subject.results.find((result: TestResult): boolean => result.testId === test.id);
+}
+---
+<div class="table-responsive">
+    <table class="scorecard">
+        <caption class="visually-hidden">HTML, CSS, and both together, against the four tests</caption>
+        <thead>
+            <tr>
+                <th scope="col">Test</th>
+                {subjects.map((subject: SubjectResults) => <th scope="col"><a href={subject.path}>{subject.name}</a></th>)}
+            </tr>
+        </thead>
+        <tbody>
+            {programmingTests.map((test: ProgrammingTest) => (
+                <tr>
+                    <th scope="row">
+                        {test.name}
+                        <span class="question">{test.question}</span>
+                    </th>
+                    {subjects.map((subject: SubjectResults) => {
+                        const result: TestResult | undefined = resultFor(subject, test);
+
+                        return <td>{result !== undefined && <ScorePill score={result.score} />}</td>;
+                    })}
+                </tr>
+            ))}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .scorecard th[scope='row'] {
+        background: none;
+    }
+
+    .scorecard td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .scorecard thead th:not(:first-child) {
+        text-align: center;
+    }
+
+    .question {
+        display: block;
+        margin-top: 0.2rem;
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+</style>

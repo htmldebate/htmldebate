@@ -84,8 +84,14 @@ const winExample: string = `.game:has(.x[value="0"]:checked):has(.x[value="4"]:c
     <h2>What it doesn't do</h2>
     <p>
         It doesn't play against you. A computer opponent has to look ahead, imagining moves and their replies, and choose
-        the best; that's a search, and as <a href="/Together#limit">part 4</a> explains, searching is exactly what HTML
-        and CSS can't do. They can referee a game. They can't play one.
+        the best: a search, which rules like these don't do. They can referee a game, not play one.
+    </p>
+    <p>
+        There are two ways round that, and neither is simple. Noughts and crosses is small enough that a program could
+        work out the best reply to every possible position in advance and write each one out as a CSS rule: a lookup
+        table, which plays perfectly without thinking at all. Or, with the newest CSS, an emulated processor like
+        <a href="/Together#limit">x86CSS</a> could run a game-playing program for real. Both show the same thing: in CSS,
+        playing a game is possible, but it takes far more than refereeing one.
     </p>
 </DemoLayout>
 

@@ -1,8 +1,8 @@
 ---
 import type { ProgrammingTest } from '../config/programming-test';
 import { programmingTests } from '../config/programming-tests';
-import { Score } from '../config/score';
 import type { TestResult } from '../config/test-result';
+import ScorePill from './ScorePill.astro';
 
 // A subject's results against the four tests, in the tests' order.
 interface Props {
@@ -11,7 +11,6 @@ interface Props {
 }
 
 const { subject, results }: Props = Astro.props;
-const scoreLabels: Record<Score, string> = { [Score.Yes]: 'Yes', [Score.Partly]: 'Partly', [Score.No]: 'No' };
 
 function resultFor(test: ProgrammingTest): TestResult | undefined {
     return results.find((result: TestResult): boolean => result.testId === test.id);
@@ -34,7 +33,7 @@ function resultFor(test: ProgrammingTest): TestResult | undefined {
                 return (
                     <tr>
                         <th scope="row">{test.name}</th>
-                        <td>{result !== undefined && <span class:list={['score', `score-${result.score}`]}>{scoreLabels[result.score]}</span>}</td>
+                        <td>{result !== undefined && <ScorePill score={result.score} />}</td>
                         <td>{result?.reason}</td>
                     </tr>
                 );
@@ -47,29 +46,5 @@ function resultFor(test: ProgrammingTest): TestResult | undefined {
     .results th[scope='row'] {
         background: none;
         white-space: nowrap;
-    }
-
-    .score {
-        display: inline-block;
-        padding: 0.1rem 0.6rem;
-        border-radius: var(--radius-pill);
-        corner-shape: round;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .score-yes {
-        background: var(--success-subtle);
-        color: var(--success);
-    }
-
-    .score-partly {
-        background: var(--warning-subtle);
-        color: var(--ink-bs-warning);
-    }
-
-    .score-no {
-        background: var(--danger-subtle);
-        color: var(--danger);
     }
 </style>

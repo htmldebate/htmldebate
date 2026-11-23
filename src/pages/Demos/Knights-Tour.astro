@@ -83,11 +83,16 @@ const ruleExample: string = `/* If move 3 landed on square 12, offer move 4
 
     <h2>Checking, not searching</h2>
     <p>
-        This is the demo that shows the limit most clearly. CSS checks every move you make, instantly and without fail.
-        But it can't find a tour for you, or even warn you that a move leads to a dead end. Finding a tour means trying a
-        move, following it until you're stuck, going back and trying another: a search, with memory of what's been tried.
-        HTML has the memory, but only you can do the going back. That's the line between what HTML and CSS can do and what
-        a programming language does without thinking.
+        This demo shows the gap between checking and searching most clearly. CSS checks every move you make, instantly
+        and without fail. But this board can't find a tour for you, or even warn you that a move leads to a dead end.
+        Finding a tour means trying a move, following it until you're stuck, going back and trying another: a search,
+        with memory of what's been tried. Here, HTML has the memory, but only you do the going back.
+    </p>
+    <p>
+        That's a limit of rules like these, not of CSS itself. With the newest features, CSS can run an emulated processor
+        by itself (<a href="/Together#limit">x86CSS, in part 4</a>), and a processor can run a program that searches. But
+        look at the difference in effort: checking a tour takes a few hundred rules anyone could read, while searching for
+        one takes building a computer first. A programming language does it in a dozen lines.
     </p>
     <p>
         Telling you you're stuck would be possible, but it would need a rule for every square at every move, checking all

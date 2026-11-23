@@ -16,7 +16,7 @@ const outline: ReadonlyArray<OutlineEntry> = [
     { id: 'rules', text: 'Every rule is an if' },
     { id: 'choosing', text: 'Choosing' },
     { id: 'calculating', text: 'Calculating' },
-    { id: 'limits', text: 'What CSS can\'t do alone' },
+    { id: 'limits', text: 'What CSS can\'t do alone, usually' },
     { id: 'beyond-html', text: 'Not just for HTML' },
     { id: 'score', text: 'How CSS scores' },
 ];
@@ -159,22 +159,29 @@ const xmlExample: string = `<?xml version="1.0"?>
         "language".
     </p>
 
-    <h2 id="limits">What CSS can't do alone</h2>
-    <p>For all that, CSS on its own is missing two things that programs depend on.</p>
+    <h2 id="limits">What CSS can't do alone, usually</h2>
+    <p>For all that, CSS as most people write it is missing two things that programs depend on.</p>
     <ul>
         <li>
             <strong>Input.</strong> CSS can only read the document it styles and the environment it's shown in: the
             screen, the settings, where the pointer is. It can't be handed new information to work on.
         </li>
         <li>
-            <strong>Memory.</strong> CSS can't record that something happened. A rule applies while its condition is
-            true and stops the moment it isn't: move the pointer away and <code>:hover</code> is forgotten. Nothing CSS
-            works out can be kept and used in a later step, and CSS can't change the document to leave a note for itself.
+            <strong>Memory.</strong> A rule applies while its condition is true and stops the moment it isn't: move the
+            pointer away and <code>:hover</code> is forgotten. CSS can't change the document to leave a note for itself,
+            so in everyday use, nothing it works out is kept for a later step.
         </li>
     </ul>
     <p>
         Without memory there's no way to repeat a step and build on the result, which is what computing anything
-        requires. CSS can decide and calculate, but only about a world it can't change.
+        requires. So for most of its life, CSS could decide and calculate, but only about a world it couldn't change.
+    </p>
+    <p>
+        The exception is animation. An animation is CSS changing values over time by itself, with nothing else involved,
+        and with enough ingenuity, and the newest features above, animations can act as a clock and carry values from one
+        step to the next. In 2026 that was enough for someone to build a working processor in CSS, which
+        <a href="/Together#limit">part 4</a> comes to. It's a long way from everyday CSS, and so far it only runs in some
+        browsers, but it means "CSS has no memory" is no longer simply true.
     </p>
 
     <h2 id="beyond-html">Not just for HTML</h2>
@@ -205,8 +212,8 @@ const xmlExample: string = `<?xml version="1.0"?>
 
     <p>
         It's a closer result than most people expect, and a different shape from HTML's. HTML can hold state but can't
-        make decisions about it; CSS can make decisions all day, but has no state of its own to make them about. Each has
-        exactly what the other is missing. <a href="/Together">Part 4</a> puts them together.
+        make decisions about it; CSS can make decisions all day, but in everyday use has no state of its own to make them
+        about. Each has exactly what the other is missing. <a href="/Together">Part 4</a> puts them together.
     </p>
 </PartLayout>
 

@@ -55,7 +55,7 @@ export const demos: ReadonlyArray<Demo> = [
         path: '/Demos/Knights-Tour',
         title: 'Knight\'s tour',
         summary: 'Move a knight so it visits every square of the board exactly once.',
-        shows: 'HTML and CSS can check an answer, but not search for one.',
+        shows: 'Checking an answer takes a few rules; searching for one takes far more.',
         status: DemoStatus.Ready,
     },
 ];

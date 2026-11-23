@@ -5,8 +5,10 @@ import type { TestResult } from './test-result';
 export const cssResults: ReadonlyArray<TestResult> = [
     {
         testId: 'compute',
-        score: Score.No,
-        reason: 'It can calculate, but it has no memory to build on: nothing it works out can feed the next step.',
+        score: Score.Partly,
+        reason:
+            'Everyday CSS can\'t: nothing it works out feeds the next step. But with the newest features, animations ' +
+            'can carry state forward, enough to run an emulated processor (x86CSS), so far only in some browsers.',
     },
     {
         testId: 'instruct',
@@ -17,8 +19,8 @@ export const cssResults: ReadonlyArray<TestResult> = [
         testId: 'decide',
         score: Score.Partly,
         reason:
-            'It decides constantly, through selectors, media queries and container queries, but it remembers nothing: ' +
-            'its decisions can only follow state that something else holds.',
+            'It decides constantly, through selectors, media queries and container queries, but in everyday use it ' +
+            'remembers nothing: its decisions follow state that something else holds.',
     },
     {
         testId: 'programs',

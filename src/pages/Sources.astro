@@ -1,37 +1,176 @@
 ---
 import PageHero from '../components/PageHero.astro';
+import type { Source } from '../config/source';
+import { SourceGroup } from '../config/source-group';
+import { sources } from '../config/sources';
+import { Stance } from '../config/stance';
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const stanceLabels: Record<Stance, string> = {
+    [Stance.For]: 'For',
+    [Stance.Against]: 'Against',
+    [Stance.Undecided]: 'Undecided',
+};
+
+function inGroup(group: SourceGroup): ReadonlyArray<Source> {
+    return sources.filter((source: Source): boolean => source.group === group);
+}
 ---
-<BaseLayout title="Sources" description="The articles, talks and definitions behind the HTML debate, and which side each came down on." path="/Sources">
+<BaseLayout title="Sources" description="The articles, talks, definitions and projects behind the HTML debate, and which side each came down on." path="/Sources">
     <PageHero
         label="Further reading"
         title="Sources and"
         highlight="further reading"
-        lead="The articles, talks and definitions behind the debate: who said what, and whether they came down for, against, or somewhere in between."
+        lead="The articles, talks, definitions and projects behind the debate: who said what, and whether they came down for, against, or somewhere in between."
     />
 
-    <section class="section" aria-labelledby="plan-title">
-        <div class="container-narrow">
-            <div class="surface plan">
-                <p class="label">Being rewritten</p>
-                <h2 id="plan-title">Coming across from the original site</h2>
-                <p>
-                    The original site's references, each with a short summary and where its author stands, checked so every
-                    link still works.
-                </p>
-            </div>
-        </div>
-    </section>
+    <div class="container-wide sources">
+        <section aria-labelledby="opinions-title">
+            <h2 id="opinions-title">Where people stand</h2>
+            <p class="lead">Arguments for and against HTML being a programming language, from teachers, writers and developers.</p>
+            <ul class="source-list" role="list">
+                {inGroup(SourceGroup.Opinions).map((source: Source) => (
+                    <li class="surface source">
+                        <div class="source-heading">
+                            <h3><a href={source.url}>{source.title}</a></h3>
+                            {source.stance !== undefined && (
+                                <span class:list={['stance', `stance-${source.stance}`]}>{stanceLabels[source.stance]}</span>
+                            )}
+                        </div>
+                        <p class="source-by">{source.by}</p>
+                        <p>{source.summary}</p>
+                        {source.archived === true && <p class="source-note">The original has been taken down; this links to a copy in the Internet Archive.</p>}
+                    </li>
+                ))}
+            </ul>
+        </section>
+
+        <section aria-labelledby="projects-title">
+            <h2 id="projects-title">Projects that push the limits</h2>
+            <p class="lead">The work that shows how far HTML and CSS can go, from Rule 110 to a processor in CSS.</p>
+            <ul class="source-list" role="list">
+                {inGroup(SourceGroup.Projects).map((source: Source) => (
+                    <li class="surface source">
+                        <h3><a href={source.url}>{source.title}</a></h3>
+                        <p class="source-by">{source.by}</p>
+                        <p>{source.summary}</p>
+                    </li>
+                ))}
+            </ul>
+        </section>
+
+        <section aria-labelledby="background-title">
+            <h2 id="background-title">Definitions and background</h2>
+            <p class="lead">The definitions and ideas the debate is built on.</p>
+            <ul class="source-list" role="list">
+                {inGroup(SourceGroup.Background).map((source: Source) => (
+                    <li class="surface source">
+                        <h3><a href={source.url}>{source.title}</a></h3>
+                        <p class="source-by">{source.by}</p>
+                        <p>{source.summary}</p>
+                    </li>
+                ))}
+            </ul>
+        </section>
+
+        <p class="checked">Links were last checked in November 2026.</p>
+    </div>
 </BaseLayout>
 
 <style>
-    .plan {
+    .sources {
         display: grid;
-        gap: 1rem;
-        padding: clamp(1.75rem, 1.4rem + 1.5vw, 2.75rem);
+        gap: clamp(3rem, 2rem + 3vw, 5rem);
+        padding-block: var(--space-section);
     }
 
-    .plan h2 {
+    .sources section {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .sources h2 {
         font-size: var(--text-3xl);
+    }
+
+    .sources .lead {
+        max-width: var(--lead-width);
+        margin-bottom: 0.5rem;
+        font-size: var(--text-lg);
+    }
+
+    .source-list {
+        display: grid;
+        gap: var(--tile-gap);
+        margin: 0;
+    }
+
+    @media (min-width: 56rem) {
+        .source-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .source {
+        display: grid;
+        align-content: start;
+        gap: 0.5rem;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--radius-lg);
+    }
+
+    .source-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .source h3 {
+        font-size: var(--text-lg);
+        font-weight: 600;
+    }
+
+    .source h3 a {
+        color: var(--heading);
+        text-decoration-color: color-mix(in srgb, var(--heading) 35%, transparent);
+        text-underline-offset: 0.18em;
+    }
+
+    .source-by {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        font-weight: 500;
+    }
+
+    .source-note,
+    .checked {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        font-style: italic;
+    }
+
+    .stance {
+        flex: none;
+        padding: 0.1rem 0.6rem;
+        border-radius: var(--radius-pill);
+        corner-shape: round;
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .stance-for {
+        background: var(--success-subtle);
+        color: var(--success);
+    }
+
+    .stance-against {
+        background: var(--danger-subtle);
+        color: var(--danger);
+    }
+
+    .stance-undecided {
+        background: var(--warning-subtle);
+        color: var(--ink-bs-warning);
     }
 </style>

@@ -17,7 +17,7 @@ const outline: ReadonlyArray<OutlineEntry> = [
     { id: 'memory', text: 'Memory' },
     { id: 'counting', text: 'Counting' },
     { id: 'demos', text: 'The demos' },
-    { id: 'limit', text: 'The limit' },
+    { id: 'limit', text: 'The limit, and how it moved' },
     { id: 'score', text: 'How they score together' },
 ];
 
@@ -115,15 +115,15 @@ const countingExample: string = `.quiz { counter-reset: used; }
 
     <p>All the demos are also listed on the <a href="/Demos">demos page</a>, linked from the top of every page.</p>
 
-    <h2 id="limit">The limit: someone has to keep clicking</h2>
+    <h2 id="limit">The limit, and how it moved</h2>
     <p>
-        So can HTML and CSS together compute anything? Surprisingly, there's a sense in which they can. Rule 110 is a
-        row of cells, each on or off, where every new row follows from the one above by a single simple rule. In 2004
-        the mathematician Matthew Cook published a proof that Rule 110 can compute anything a computer can: it's
+        So can HTML and CSS together compute anything? For years, the answer was "yes, with help". Rule 110 is a row of
+        cells, each on or off, where every new row follows from the one above by a single simple rule. In 2004 the
+        mathematician Matthew Cook published a proof that Rule 110 can compute anything a computer can: it's
         Turing-complete. And Rule 110 has been built in HTML and CSS, notably by Eli Fox-Epstein in 2011; there's a
         version you can <a href="/Demos/Rule-110">try in the demos</a>.
     </p>
-    <p>That makes HTML and CSS Turing-complete too, with two catches:</p>
+    <p>That made HTML and CSS Turing-complete too, with two catches:</p>
     <ul>
         <li>
             <strong>The page must be big enough.</strong> Every cell has to exist in the HTML before the page loads, so
@@ -131,16 +131,48 @@ const countingExample: string = `.quiz { counter-reset: used; }
             computer has a fixed amount of memory too.
         </li>
         <li>
-            <strong>A person has to keep clicking.</strong> CSS can work out what the next row should be, but it can't
-            make it happen. Someone has to click to move the machine on, every step, forever. The person is the clock.
+            <strong>A person has to keep clicking.</strong> CSS can work out what the next row should be, but with the
+            CSS most of us write, it can't make it happen. Someone has to click to move the machine on, every step. The
+            person is the clock.
         </li>
     </ul>
     <p>
-        The second catch is the real one, and it shows up in a simpler way too. HTML and CSS are very good at
-        <em>checking</em> an answer: is this game won, is this sum right, is this a valid move? They can't
-        <em>search</em> for one, because searching means trying something, remembering the result, undoing it and
-        trying again, over and over, and only the person clicking can do that. A <a href="/Demos/Knights-Tour">knight's tour</a> is easy to
-        check in CSS. Finding one, CSS would never do by itself.
+        The second catch shows up in a simpler way too. HTML and CSS are very good at <em>checking</em> an answer: is
+        this game won, is this sum right, is this a valid move? <em>Searching</em> for one is another matter, because
+        searching means trying something, remembering the result, undoing it and trying again, over and over. In every
+        demo on this site, only the person clicking does that. A <a href="/Demos/Knights-Tour">knight's tour</a> is easy
+        to check in CSS; finding one is left to you.
+    </p>
+
+    <h3>Then CSS got a clock</h3>
+    <p>
+        In February 2026, Lyra Rebane published <a href="https://lyra.horse/x86css/">x86CSS</a>: an emulator, written in
+        CSS, of an Intel x86 processor, the family inside most desktop computers. It runs real programs, written in C and
+        compiled to x86 machine code, with no JavaScript at all. And it doesn't need anyone clicking: its clock is a CSS
+        animation, combined with the newest kind of container query, so the processor steps forward by itself. It builds
+        on Jane Ori's earlier CSS CPU, which needed the pointer held over the page to keep it running.
+    </p>
+    <p>
+        That removes the second catch. A processor that runs compiled programs can run one that searches, so in principle
+        CSS can now find a knight's tour by itself. It also means CSS is carrying its own state from one step to the next,
+        the memory <a href="/CSS#limits">part 3</a> says it lacks in everyday use.
+    </p>
+    <p>The new catches are practical ones:</p>
+    <ul>
+        <li>
+            <strong>It needs the very newest CSS.</strong> x86CSS relies on <code>if()</code>, custom
+            <code>@function</code>s and style queries, so for now it only runs in Chromium-based browsers, such as Chrome
+            and Edge, and in Ladybird.
+        </li>
+        <li>
+            <strong>It's slow and small.</strong> It has 1.5 KB of memory to start with, its author says it isn't
+            practical, and it doesn't support every x86 instruction.
+        </li>
+    </ul>
+    <p>
+        Neither matters to the question of what CSS <em>can</em> do. Slow and small is how every computer started. The
+        demos on this site stick to CSS that works in every browser, which is why they still need you to click; but the
+        line they show isn't where it was.
     </p>
 
     <h2 id="score">How they score together</h2>
@@ -150,7 +182,7 @@ const countingExample: string = `.quiz { counter-reset: used; }
 
     <p>
         That's a very different picture from either on its own. Together they pass the middle test outright, and get
-        further on the strictest than most people would guess. Whether that's enough to call them a programming
+        further on the strictest than most people would guess, further every year. Whether that's enough to call them a programming
         language is what the <a href="/Verdict">verdict</a> is about.
     </p>
 </PartLayout>

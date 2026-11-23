@@ -60,12 +60,12 @@ export const debateParts: ReadonlyArray<DebatePart> = [
         points: [
             'Checkboxes and radio buttons as memory; :checked and :has() as logic.',
             'The demos: FizzBuzz, the sieve of Eratosthenes, Boolean logic, a quine, an adding machine, Rule 110, noughts and crosses, and a knight\'s tour.',
-            'The limit: HTML and CSS can check an answer, but they can\'t search for one, and a person has to keep clicking.',
+            'The limit, and how it moved: from a person clicking as the clock to x86CSS, a processor that runs by itself.',
         ],
     },
     {
         number: 5,
-        status: PartStatus.Planned,
+        status: PartStatus.Written,
         path: '/Verdict',
         title: 'The verdict:',
         highlight: 'it depends',

@@ -7,8 +7,8 @@ export const togetherResults: ReadonlyArray<TestResult> = [
         testId: 'compute',
         score: Score.Partly,
         reason:
-            'They can imitate a machine that computes anything (Rule 110), but only with a person clicking to move each ' +
-            'step on, and a page big enough for the job.',
+            'With a person clicking, they can run a machine that computes anything (Rule 110). With the newest CSS, an ' +
+            'emulated processor runs by itself (x86CSS), but only in some browsers, slowly and in little memory.',
     },
     {
         testId: 'instruct',
@@ -23,6 +23,8 @@ export const togetherResults: ReadonlyArray<TestResult> = [
     {
         testId: 'programs',
         score: Score.Partly,
-        reason: 'Games, puzzles and calculators, yes; but nobody would build real software this way, or should.',
+        reason:
+            'Games, puzzles and calculators, and even compiled C programs on an emulated processor; but nobody would build ' +
+            'real software this way, or should.',
     },
 ];
