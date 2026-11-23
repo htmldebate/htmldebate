@@ -32,7 +32,7 @@ npm run dev        # http://localhost:4321 with live reload
 | `npm run preview` | Serves `dist/` locally. |
 | `npm run lint` | ESLint, type-aware. |
 | `npm test` | Unit tests (Vitest). |
-| `npm run images` | Regenerates the HTML5 logo and its glow from the original artwork. |
+| `npm run images` | Regenerates the HTML5 logo, its glow and the sharing image from the original artwork. |
 
 ## Where things live
 

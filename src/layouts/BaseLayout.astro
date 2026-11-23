@@ -16,14 +16,20 @@ import poppinsSemiBold from '@fontsource/poppins/files/poppins-latin-600-normal.
 import Seo from '../components/Seo.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import StructuredData from '../components/StructuredData.astro';
+import { PageKind } from '../config/page-kind';
 
 interface Props {
     readonly title: string;
+    readonly searchTitle?: string;
     readonly description: string;
     readonly path: string;
+    readonly kind?: PageKind;
+    // Kept out of search results.
+    readonly isHidden?: boolean;
 }
 
-const props: Props = Astro.props;
+const { title, searchTitle = title, description, path, kind = PageKind.Other, isHidden = false }: Props = Astro.props;
 
 // The browser refuses to run any script at all, even one that slipped past the build's check (forbid-scripts).
 // Inline styles are allowed: CSS is what the site demonstrates, and the quine shows its own <style> element.
@@ -61,7 +67,7 @@ const contentSecurityPolicy: string = [
         <link rel="preload" href={poppinsRegular} as="font" type="font/woff2" crossorigin />
         <link rel="preload" href={poppinsSemiBold} as="font" type="font/woff2" crossorigin />
 
-        <Seo {...props} />
+        <Seo searchTitle={searchTitle} description={description} path={path} isHidden={isHidden} />
     </head>
     <body>
         <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -70,5 +76,6 @@ const contentSecurityPolicy: string = [
             <slot />
         </main>
         <SiteFooter />
+        {!isHidden && <StructuredData kind={kind} name={title} searchTitle={searchTitle} description={description} path={path} />}
     </body>
 </html>

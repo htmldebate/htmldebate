@@ -12,7 +12,7 @@
     "check": "astro check",
     "lint": "astro sync && eslint .",
     "test": "vitest run",
-    "images": "node scripts/generate-logo-images.ts"
+    "images": "node scripts/generate-logo-images.ts && node scripts/generate-social-image.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",
@@ -23,11 +23,13 @@
   "devDependencies": {
     "@astrojs/check": "0.9.12",
     "@eslint/js": "10.0.1",
+    "@types/fontkit": "2.0.9",
     "eslint": "10.14.0",
     "eslint-import-resolver-typescript": "4.4.5",
     "eslint-plugin-astro": "3.2.1",
     "eslint-plugin-import-x": "4.17.1",
     "eslint-plugin-jsx-a11y-x": "0.2.0",
+    "fontkit": "2.0.4",
     "globals": "17.14.0",
     "sharp": "0.35.5",
     "typescript": "6.0.3",

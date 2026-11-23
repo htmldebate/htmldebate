@@ -6,7 +6,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout
     title="Demos"
-    description="Small programs built from nothing but HTML and CSS: logic gates, FizzBuzz, a prime sieve, a quine and more."
+    searchTitle="CSS-only demos with no JavaScript"
+    description="Eight working programs built from nothing but HTML and CSS, including logic gates, FizzBuzz, Rule 110, noughts and crosses and a knight's tour."
     path="/Demos"
 >
     <PageHero
@@ -20,8 +21,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </Fragment>
     </PageHero>
 
-    <section class="section" aria-label="All demos">
+    <section class="section" aria-labelledby="all-demos">
         <div class="container-wide">
+            <h2 id="all-demos" class="visually-hidden">All the demos</h2>
             <DemoGrid />
         </div>
     </section>

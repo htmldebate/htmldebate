@@ -300,6 +300,12 @@ function verdictFor(test: ProgrammingTest): TestVerdict {
         line-height: 1.25;
     }
 
+    @media (max-width: 30rem) {
+        .verdict-headline {
+            font-size: var(--text-xl);
+        }
+    }
+
     .verdict-headline :global(.icon) {
         width: 1.25em;
         height: 1.25em;

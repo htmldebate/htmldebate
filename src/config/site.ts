@@ -9,6 +9,10 @@ export const site: SiteSettings = {
         'Is HTML a programming language? A guided look at the definitions, the arguments and the evidence, with demos ' +
         'built from nothing but HTML and CSS.',
     locale: 'en_GB',
+    searchTitle: 'Is HTML a programming language?',
+    socialImage: '/images/social.png',
+    socialImageAlt: 'Is HTML a programming language? The 3D HTML5 logo, glowing',
+    twitterHandle: '@onix_labs',
     author: 'Matthew Layton',
     authorUrl: 'https://www.onixlabs.io/Contributors/Matthew-Layton',
     companyName: 'ONIXLabs',

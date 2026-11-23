@@ -109,6 +109,11 @@ const resetExample: string = `<button class="button" type="reset">New game</butt
             The message above the board is empty in the HTML, and CSS writes it. There's a rule for each move, saying who plays
             next. They come in order, so as the game goes on, each one takes over from the last.
         </p>
+        <p>
+            It's also where having no JavaScript costs something. A script could ask a screen reader to announce each turn. Text
+            that CSS writes can be read, but it may not be announced when it changes, so a screen reader user may need to go
+            back to the message after each move.
+        </p>
         <Disclosure>
             <Fragment slot="summary">Saying whose turn it is source</Fragment>
             <pre><code>{statusExample}</code></pre>
@@ -214,7 +219,8 @@ const resetExample: string = `<button class="button" type="reset">New game</butt
         display: none;
         place-items: center;
         border-radius: var(--radius);
-        background: color-mix(in srgb, var(--brand-teal) calc(var(--winning) * 45%), transparent);
+        background: color-mix(in srgb, var(--brand-teal) calc(var(--winning) * 10%), transparent);
+        box-shadow: inset 0 0 0 calc(var(--winning) * 3px) var(--brand-teal);
         cursor: pointer;
     }
 
@@ -252,10 +258,10 @@ const resetExample: string = `<button class="button" type="reset">New game</butt
     }
 
     .cell:has(.x) .mark {
-        color: var(--ink-blue-large);
+        color: var(--ink-blue);
     }
 
     .cell:has(.o) .mark {
-        color: var(--ink-rose-large);
+        color: var(--ink-rose);
     }
 </style>

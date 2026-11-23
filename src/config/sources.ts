@@ -5,7 +5,7 @@ import { Stance } from './stance';
 // Every source the site draws on. Links were last checked in November 2026.
 export const sources: ReadonlyArray<Source> = [
     {
-        title: 'Computerphile video on HTML',
+        title: 'HTML IS a Programming Language (Imperative vs Declarative)',
         by: 'Professor David Brailsford, University of Nottingham, for Computerphile',
         url: 'https://www.youtube.com/watch?v=4A2mWqLUpzw',
         group: SourceGroup.Opinions,
@@ -52,7 +52,7 @@ export const sources: ReadonlyArray<Source> = [
         archived: true,
         summary:
             'Opens by calling HTML "one of the most widely used programming languages", then argues it isn\'t one, because ' +
-            'programming languages involve logic and algorithms and markup languages don\'t.',
+            'programming languages involve logic and algorithms and markup languages don\'t. Quoted in part 1.',
     },
     {
         title: 'Is HTML a programming language?',
@@ -99,13 +99,6 @@ export const sources: ReadonlyArray<Source> = [
         summary: 'Programming as creating instructions that tell a computer how to perform a task: the broad definition in part 1.',
     },
     {
-        title: 'Programming',
-        by: 'Techopedia',
-        url: 'https://www.techopedia.com/definition/13128/programming',
-        group: SourceGroup.Background,
-        summary: 'Programming as "the implementation of logic": the definition in part 1 that asks for logic.',
-    },
-    {
         title: 'Computer programming',
         by: 'Wikipedia',
         url: 'https://en.wikipedia.org/wiki/Computer_programming',
@@ -129,7 +122,7 @@ export const sources: ReadonlyArray<Source> = [
         summary: 'What it means for a system to compute anything a computer can: the strictest of the four tests.',
     },
     {
-        title: 'Computerphile video on Turing completeness',
+        title: 'Turing Complete',
         by: 'Professor David Brailsford, for Computerphile',
         url: 'https://www.youtube.com/watch?v=RPQD7-AOjMI',
         group: SourceGroup.Background,

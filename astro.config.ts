@@ -33,7 +33,8 @@ export default defineConfig({
         },
     },
     integrations: [
-        sitemap(),
+        // The quine is a file of its own (public/Demos/Quine.html), so Astro doesn't know of it.
+        sitemap({ customPages: [`${site.url}/Demos/Quine`] }),
         emitLegacyRedirects(),
         emitSectionIndexes(),
         forbidScripts(),

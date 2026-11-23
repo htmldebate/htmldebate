@@ -14,8 +14,8 @@ describe('renderRedirectPage', () => {
         expect(page).toContain('<link rel="canonical" href="https://www.htmldebate.com/Verdict">');
     });
 
-    it('keeps the old page out of search results', () => {
-        expect(page).toContain('<meta name="robots" content="noindex">');
+    it('lets search engines follow the move', () => {
+        expect(page).not.toContain('noindex');
     });
 
     it('forwards without JavaScript', () => {

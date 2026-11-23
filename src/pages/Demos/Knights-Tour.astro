@@ -150,6 +150,10 @@ const resetExample: string = `<button class="button" type="reset">Start again</b
             Every visited square shows the number of the move that reached it, except the latest, which shows the knight. A move is
             the latest if it has been made and the one after it hasn't.
         </p>
+        <p>
+            The message above the board and the count below it are written by CSS too. A screen reader can read them, but may not
+            announce them as they change, which would take a script.
+        </p>
         <Disclosure>
             <Fragment slot="summary">Showing the knight source</Fragment>
             <pre><code>{knightExample}</code></pre>
@@ -273,7 +277,7 @@ const resetExample: string = `<button class="button" type="reset">Start again</b
         aspect-ratio: 1;
         border-radius: 50%;
         corner-shape: round;
-        background: var(--brand-amber);
+        background: var(--ink-amber);
     }
 
     .cell:not(:has(:checked)):hover {

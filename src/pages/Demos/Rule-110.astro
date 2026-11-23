@@ -15,10 +15,13 @@ const selectors: Rule110Selectors = buildRule110Selectors(width, height);
 function prefixed(list: ReadonlyArray<string>): string {
     return list.map((selector: string): string => `.rule-110 ${selector}`).join(',\n');
 }
+const onStyle: string = '--state: var(--cell-on);';
+const missingStyle: string = '--state: var(--cell-missing); --hint: ", should be on";';
+const wrongStyle: string = '--state: var(--cell-wrong); --hint: ", should be off";';
 const ruleCss: string = [
-    `${prefixed(selectors.on)} { --state: var(--cell-on); }`,
-    `${prefixed(selectors.missing)} { --state: var(--cell-missing); }`,
-    `${prefixed(selectors.wrong)} { --state: var(--cell-wrong); }`,
+    `${prefixed(selectors.on)} { ${onStyle} }`,
+    `${prefixed(selectors.missing)} { ${missingStyle} }`,
+    `${prefixed(selectors.wrong)} { ${wrongStyle} }`,
     `${prefixed(selectors.focus)} { outline: 2px solid var(--focus); outline-offset: 1px; }`,
 ].join('\n');
 const ruleCount: number = selectors.on.length + selectors.missing.length + selectors.wrong.length;
@@ -26,10 +29,10 @@ const ruleCount: number = selectors.on.length + selectors.missing.length + selec
 // The real rules for one cell, so what's shown is what runs.
 const sampleCell: string = rule110CellId(1, 4);
 
-function rulesForSample(list: ReadonlyArray<string>, state: string): string {
+function rulesForSample(list: ReadonlyArray<string>, style: string): string {
     return list
         .filter((selector: string): boolean => selector.endsWith(`[for="${sampleCell}"]`))
-        .map((selector: string): string => `${selector} {\n    --state: var(${state});\n}`)
+        .map((selector: string): string => `${selector} {\n    ${style.replaceAll('; ', ';\n    ')}\n}`)
         .join('\n\n');
 }
 
@@ -40,13 +43,18 @@ const gridExample: string = `<input class="cell-box" type="checkbox" id="r0c0">
 <label class="cell" for="r0c0">Row 1, cell 1</label>
 <label class="cell" for="r0c1">Row 1, cell 2</label>
 <!-- … every label, in the same order -->`;
-const onExample: string = rulesForSample(selectors.on, '--cell-on');
-const missingExample: string = rulesForSample(selectors.missing, '--cell-missing');
-const wrongExample: string = rulesForSample(selectors.wrong, '--cell-wrong');
+const onExample: string = rulesForSample(selectors.on, onStyle);
+const missingExample: string = rulesForSample(selectors.missing, missingStyle);
+const wrongExample: string = rulesForSample(selectors.wrong, wrongStyle);
 
 const drawExample: string = `.cell {
     --state: var(--surface-alt);
+    --hint: '';
     background: var(--state);
+}
+
+.cell::after {
+    content: var(--hint);
 }`;
 ---
 <DemoLayout path="/Demos/Rule-110">
@@ -80,22 +88,25 @@ const drawExample: string = `.cell {
         <p>
             The top row is the starting pattern: click its cells to change it. Every row below follows from the row above, by
             Rule 110. CSS works out which cells should be on and marks them; your job is to click them, one row at a time.
-            Get one wrong and CSS shows it in red.
+            Get one wrong and CSS marks it with a cross.
         </p>
     </Fragment>
 
     <Fragment slot="demo">
         <div class="rule-110-stage">
-            <div class="rule-110">
-                {rows.map((row: number) => columns.map((column: number) => (
-                    <input class="cell-box" type="checkbox" id={rule110CellId(row, column)} checked={row === 0 && column === width - 1} />
-                )))}
-                {rows.map((row: number) => columns.map((column: number) => (
-                    <label class:list={['cell', { 'is-start': row === 0 }]} for={rule110CellId(row, column)}>
-                        <span class="visually-hidden">Row {row + 1}, cell {column + 1}</span>
-                    </label>
-                )))}
+            <div class="rule-110-scroll" role="region" aria-label="The Rule 110 grid" tabindex="0">
+                <div class="rule-110">
+                    {rows.map((row: number) => columns.map((column: number) => (
+                        <input class="cell-box" type="checkbox" id={rule110CellId(row, column)} style={`grid-area: ${String(row + 1)} / ${String(column + 1)}`} checked={row === 0 && column === width - 1} />
+                    )))}
+                    {rows.map((row: number) => columns.map((column: number) => (
+                        <label class:list={['cell', { 'is-start': row === 0 }]} for={rule110CellId(row, column)}>
+                            <span class="visually-hidden">Row {row + 1}, cell {column + 1}</span>
+                        </label>
+                    )))}
+                </div>
             </div>
+            <p class="swipe-hint">Swipe the grid sideways to see the rest of it.</p>
             <ul class="key" role="list">
                 <li><span class="swatch swatch-on"></span>On</li>
                 <li><span class="swatch swatch-missing"></span>Should be on: click it</li>
@@ -152,9 +163,14 @@ const drawExample: string = `.cell {
 
         <h3>Drawing the cells</h3>
         <p>
-            None of those rules sets a colour. Each sets a custom property, <code>--state</code>, and every cell paints itself
+            None of those rules draws anything. Each sets a custom property, <code>--state</code>, and every cell paints itself
             with whatever that is. A mistake's rule tests more boxes than the plain "on" rule does, which makes it more specific,
             so it wins when both match.
+        </p>
+        <p>
+            A cell to click has a dot and a mistake has a cross, so nobody has to tell them apart by colour. The rules also set
+            <code>--hint</code>, words that CSS adds out of sight at the end of the cell's label. Text in a label is part of its
+            checkbox's name, so a screen reader says "Row 2, cell 16, should be on".
         </p>
         <Disclosure>
             <Fragment slot="summary">Drawing the cells source</Fragment>
@@ -200,23 +216,55 @@ const drawExample: string = `.cell {
 <style>
     .rule-110-stage {
         display: grid;
+        grid-template-columns: minmax(0, 1fr);
         gap: 1.25rem;
         justify-items: center;
     }
 
-    .rule-110 {
-        --cell-on: var(--heading);
-        --cell-missing: color-mix(in srgb, var(--brand-amber) 55%, transparent);
-        --cell-wrong: var(--danger);
-
-        display: grid;
-        grid-template-columns: repeat(16, minmax(0, 2rem));
-        gap: 3px;
-        width: 100%;
-        max-width: 36rem;
+    /* Phones hide scrollbars, so say that the grid goes on. */
+    .swipe-hint {
+        color: var(--text-muted);
+        font-size: var(--text-sm);
+        text-align: center;
     }
 
-    /* The boxes stay in the page, so the grid can be used with a keyboard, but out of sight behind their labels. */
+    @media (min-width: 36rem) {
+        .swipe-hint {
+            display: none;
+        }
+    }
+
+    /* Cells stay big enough to tap, so on a phone the grid scrolls sideways. It's laid out from the right, to start at the
+       end the pattern grows from, which means it can only scroll left: the grid has to be wider than this box itself, as
+       cells spilling out of its right-hand side could never be reached. */
+    .rule-110-scroll {
+        width: 100%;
+        max-width: calc(16 * 2rem + 15 * 3px + 6px);
+        padding: 3px;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        direction: rtl;
+    }
+
+    .rule-110,
+    .key {
+        --dot: radial-gradient(circle, var(--ink-amber) 0 38%, transparent 40%);
+        --cross: linear-gradient(45deg, transparent 43%, var(--danger-contrast) 44% 56%, transparent 57%), linear-gradient(-45deg, transparent 43%, var(--danger-contrast) 44% 56%, transparent 57%);
+        --cell-on: var(--heading);
+        --cell-missing: var(--dot), var(--surface-alt);
+        --cell-wrong: var(--cross), var(--danger);
+    }
+
+    .rule-110 {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(16, minmax(0, 1fr));
+        gap: 3px;
+        min-width: calc(16 * 1.5rem + 15 * 3px);
+        direction: ltr;
+    }
+
+    /* The boxes stay in the page, so the grid can be used with a keyboard, but out of sight, each in its own cell. */
     .cell-box {
         position: absolute;
         width: 1px;
@@ -226,19 +274,33 @@ const drawExample: string = `.cell {
 
     .cell {
         --state: var(--surface-alt);
+        --hint: '';
+        position: relative;
         aspect-ratio: 1;
         border-radius: 3px;
         background: var(--state);
+        box-shadow: inset 0 0 0 1px var(--field-border);
         cursor: pointer;
         corner-shape: round;
     }
 
+    /* What a screen reader says after the cell's name. */
+    .cell::after {
+        content: var(--hint);
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
     .cell.is-start {
-        box-shadow: inset 0 0 0 1px var(--border-strong);
+        box-shadow: inset 0 0 0 2px var(--field-border);
     }
 
     .cell:hover {
-        outline: 2px solid var(--border-strong);
+        outline: 2px solid var(--field-border);
     }
 
     .key {
@@ -260,15 +322,15 @@ const drawExample: string = `.cell {
     }
 
     .swatch {
-        width: 1rem;
+        width: 1.25rem;
         aspect-ratio: 1;
         border-radius: 3px;
         corner-shape: round;
     }
 
-    .swatch-on { background: var(--heading); }
-    .swatch-missing { background: color-mix(in srgb, var(--brand-amber) 55%, transparent); }
-    .swatch-wrong { background: var(--danger); }
+    .swatch-on { background: var(--cell-on); }
+    .swatch-missing { background: var(--cell-missing); box-shadow: inset 0 0 0 1px var(--field-border); }
+    .swatch-wrong { background: var(--cell-wrong); }
 
     .rule-table td,
     .rule-table th {

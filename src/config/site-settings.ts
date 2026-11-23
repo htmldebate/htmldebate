@@ -6,6 +6,10 @@ export interface SiteSettings {
     readonly url: string;
     readonly description: string;
     readonly locale: string;
+    readonly searchTitle: string;
+    readonly socialImage: string;
+    readonly socialImageAlt: string;
+    readonly twitterHandle: string;
     readonly author: string;
     readonly authorUrl: string;
     readonly companyName: string;

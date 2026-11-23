@@ -4,6 +4,7 @@ import PageHero from '../components/PageHero.astro';
 import type { Demo } from '../config/demo';
 import { DemoStatus } from '../config/demo-status';
 import { demos } from '../config/demos';
+import { PageKind } from '../config/page-kind';
 import BaseLayout from './BaseLayout.astro';
 
 // A demo: its hero, then four sections, always in the same order (what it is, a working example, how it works, and why it
@@ -30,7 +31,7 @@ for (const section of ['what', 'demo', 'how', 'why']) {
 const previous: Demo | undefined = steps[index - 1];
 const next: Demo | undefined = steps[index + 1];
 ---
-<BaseLayout title={demo.title} description={demo.summary} path={demo.path}>
+<BaseLayout title={demo.title} searchTitle={demo.searchTitle} description={demo.description} path={demo.path} kind={PageKind.Article}>
     <PageHero label="Demo" title={demo.title} highlight="in HTML and CSS" lead={demo.summary} />
 
     <div class="container-wide demo-page">
@@ -109,5 +110,11 @@ const next: Demo | undefined = steps[index + 1];
         max-width: 46rem;
         padding-top: 2.5rem;
         border-top: 1px solid var(--border);
+    }
+
+    /* A long title wraps rather than running off a phone's screen. */
+    .demo-nav :global(.button) {
+        max-width: 100%;
+        white-space: normal;
     }
 </style>

@@ -1,0 +1,73 @@
+---
+import { PageKind } from '../config/page-kind';
+import { site } from '../config/site';
+
+// What the page is, for search engines. It's usually written as JSON-LD, which needs a <script> element; microdata says the
+// same with HTML attributes alone.
+interface Props {
+    readonly kind: PageKind;
+    readonly name: string;
+    readonly searchTitle: string;
+    readonly description: string;
+    readonly path: string;
+}
+
+const { kind, name, searchTitle, description, path }: Props = Astro.props;
+const url: string = new URL(path, site.url).href;
+const home: string = new URL('/', site.url).href;
+const image: string = new URL(site.socialImage, site.url).href;
+const companyLogo: string = new URL('/onixlabs/images/logo/logo-orb-512.png', site.url).href;
+const isInDemos: boolean = path.startsWith('/Demos/');
+---
+{kind === PageKind.Site && (
+    <div itemscope itemtype="https://schema.org/WebSite" hidden>
+        <meta itemprop="name" content={site.name} />
+        <meta itemprop="alternateName" content={site.shortName} />
+        <meta itemprop="description" content={description} />
+        <link itemprop="url" href={home} />
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+            <meta itemprop="name" content={site.companyName} />
+            <link itemprop="url" href={site.companyUrl} />
+            <link itemprop="logo" href={companyLogo} />
+        </div>
+    </div>
+)}
+{kind === PageKind.Article && (
+    <div itemscope itemtype="https://schema.org/Article" hidden>
+        <meta itemprop="headline" content={searchTitle} />
+        <meta itemprop="description" content={description} />
+        <meta itemprop="inLanguage" content="en-GB" />
+        <link itemprop="mainEntityOfPage" href={url} />
+        <link itemprop="image" href={image} />
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+            <meta itemprop="name" content={site.author} />
+            <link itemprop="url" href={site.authorUrl} />
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+            <meta itemprop="name" content={site.companyName} />
+            <link itemprop="url" href={site.companyUrl} />
+            <link itemprop="logo" href={companyLogo} />
+        </div>
+    </div>
+)}
+{kind !== PageKind.Site && (
+    <div itemscope itemtype="https://schema.org/BreadcrumbList" hidden>
+        <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <link itemprop="item" href={home} />
+            <meta itemprop="name" content={site.shortName} />
+            <meta itemprop="position" content="1" />
+        </div>
+        {isInDemos && (
+            <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <link itemprop="item" href={new URL('/Demos', site.url).href} />
+                <meta itemprop="name" content="Demos" />
+                <meta itemprop="position" content="2" />
+            </div>
+        )}
+        <div itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <link itemprop="item" href={url} />
+            <meta itemprop="name" content={name} />
+            <meta itemprop="position" content={isInDemos ? '3' : '2'} />
+        </div>
+    </div>
+)}

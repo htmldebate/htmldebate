@@ -37,6 +37,11 @@ const { label, title, highlight, lead }: Props = Astro.props;
         text-align: center;
     }
 
+    /* On phones, only as large as lets the longest word ("programming?") fit on a line. */
+    .page-hero h1 {
+        font-size: min(var(--text-hero), 11.6vw);
+    }
+
     .page-hero h1 .gradient-text {
         display: block;
     }

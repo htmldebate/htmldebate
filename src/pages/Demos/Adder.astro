@@ -56,7 +56,7 @@ const decimalExample: string = `.value-sum {
         <div class="sum-grid">
             <span class="row-name" aria-hidden="true"></span>
             {places.map((place: number) => <span class="place" aria-hidden="true">{place}</span>)}
-            <span aria-hidden="true"></span>
+            <span class="total" aria-hidden="true"></span>
 
             <span class="row-name">Carry</span>
             <span class="computed carry c4" aria-hidden="true"></span>
@@ -64,7 +64,7 @@ const decimalExample: string = `.value-sum {
             <span class="computed carry c2" aria-hidden="true"></span>
             <span class="computed carry c1" aria-hidden="true"></span>
             <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
+            <span class="total" aria-hidden="true"></span>
 
             <span class="row-name">A</span>
             <span aria-hidden="true"></span>
@@ -74,7 +74,7 @@ const decimalExample: string = `.value-sum {
                     <label for={`a${String(bit)}`}><span class="visually-hidden">A, the {2 ** bit}s bit</span></label>
                 </span>
             ))}
-            <span class="decimal value-a"></span>
+            <span class="decimal total value-a"></span>
 
             <span class="row-name">B</span>
             <span aria-hidden="true"></span>
@@ -84,7 +84,7 @@ const decimalExample: string = `.value-sum {
                     <label for={`b${String(bit)}`}><span class="visually-hidden">B, the {2 ** bit}s bit</span></label>
                 </span>
             ))}
-            <span class="decimal value-b"></span>
+            <span class="decimal total value-b"></span>
 
             <span class="sum-rule" aria-hidden="true"></span>
 
@@ -94,7 +94,7 @@ const decimalExample: string = `.value-sum {
             <span class="computed sum s2"></span>
             <span class="computed sum s1"></span>
             <span class="computed sum s0"></span>
-            <span class="decimal value-sum"></span>
+            <span class="decimal total value-sum"></span>
         </div>
 
         <p class="equation" aria-live="polite"></p>
@@ -157,9 +157,15 @@ const decimalExample: string = `.value-sum {
             <pre><code>{answerExample}</code></pre>
         </Disclosure>
 
+        <p>
+            The sum underneath is written the same way, so a screen reader can read it, but may not announce it as it changes,
+            which would take a script.
+        </p>
+
         <h3>Checking it in decimal</h3>
         <p>
-            The decimal totals on the right are worked out by adding up the columns that are on. The sum's total comes from the
+            The decimal totals, beside the bits on wider screens and in the sum underneath, are worked out by adding up the
+            columns that are on. The sum's total comes from the
             answer's bits, not from A and B, so if the adder went wrong, it would show.
         </p>
         <Disclosure>
@@ -227,10 +233,15 @@ const decimalExample: string = `.value-sum {
         gap: 0.6rem;
     }
 
-    @media (max-width: 30rem) {
+    /* On a phone there's no room for the totals beside the bits. The sum underneath gives them. */
+    @media (max-width: 40rem) {
         .sum-grid {
-            grid-template-columns: 3rem repeat(5, 2.5rem) 3.5rem;
+            grid-template-columns: auto repeat(5, minmax(1.5rem, 2.5rem));
             gap: 0.4rem;
+        }
+
+        .total {
+            display: none;
         }
     }
 
