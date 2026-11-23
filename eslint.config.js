@@ -11,7 +11,7 @@ import tseslint from 'typescript-eslint';
 // from the named-exports rule.
 export default defineConfig(
     {
-        ignores: ['dist/', '.astro/', '.claude/', 'node_modules/', 'legacy/'],
+        ignores: ['dist/', '.astro/', '.claude/', 'node_modules/'],
     },
     js.configs.recommended,
     ...astro.configs['flat/recommended'],
