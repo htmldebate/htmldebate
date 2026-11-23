@@ -2,9 +2,9 @@ import sharp from 'sharp';
 
 import { renderAura } from './render-aura.ts';
 
-// The 3D HTML5 logo for the introduction, from the original site's artwork, and its glow for each theme. Re-run it
+// The 3D HTML5 logo for the introduction, from its artwork, and its glow for each theme. Re-run it
 // (npm run images) after changing the artwork; the results are committed.
-const artwork: string = 'legacy/content/images/logos/html.png';
+const artwork: string = 'artwork/html5.png';
 const shieldBottom: number = 1945; // Below this is only the shadow the logo casts, which would dirty the glow.
 const canvas: number = 2048;
 

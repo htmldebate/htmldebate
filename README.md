@@ -45,7 +45,7 @@ src/
   integrations/    Build steps: the no-script check and the forwarding pages for the original site's addresses
   styles/          The ONIXLabs design system (Stride), copied from the onixlabs.io site and adapted to follow the
                    device's light or dark setting
-legacy/            The original 2023 site, kept as a reference while its content is rewritten. Not published.
+artwork/           The 3D HTML5 logo, as drawn; npm run images makes the published images from it
 ```
 
 The design is copied from the ONIXLabs website rather than shared, so changes there need copying across by hand.
